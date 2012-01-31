@@ -19,6 +19,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Node;
+import com.zj.retrieval.master.NodeType;
+import com.zj.retrieval.master.UserField;
 import com.zj.retrieval.master.dao.NodeService;
 import com.zj.retrieval.master.dao.UserDao;
 import com.zj.retrieval.master.Util;
@@ -52,7 +54,7 @@ public class AddRootNodeAction {
 			root.setDesc(desc);
 			root.setEnglishName(node_name_en);
 			root.setName(node_name);
-			root.setNodeType(Node.NODETYPE_CLASS);
+			root.setNodeType(NodeType.NODETYPE_CLASS);
 			root.setUri(uri);
 			root.setUriName(root.getUri() + "#" + uri_name);
 			
@@ -72,14 +74,9 @@ public class AddRootNodeAction {
 			root.setImages(images_path);
 			
 			// 解析自定义字段
-			if (!user_field.isEmpty() || user_field != null) {
+			if (user_field != null && !user_field.equals("")) {
 				JSONArray user_field_jsonarray = new JSONArray(user_field);
-				Map<String, String> user_field_map = new HashMap<String, String>();
-				for (int i = 0; i < user_field_jsonarray.length(); i++) {
-					JSONObject j = user_field_jsonarray.getJSONObject(i);
-					user_field_map.put(j.getString("key"), j.getString("value"));
-				}
-				root.setUserfields(user_field_map);
+				root.setUserfields(UserField.parse(user_field_jsonarray));
 			}
 			
 			NodeService ndService = Util.getNodeService();

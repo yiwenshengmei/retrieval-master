@@ -14,6 +14,8 @@ public class Attribute {
 	private String enName = "";
 	private String image = "";
 	private Map<String, String> userfields = new HashMap<String, String>();
+	
+	public Attribute() {}
 
 	public Attribute(String name) {
 		this(name, "no english name", "no description.");

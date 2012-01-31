@@ -37,7 +37,7 @@ public class CodeTest {
 		SimpleJdbcTemplate opt = new SimpleJdbcTemplate(ds);
 		
 		List<String> result = opt.query("select * from `string`", new ParameterizedRowMapper<String>() {
-			@Override
+
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
 				System.out.println("Hello World");
 				return null;

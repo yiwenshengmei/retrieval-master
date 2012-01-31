@@ -17,25 +17,31 @@ public class UserDao {
 	public void setDataSource(DataSource dataSource) {
 		sqlClient = new SimpleJdbcTemplate(dataSource);
 	}
-	public int addUser(User usr) {
-		String sql = "insert into `user` values(:id, :name, :password, :authType)";
-		SqlParameterSource param = new BeanPropertySqlParameterSource(usr);
+	public int addUser(User user) {
+		String sql = "insert into `user` values(:id, :name, :password, :isActive)";
+		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
 		return sqlClient.update(sql, param);
 	}
+	public List<User> queryAllUserNotActive() {
+		String sql = "select * from `user` where `isActive`=0";
+		ParameterizedBeanPropertyRowMapper<User> rm = 
+				ParameterizedBeanPropertyRowMapper.newInstance(User.class);
+		return sqlClient.query(sql, rm);
+	}
 	public List<User> queryAllUser() {
-		String sql = "select `id`, `name`, `password`, `auth_type` as authType from `user`";
+		String sql = "select * from `user`";
 		ParameterizedBeanPropertyRowMapper<User> rm = 
 			ParameterizedBeanPropertyRowMapper.newInstance(User.class);
 		return sqlClient.query(sql, rm);
 	}
 	public List<User> queryUserById(String id) {
-		String sql = "select `id`, `name`, `password`, `auth_type` as authType from `user` where `id`=?";
+		String sql = "select * from `user` where `id`=?";
 		ParameterizedBeanPropertyRowMapper<User> rm =
 			ParameterizedBeanPropertyRowMapper.newInstance(User.class);
 		return sqlClient.query(sql, rm, id);
 	}
 	public List<User> queryUserByName(String name) {
-		String sql = "select `id`, `name`, `password`, `auth_type` as authType from `user` where `name`=?";
+		String sql = "select * from `user` where `name`=?";
 		ParameterizedBeanPropertyRowMapper<User> rm =
 			ParameterizedBeanPropertyRowMapper.newInstance(User.class);
 		return sqlClient.query(sql, rm, name);

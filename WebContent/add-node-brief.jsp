@@ -4,7 +4,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>添加物种</title>
+	<title>添加物种（非详细）</title>
 	<style type="text/css">
 		.no_value_input {
 			border-color: red;
@@ -12,44 +12,13 @@
 	</style>
 	<script type="text/javascript" src="jquery-1.7.1.js"></script>
 	<script type="text/javascript">
-	var user_field_index = 0;
 	var new_attr_index = 0;
 
-	// 删除一条用户自定义属性
-	function delete_user_field(index) {
-		$('#user_field_' + index).remove();
-	}
-	
 	// 删除一条新属性
 	function delete_attr(index) {
 		$('#new_attr_' + index).remove();
 	}
 	
-	// 收集用户自定义字段
-	// 并填充到隐藏字段
-	function process_user_field() {
-		var user_fields_json = '[ ';
-		
-		for (var i = 0; i < user_field_index; i++) {
-			var field_key_id   = 'user_field_key_'   + i;
-			var field_value_id = 'user_field_value_' + i;
-			
-			if ($('#' + field_key_id).length == 0) {
-				// 如果最后一个元素是空的，那么要把json字符串的最后一个逗号去掉
-				if (i == (user_field_index - 1)) 
-					user_fields_json = user_fields_json.substr(0, user_fields_json.length - 1);
-				continue;
-			}
-			var key = $('#' + field_key_id).val();
-			var value = $('#' + field_value_id).val();
-			
-			var one_field = '{key: "' + key + '", value: "' + value + '"}';
-			user_fields_json += (i == (user_field_index - 1) ? one_field : one_field + ',');
-		}
-		user_fields_json += ' ]';
-		$('#user_field').val(user_fields_json);
-	}
-
 	// 收集新特性
 	// 并填充到隐藏字段
 	function process_new_attr() {
@@ -161,27 +130,6 @@
 			return false;
 		});
 		
-		// 增加一条用户自定义属性
-		$("#add_user_field").click(function() {
-			var location = $("#add_user_field_location");
-			var new_field = $(
-				"<div style='margin-top: 10px;' id='user_field_" + user_field_index + "'>" +
-					"<span>" +
-						"key: <input id='user_field_key_" + user_field_index + "' type='text'/>" +
-					"</span>" + 
-					"<span>" +
-						"value: <input id='user_field_value_" + user_field_index + "' type='text'>" +
-					"</span>" +
-					"<span>" +
-						"<a class='user_field_delete' href='#' onclick='delete_user_field(" + user_field_index + ");'>DELETE</a>" +
-					"</span>" +
-				"</div>"
-			);
-			location.append(new_field);
-			user_field_index++;
-			return false;
-		});
-		
 		// 拦截表单的提交，为隐藏域填充值
 		$("#submit_form").click(function() {
 			
@@ -189,10 +137,8 @@
 // 			if (!validate_input())
 // 				return false;
 			
-			process_user_field();
 			process_new_attr();
 			
-			alert('debug[隐藏字段user_field]: ' + $('#user_field').val());
 			alert('debug[隐藏字段new_attr]: ' + $('#new_attr').val());
 
 			// 提交表单
@@ -203,15 +149,13 @@
 	</script>
 </head>
 <body>
-	<form style="width:700px;margin:0 auto;" id="add_node_form" action="node/add" method="post" enctype="multipart/form-data" >
+	<form style="width:700px;margin:0 auto;" id="add_node_form" action="briefnode/add" method="post" enctype="multipart/form-data" >
 		<table id="base_info">
+			<tr><td>ID: </td><td><input name="node_id" type="text"/></td></tr>
 			<tr><td>Name: </td><td><input name="node_name" type="text"/></td></tr>
 			<tr><td>English Name: </td><td><input name="node_name_en" type="text"/></td></tr>
-			<tr><td>Description: </td><td><input name="desc" type="text"/></td></tr>
-			<tr><td>URI:</td><td><input name="uri" type="text"/></td></tr>
-			<tr><td>URI Name: </td><td><input name="uri_name" type="text"/></td></tr>
 			<tr><td>Parents Attr: </td><td><input name='parent_attr' type='text'/></td></tr>
-			<tr><td>Images(多张图片请使用分号分隔): </td><td><input name='images' type='text'/></td></tr>
+			<tr><td>联系方式: </td><td><input name='contact' type='text'/></td></tr>
 		</table>
 		
 		<div style='height: 10px;'></div>
@@ -228,23 +172,6 @@
 			-->
 		</div>
 		
-		<div style='height: 10px;'></div>
-		<a id="add_user_field" href="#">Add Your Field</a>
-		<div id="add_user_field_location">
-			<!--
-				<div id='user_field_32'>
-					<span>
-						key: <input id='user_field_key_32' type='text'/>
-					</span>
-					<span>
-						value: <input id='user_field_value_32' type='text'>
-					</span>
-					<span>
-						<a class='user_field_delete' href='#' onclick='delete_user_field(32);'>DELETE</a>
-					</span>
-				</div>
-			-->
-		</div>
 		
 		<input id='user_field' type="hidden" name="user_field"/>
 		<input id='new_attr' type='hidden' name='new_attr'/>

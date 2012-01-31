@@ -28,59 +28,43 @@ import com.zj.retrieval.master.Attribute;
 import com.zj.retrieval.master.AttributeSelectedWrongException;
 import com.zj.retrieval.master.AttributeSelector;
 import com.zj.retrieval.master.Node;
+import com.zj.retrieval.master.NodeType;
 import com.zj.retrieval.master.UserField;
 import com.zj.retrieval.master.Util;
 import com.zj.retrieval.master.dao.NodeService;
 
-public class AddNodeAction {
-	private static Log log = LogFactory.getLog(AddNodeAction.class);
-	private String desc;
+public class AddNodeBriefAction {
+	private static Log log = LogFactory.getLog(AddNodeBriefAction.class);
 	private String name_en;
 	private String name;
-	private int node_type;
 	private String parent_id;
-	private String uri;
-	private String images;
-	private String user_field;
 	private String parent_attr;
 	private String new_attr;
 	private String message;
+	private String contact;
+	private String node_id;
 	
 	public String execute() {
 		try {
 			Node new_node = new Node();
-			new_node.setDesc(desc);
+			new_node.setId(node_id);
 			new_node.setEnglishName(name_en);
 			new_node.setName(name);
-			new_node.setNodeType(node_type);
+			new_node.setNodeType(NodeType.NODETYPE_INDIVIDUAL);
 			new_node.setParentId(parent_id);
-			new_node.setUri(uri);
-			new_node.setUriName(new_node.getUri() + "#" + new_node.getEnglishName());
-			
-			// Ëß£Êûêimages
-			List<String> images_path = new ArrayList<String>();
-			for (String image_id : images.split(";")) {
-				images_path.add("images/" + image_id);
-			}
-			new_node.setImages(images_path);
-			
-			// Ëß£ÊûêËá™ÂÆö‰πâÂ≠óÊÆµ
-			if (user_field != null && !user_field.equals("")) {
-				JSONArray user_field_jsonarray = new JSONArray(user_field);
-				new_node.setUserfields(UserField.parse(user_field_jsonarray));
-			}
+			new_node.setContact(contact);
 			
 			NodeService ndService =  Util.getNodeService();;
 			
 			Node parent_node = ndService.queryNodeById(new_node.getParentId());
-			log.info("ÊâæÂà∞Áà∂ËäÇÁÇπÔºö" + parent_node);
+			log.info("’“µΩ∏∏Ω⁄µ„£∫" + parent_node);
 			AttributeSelector attrSelector = ndService.getAttributeSelector(parent_node);
 			String[] selectedAttributes = parent_attr.equals("") ?
 				new String[0] : parent_attr.split(" ");
 			for (int i = 0; i < selectedAttributes.length; i++) {
 				int selectedAttribute = Integer.valueOf(selectedAttributes[i]);
 				attrSelector.select(selectedAttribute, true);
-				log.info(String.format("ÈÄâÊã©Áà∂ËäÇÁÇπÂ±ûÊÄß[id=%1$s, name=%2$s]", selectedAttribute, 
+				log.info(String.format("—°‘Ò∏∏Ω⁄µ„ Ù–‘[id=%1$s, name=%2$s]", selectedAttribute, 
 						parent_node.getRetrievalDataSource().getAttributes().get(selectedAttribute).getName()));
 			}
 			JSONArray jNewAttributes = new JSONArray(new_attr);
@@ -92,36 +76,33 @@ public class AddNodeAction {
 						                          jAttr.getString("new_attr_image"));
 				JSONArray jAttrUserfields = jAttr.getJSONArray("user_fields");
 				newAttr.setUserFields(UserField.parse(jAttrUserfields));
-				log.info("Êñ∞Ê∑ªÂä†ÁöÑÂ±ûÊÄßÔºö" + newAttr);
+				log.info("–¬ÃÌº”µƒ Ù–‘£∫" + newAttr);
 				attrSelector.addNewAttribute(newAttr, true);
 			}
-			ndService.addNode(new_node, parent_node, attrSelector);
+			ndService.addNodeBrief(new_node, parent_node, attrSelector);
+//			ndService.addNode(new_node, parent_node, attrSelector);
 			
-			this.message = "Success, o(‚à©_‚à©)o...";
+			this.message = "Success, o(°…_°…)o...";
 			return ActionSupport.SUCCESS;
 			
 		} catch (JSONException e) {
-			log.error("Êï∞ÊçÆÊ†ºÂºèÈîôËØØ", e);
-			this.message = "ÂÆ¢Êà∑Á´ØÁ®ãÂ∫èÂèëÈÄÅÊï∞ÊçÆÊ†ºÂºèÈîôËØØÔºÅËØ∑‰ΩøÁî®ÊúÄÊñ∞ÁöÑÂÆ¢Êà∑Á´ØÁ®ãÂ∫è„ÄÇ";
+			log.error(" ˝æ›∏Ò Ω¥ÌŒÛ", e);
+			this.message = "øÕªß∂À≥Ã–Ú∑¢ÀÕ ˝æ›∏Ò Ω¥ÌŒÛ£°«Î π”√◊Ó–¬µƒøÕªß∂À≥Ã–Ú°£";
 			return ActionSupport.ERROR;
 		} catch (AttributeSelectedWrongException e) {
-			log.info("‰∏çÂ≠òÂú®ËøôÊ†∑ÁöÑÁà∂ËäÇÁÇπ");
-			this.message = "‰∏çÂ≠òÂú®ËøôÊ†∑ÁöÑÁà∂ËäÇÁÇπÂ±ûÊÄßÔºÅ";
+			log.info("≤ª¥Ê‘⁄’‚—˘µƒ∏∏Ω⁄µ„");
+			this.message = "≤ª¥Ê‘⁄’‚—˘µƒ∏∏Ω⁄µ„ Ù–‘£°";
 			return ActionSupport.ERROR;
 		} catch (NumberFormatException ex) {
-			log.info("ÂÆ¢Êà∑Á´ØËæìÂÖ•‰∫ÜÈîôËØØÁöÑÁà∂ËäÇÁÇπÂ±ûÊÄß");
-			this.message = "Áà∂ËäÇÁÇπÂ±ûÊÄßÊ†ºÂºèÈîôËØØÔºÅ";
+			log.info("øÕªß∂À ‰»Î¡À¥ÌŒÛµƒ∏∏Ω⁄µ„ Ù–‘");
+			this.message = "∏∏Ω⁄µ„ Ù–‘∏Ò Ω¥ÌŒÛ£°";
 			return ActionSupport.ERROR;
 		} catch (Exception ex) {
-			log.error("Âú®Ê∑ªÂä†Â≠êÁªìÁÇπÊó∂ÂèëÁîüÊú™Áü•ÈîôËØØ", ex);
-			this.message = "Âú®Ê∑ªÂä†Â≠êÁªìÁÇπÊó∂ÂèëÁîüÊú™Áü•ÈîôËØØ";
+			log.error("‘⁄ÃÌº”◊”Ω·µ„ ±∑¢…˙Œ¥÷™¥ÌŒÛ", ex);
+			this.message = "‘⁄ÃÌº”◊”Ω·µ„ ±∑¢…˙Œ¥÷™¥ÌŒÛ";
 			return ActionSupport.ERROR;
 		}
 	
-	}
-
-	public void setDesc(String desc) {
-		this.desc = desc;
 	}
 
 	public void setName_en(String name_en) {
@@ -132,24 +113,8 @@ public class AddNodeAction {
 		this.name = name;
 	}
 
-	public void setNode_type(int node_type) {
-		this.node_type = node_type;
-	}
-
 	public void setParent_id(String parent_id) {
 		this.parent_id = parent_id;
-	}
-
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-
-	public void setImages(String images) {
-		this.images = images;
-	}
-
-	public void setUser_field(String user_field) {
-		this.user_field = user_field;
 	}
 
 	public void setParent_attr(String parent_attr) {
@@ -162,5 +127,13 @@ public class AddNodeAction {
 
 	public String getMessage() {
 		return message;
+	}
+
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
+
+	public void setNode_id(String node_id) {
+		this.node_id = node_id;
 	}
 }

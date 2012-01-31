@@ -101,6 +101,7 @@
 			$('#user_field').val(user_fields_json);
 			// 提交表单
 			$('#add_node_form').submit();
+// 			alert($('#user_field').val()); // for test
 			return false;
 		});
 

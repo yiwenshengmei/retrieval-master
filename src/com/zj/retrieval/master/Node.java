@@ -25,9 +25,6 @@ import com.zj.retrieval.master.dao.RetrievalDataSource;
 public class Node {
 	private static Log log = LogFactory.getLog(Node.class);
 		
-	public final static int NODETYPE_CLASS      = 1;
-	public final static int NODETYPE_INDIVIDUAL = 2;
-	
 	public final static String VIRTUAL_NODE_NAME = "virtual_node";
 	
 	private String uri = "";
@@ -40,8 +37,10 @@ public class Node {
 	private String owl = "";
 	private RetrievalDataSource retrievalDataSource;
 	private String label = "";
-	private int nodeType = NODETYPE_CLASS;
-	private List<String> image = new ArrayList<String>();
+	private int nodeType = NodeType.NODETYPE_CLASS;
+	private int detailType = DetailType.FULL;
+	private String contact;
+	private List<String> images = new ArrayList<String>();
 	private Map<String, String> userfields = new HashMap<String, String>();
 	
 	public Node() {
@@ -113,11 +112,11 @@ public class Node {
 	public void setNodeType(int nodeType) {
 		this.nodeType = nodeType;
 	}
-	public List<String> getImage() {
-		return image;
+	public List<String> getImages() {
+		return images;
 	}
 	public void setImages(List<String> image) {
-		this.image = image;
+		this.images = image;
 	}
 	
 	public static Node parseVirtualNodeFromOWL(String owl) throws Exception {
@@ -260,7 +259,7 @@ public class Node {
 			builder.a("xmlns:xsd", "http://www.w3.org/2001/XMLSchema#");
 			
 			// 创建class类型节点的owl格式
-			if(nd.getNodeType() == Node.NODETYPE_CLASS) {
+			if(nd.getNodeType() == NodeType.NODETYPE_CLASS) {
 				// Create <owl:Class>
 				String parentURI = nd.getParentId() == "virtual" ? "" : getParentUri(nd.getParentId(), jdbcOperations);
 				XMLBuilder elemClass = builder.e("owl:Class").a("rdf:ID", nd.getUri() + "#" + nd.getEnglishName());
@@ -272,7 +271,7 @@ public class Node {
 				
 				// Create <images>
 				XMLBuilder eImages = elemClass.e("images");
-				for (String image_path : nd.getImage()) {
+				for (String image_path : nd.getImages()) {
 					eImages.e("item").t(image_path);
 				}
 				
@@ -318,7 +317,7 @@ public class Node {
 			} // end of if(nd.getNodeType() == Node.NODETYPE_CLASS) {
 			
 			// 创建individual类型节点的owl格式
-			if(nd.getNodeType() == Node.NODETYPE_INDIVIDUAL) {
+			if(nd.getNodeType() == NodeType.NODETYPE_INDIVIDUAL) {
 				String parentEnName = jdbcOperations.queryForObject(
 						"select `enName` from fishes where id=?",
 						java.lang.String.class, nd.getParentId());
@@ -329,7 +328,7 @@ public class Node {
 					.e("desc").t(nd.getDesc());
 
 				XMLBuilder eImages = individual.e("images");
-				for (String image_path : nd.getImage()) {
+				for (String image_path : nd.getImages()) {
 					eImages.e("item").t(image_path);
 				}
 				
@@ -376,4 +375,17 @@ public class Node {
 	public void setUserfields(Map<String, String> userfields) {
 		this.userfields = userfields;
 	}
+	public int getDetailType() {
+		return detailType;
+	}
+	public void setDetailType(int detailType) {
+		this.detailType = detailType;
+	}
+	public String getContact() {
+		return contact;
+	}
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
+
 }

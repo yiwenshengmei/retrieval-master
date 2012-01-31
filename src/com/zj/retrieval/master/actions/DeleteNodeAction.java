@@ -13,6 +13,9 @@ public class DeleteNodeAction {
 	private String node_id;
 	private String message;
 	private boolean isError;
+	
+	private String post_user_name;
+	private String post_user_password;
 
 	public String execute() {
 		try {
@@ -47,6 +50,12 @@ public class DeleteNodeAction {
 	}
 	public boolean getIsError() {
 		return this.isError;
+	}
+	public void setPost_user_name(String post_user_name) {
+		this.post_user_name = post_user_name;
+	}
+	public void setPost_user_password(String post_user_password) {
+		this.post_user_password = post_user_password;
 	}
 
 }

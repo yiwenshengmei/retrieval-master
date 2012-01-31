@@ -1,17 +1,12 @@
 package com.zj.retrieval.master.dao;
 
-import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.sql.DataSource;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -19,15 +14,9 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedBeanPropertyRowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import com.jamesmurty.utils.XMLBuilder;
 import com.zj.retrieval.master.Attribute;
 import com.zj.retrieval.master.AttributeSelector;
+import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Matrix;
 import com.zj.retrieval.master.Node;
 
@@ -35,6 +24,14 @@ public class NodeService {
 	
 	private SimpleJdbcTemplate sqlclient;
 	private static Log log = LogFactory.getLog(NodeService.class);
+	
+	public List<Node> queryAllNodeAsBrief() {
+		String sql = "select `id`, `name`, `parent_id` as parentId from `fish`, `detail_type` as detailType)";
+		ParameterizedRowMapper<Node> rm = 
+				ParameterizedBeanPropertyRowMapper.newInstance(Node.class);
+		List<Node> queryResult = sqlclient.query(sql, rm);
+		return queryResult;
+	}
 	
 	public boolean deleteNode(Node nd) {
 		try {
@@ -77,7 +74,9 @@ public class NodeService {
 		
 	public Node queryNodeById(String id) {
 		try {
-			String sql = "SELECT * FROM `fish` where `id`=?";
+			String sql = "select `id`, `uri_name` as uriName, `name`, " +
+					"`name_en` as englishName, `parent_id` as parentId, " +
+					"`owl`, `uri` from `fish` where `id`=?";
 			ParameterizedRowMapper<Node> rowMapper = 
 				ParameterizedBeanPropertyRowMapper.newInstance(Node.class);
 			Node result = sqlclient.queryForObject(sql, rowMapper, id);
@@ -193,7 +192,7 @@ public class NodeService {
 			log.info("开始更新abstractRootNode的子节点列表...");
 			String virtual_node_query_sql = "select `owl` from `fish` where `id`=?";
 			List<Node> vrtl_node_query_result = sqlclient.query(virtual_node_query_sql, new ParameterizedRowMapper<Node>() {
-				@Override
+
 				public Node mapRow(ResultSet rs, int rowNum) throws SQLException {
 					Node vrtl_node = null;
 					try {
@@ -255,4 +254,69 @@ public class NodeService {
 		}
 	}
 
+	public void addNodeBrief(Node newNode, Node parentNode,
+			AttributeSelector as) {
+		try {
+			// 更新parent的matrix属性
+			log.info("更新父节点的特征矩阵");
+			Matrix matrix = parentNode.getRetrievalDataSource().getMatrix();
+			//   先修改行：将newNode和parentNode中已有特性的进行匹配
+			//   如果matrix为空[列数或行数等于零]，从特征矩阵的语义上来说无论添加多少行
+			//   都等于没有添加，因为没有已知的特性与其匹配
+			int[] newRow = new int[matrix.getColSize()];
+			for(int i = 0; i < newRow.length; i++)
+				newRow[i] = as.getAttributeMapping().get(i) ? Attribute.YES : Attribute.NO;
+			matrix.addRow(newRow, 0, newRow.length);
+
+			//   再修改列：向parentNode添加创建newNode时一起添加的新特性
+			//   在添加新特性的同时将新特性加入parentNode的attribute列表
+			List<Attribute> parentAttributes = parentNode.getRetrievalDataSource().getAttributes();
+			for(Attribute attr : as.getNewAttributeMapping().keySet()) {
+				// matrix可能为空，向空矩阵添加1列需要的长度始终是1
+				int[] newCol = matrix.getRowSize() == 0 ? new int[1] : new int[matrix.getRowSize()];
+				for(int j = 0; j < newCol.length; j++) {
+					newCol[j] = (j != newCol.length - 1 ? 0 : 
+						(as.getNewAttributeMapping().get(attr) ? Attribute.YES : Attribute.NO));
+				}
+				matrix.addCol(newCol, 0, newCol.length);
+				// 同时更新parentNode的attribte列表
+				parentAttributes.add(attr);
+			}
+			
+			// 创建并设置newNode的owl字符串
+//			log.info("创建并设置新节点的owl字符串");
+//			newNode.setOwl(Node.getOwlFromNode(newNode, sqlclient));
+			
+			log.info("将新节点写入数据库");
+			// 注意，brief节点的ID值是由客户端提供的！！！
+			// 为新节点detailType设置值: brief
+			newNode.setDetailType(DetailType.BRIEF);
+			String sqlInsertNewNode = "insert into fish(`id`, `name`, `detail_type`" +
+					"`enName`, `parentId`, `contact`) values(:id, :name, :enName, :parentId, :detailType, :contact)";
+			SqlParameterSource paramInsertNewNode = new BeanPropertySqlParameterSource(newNode) ;
+			if (sqlclient.update(sqlInsertNewNode, paramInsertNewNode) != 1) {
+				throw new Exception("插入节点时失败@NodeService.addNode()"); // Rollback
+			}
+	
+			// 将newNode的id值加入parentNode的childNodes列表中
+			log.info("更新父节点的子结点列表");
+			parentNode.getRetrievalDataSource().getChildNodes().add(newNode.getId());
+			// 更新parentNode的owl字符串
+			log.info("更新父节点的owl字符串");
+			parentNode.setOwl(Node.getOwlFromNode(parentNode, sqlclient));
+					
+			// 将parentNode重新写回数据库
+			// 由于只修改了parentNode的owl信息，所以这里只更新owl字段
+			log.info("将父节点写回数据库");
+			String sqlUpdateParentNode = "update `fish` set `owl`=:owl where id=:id";
+			SqlParameterSource paramUpdateParentNode = new BeanPropertySqlParameterSource(parentNode);
+			if (sqlclient.update(sqlUpdateParentNode, paramUpdateParentNode) != 1) {
+				throw new Exception("更新父类时失败@NodeService.addNode()"); // Rollback
+			}
+			
+		} catch (Exception ex) {
+			log.error("NodeService.addNode()方法发生错误", ex);
+			throw new RuntimeException("NodeService.addNode()方法发生错误", ex);
+		}
+	}
 }
