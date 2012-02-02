@@ -41,12 +41,19 @@ public class AddRootNodeAction {
 	private String post_user_password;
 	
 	private String message;
+	private boolean isError;
+	
+	public boolean getIsError() {
+		return isError;
+	}
 	
 	public String execute() {
 		try {
 			
-			UserDao usrService = Util.getUserDao();
-			if (!usrService.verify(post_user_name, post_user_password)) {
+			UserDao userDao = Util.getUserDao();
+			if (!userDao.verifyUser(post_user_name, post_user_password)) {
+				this.isError = true;
+				this.message = "用户名或密码错误.";
 				return ActionSupport.ERROR;
 			}
 			

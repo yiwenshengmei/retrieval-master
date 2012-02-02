@@ -8,6 +8,8 @@
 </head>
 <body>
 <form action="file/upload" method="post" enctype="multipart/form-data" >
+	PostUserName: <input type='text' name='post_user_name'/>
+	PostUserPassword: <input type='text' name='post_user_password'/>
 	<input name='image' type="file"/>
 </form>
 </body>

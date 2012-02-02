@@ -9,9 +9,18 @@ public class ActiveUserAction {
 	private boolean isError;
 	private String message;
 	
+	private String post_user_name;
+	private String post_user_password;
+	
 	public String execute() {
 		try {
 			UserDao userDao = Util.getUserDao();
+			if (!userDao.verifySu(post_user_name, post_user_password)) {
+				this.isError = true;
+				this.message = "用户名或密码错误.";
+				return ActionSupport.ERROR;
+			}
+			
 			userDao.activeUser(id);
 			
 			this.isError = false;

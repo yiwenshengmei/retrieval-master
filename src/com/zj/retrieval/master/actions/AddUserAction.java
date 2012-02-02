@@ -16,7 +16,7 @@ public class AddUserAction {
 	public String execute() {
 		try {
 			UserDao userDao = Util.getUserDao();
-			if (userDao.queryUserByName(name).size() > 0) {
+			if (userDao.getUserByName(name).size() > 0) {
 				this.isError = true;
 				this.message = String.format("用户名：%1$s 已经存在！", name);
 				return ActionSupport.ERROR;

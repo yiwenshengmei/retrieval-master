@@ -31,6 +31,7 @@ import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.UserField;
 import com.zj.retrieval.master.Util;
 import com.zj.retrieval.master.dao.NodeService;
+import com.zj.retrieval.master.dao.UserDao;
 
 public class AddNodeAction {
 	private static Log log = LogFactory.getLog(AddNodeAction.class);
@@ -44,10 +45,26 @@ public class AddNodeAction {
 	private String user_field;
 	private String parent_attr;
 	private String new_attr;
+	
 	private String message;
+	private boolean isError;
+	
+	public boolean getIsError() {
+		return this.isError;
+	}
+	
+	private String post_user_name;
+	private String post_user_password;
 	
 	public String execute() {
 		try {
+			UserDao userDao = Util.getUserDao();
+			if (!userDao.verifyUser(post_user_name, post_user_password)) {
+				this.isError = true;
+				this.message = "用户名或密码错误.";
+				return ActionSupport.ERROR;
+			}
+			
 			Node new_node = new Node();
 			new_node.setDesc(desc);
 			new_node.setEnglishName(name_en);

@@ -150,7 +150,6 @@
 			-->
 		</div>
 		
-		
 		<input id='user_field' type="hidden" name="user_field"/>
 		PostUserName: <input type='text' name='post_user_name'/>
 		PostUserPassword: <input type='text' name='post_user_password'/>

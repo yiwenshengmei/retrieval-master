@@ -23,7 +23,6 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 import com.zj.retrieval.master.Matrix;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.User;
-import com.zj.retrieval.master.actions.FileUploadConfig;
 import com.zj.retrieval.master.dao.NodeService;
 import com.zj.retrieval.master.dao.UserDao;
 
@@ -89,7 +88,7 @@ public class CodeTest {
 	public void dataBaseTest() {
 		ApplicationContext spring =  new FileSystemXmlApplicationContext("/WebContent/WEB-INF/beans.xml");
 		UserDao userDao = (UserDao) spring.getBean("userDao");
-		List<User> queryResult = userDao.queryAllUser();
+		List<User> queryResult = userDao.getAllUser();
 		
 		for (User user : queryResult) {
 			System.out.println(user);

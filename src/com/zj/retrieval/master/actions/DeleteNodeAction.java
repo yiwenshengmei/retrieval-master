@@ -6,6 +6,7 @@ import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.Util;
 import com.zj.retrieval.master.dao.NodeService;
+import com.zj.retrieval.master.dao.UserDao;
 
 public class DeleteNodeAction {
 
@@ -19,6 +20,13 @@ public class DeleteNodeAction {
 
 	public String execute() {
 		try {
+			UserDao userDao = Util.getUserDao();
+			if (!userDao.verifyUser(post_user_name, post_user_password)) {
+				this.isError = true;
+				this.message = "用户名或密码错误.";
+				return ActionSupport.ERROR;
+			}
+			
 			Node nd = new Node();
 			nd.setId(node_id);
 			log.info("要删除的节点id为：" + nd.getId());

@@ -13,15 +13,33 @@ import org.apache.struts2.ServletActionContext;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Node;
+import com.zj.retrieval.master.Util;
+import com.zj.retrieval.master.dao.UserDao;
 
 public class UploadAction {
 	private File image;
+	
 	private String message;
+	private boolean isError;
+	
+	public boolean getIsError() {
+		return isError;
+	}
+	
+	private String post_user_name;
+	private String post_user_password;
 	
 	private static Log log = LogFactory.getLog(Node.class);
 	
 	public String execute() {
 		try {
+			UserDao userDao = Util.getUserDao();
+			if (!userDao.verifyUser(post_user_name, post_user_password)) {
+				this.isError = true;
+				this.message = "用户名或密码错误.";
+				return ActionSupport.ERROR;
+			}
+						
 			String filename = null;
 			List<String> images_path = new ArrayList<String>();
 			String realpath = ServletActionContext.getServletContext().getRealPath("/images");
