@@ -59,4 +59,8 @@ public class UserDao {
 		String sql = "select count(*) from `su` where `name`=? and `password`=?";
 		return sqlClient.queryForInt(sql, postUserName, postUserPassword) > 0;
 	}
+	public void activeUser(String id) {
+		String sql = "update `user` set `isActive`=1 where `id`=?";
+		sqlClient.update(sql, id);
+	}
 }

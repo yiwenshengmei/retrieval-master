@@ -23,7 +23,7 @@ public class Util {
 		}
 	}
 	
-	public static UserDao getUserService() {
+	public static UserDao getUserDao() {
 		ApplicationContext ctx = getApplicationContext();
 		return (UserDao) ctx.getBean("userService");
 	}

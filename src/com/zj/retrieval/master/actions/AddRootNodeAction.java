@@ -45,7 +45,7 @@ public class AddRootNodeAction {
 	public String execute() {
 		try {
 			
-			UserDao usrService = Util.getUserService();
+			UserDao usrService = Util.getUserDao();
 			if (!usrService.verify(post_user_name, post_user_password)) {
 				return ActionSupport.ERROR;
 			}
