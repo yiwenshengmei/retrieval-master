@@ -8,7 +8,7 @@
 <%@page import="com.zj.retrieval.master.DetailType"%>
 <%@page import="com.zj.retrieval.master.Node"%>
 <%@page import="com.zj.retrieval.master.Util"%>
-<%@page import="com.zj.retrieval.master.dao.NodeService"%>
+<%@page import="com.zj.retrieval.master.dao.NodeDao"%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
     pageEncoding="utf-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -19,7 +19,7 @@
 </head>
 <body>
 <table width="95%" style='margin: 0 auto;'>
-<% 
+<%
 	String name = "";
 	String name_en = "";
 	String parent_id = "";
@@ -36,7 +36,7 @@
 	Map<String, String> user_filed = new HashMap<String, String>();
 	
 	try {	
-		NodeService ns = Util.getNodeService();
+		NodeDao ns = Util.getNodeDao();
 		
 		Node nd = ns.queryNodeById(node_id);
 		name = nd.getName();

@@ -5,7 +5,7 @@
 <%@page import="com.zj.retrieval.master.RetrievalResult"%>
 <%@page import="com.zj.retrieval.master.NodeRetrieval"%>
 <%@page import="com.zj.retrieval.master.Util"%>
-<%@page import="com.zj.retrieval.master.dao.NodeService"%>
+<%@page import="com.zj.retrieval.master.dao.NodeDao"%>
 
 <%@page language="java" 
 		contentType="text/html; charset=utf-8"
@@ -26,7 +26,7 @@
 	List<String> attr_images = new ArrayList<String>();
 	String display_style = "block";
 	Map<String, String> attr_user_fields = null;
-	NodeService node_service = Util.getNodeService();
+	NodeDao node_service = Util.getNodeDao();
 	List<Node> root_childs = null;
 	
 	// 如果存在node_id，则进一步读取selected_state
@@ -37,20 +37,20 @@
 		RetrievalResult result = node_retrieval.retrieval(selected_state);
 		
 		if (result.hasResult()) {
-			result_node_ids = result.getResult();
+	result_node_ids = result.getResult();
 		} else {
-			attr_name = result.getNext().getName();
-			attr_name_en = result.getNext().getEnglishName();
-			attr_desc = result.getNext().getDesc();
-			attr_images.add(result.getNext().getImage());
-			attr_user_fields = result.getNext().getUserFields();
+	attr_name = result.getNext().getName();
+	attr_name_en = result.getNext().getEnglishName();
+	attr_desc = result.getNext().getDesc();
+	attr_images.add(result.getNext().getImage());
+	attr_user_fields = result.getNext().getUserFields();
 		}
 	} else {
 		display_style = "none";
 		Node root = node_service.queryNodeById(Node.VIRTUAL_NODE_NAME);
 		root_childs = new ArrayList<Node>();
 		for (String id : root.getRetrievalDataSource().getChildNodes()) {
-			root_childs.add(node_service.queryNodeById(id));
+	root_childs.add(node_service.queryNodeById(id));
 		}
 	}
 %>

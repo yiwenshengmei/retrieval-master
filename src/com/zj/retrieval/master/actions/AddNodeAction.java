@@ -30,7 +30,7 @@ import com.zj.retrieval.master.AttributeSelector;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.UserField;
 import com.zj.retrieval.master.Util;
-import com.zj.retrieval.master.dao.NodeService;
+import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class AddNodeAction {
@@ -87,7 +87,7 @@ public class AddNodeAction {
 				new_node.setUserfields(UserField.parse(user_field_jsonarray));
 			}
 			
-			NodeService ndService =  Util.getNodeService();;
+			NodeDao ndService =  Util.getNodeDao();;
 			
 			Node parent_node = ndService.queryNodeById(new_node.getParentId());
 			log.info("找到父节点：" + parent_node);

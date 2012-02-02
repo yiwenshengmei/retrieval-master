@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.zj.retrieval.master.dao.NodeService;
+import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class Util {
@@ -28,9 +28,9 @@ public class Util {
 		return (UserDao) ctx.getBean("userService");
 	}
 	
-	public static NodeService getNodeService() {
+	public static NodeDao getNodeDao() {
 		ApplicationContext ctx = getApplicationContext();
-		return (NodeService) ctx.getBean("nodeService");
+		return (NodeDao) ctx.getBean("nodeService");
 	}
 	
 	public static NodeRetrieval getNodeRetrieval() {

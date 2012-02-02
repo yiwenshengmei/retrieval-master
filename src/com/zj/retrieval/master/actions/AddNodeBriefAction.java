@@ -31,7 +31,7 @@ import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
 import com.zj.retrieval.master.UserField;
 import com.zj.retrieval.master.Util;
-import com.zj.retrieval.master.dao.NodeService;
+import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class AddNodeBriefAction {
@@ -71,7 +71,7 @@ public class AddNodeBriefAction {
 			new_node.setParentId(parent_id);
 			new_node.setContact(contact);
 			
-			NodeService ndService =  Util.getNodeService();;
+			NodeDao ndService =  Util.getNodeDao();;
 			
 			Node parent_node = ndService.queryNodeById(new_node.getParentId());
 			log.info("ÕÒµ½¸¸½Úµã£º" + parent_node);

@@ -21,7 +21,7 @@ import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
 import com.zj.retrieval.master.UserField;
-import com.zj.retrieval.master.dao.NodeService;
+import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 import com.zj.retrieval.master.Util;
 
@@ -86,7 +86,7 @@ public class AddRootNodeAction {
 				root.setUserfields(UserField.parse(user_field_jsonarray));
 			}
 			
-			NodeService ndService = Util.getNodeService();
+			NodeDao ndService = Util.getNodeDao();
 			ndService.addRootNode(root);
 			
 			this.message = "Success, o(∩_∩)o...";

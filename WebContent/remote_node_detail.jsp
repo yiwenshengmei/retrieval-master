@@ -1,3 +1,14 @@
+<%@page import="org.apache.http.impl.client.BasicResponseHandler"%>
+<%@page import="org.apache.http.client.ResponseHandler"%>
+<%@page import="org.apache.http.HttpEntity"%>
+<%@page import="org.apache.http.impl.client.DefaultHttpClient"%>
+<%@page import="org.apache.http.HttpResponse"%>
+<%@page import="org.apache.http.client.entity.UrlEncodedFormEntity"%>
+<%@page import="org.apache.http.protocol.HTTP"%>
+<%@page import="org.apache.http.message.BasicNameValuePair"%>
+<%@page import="org.apache.http.NameValuePair"%>
+<%@page import="org.apache.http.client.methods.HttpPost"%>
+<%@page import="org.apache.http.client.HttpClient"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.zj.retrieval.master.Attribute"%>
@@ -10,35 +21,27 @@
     pageEncoding="utf-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Insert title here</title>
-</head>
-<body>
 <%
 	String nodeId = request.getParameter("node_id");
 	String url = request.getParameter("url");
 	String userName = request.getParameter("user_name");
 	String userPwd = request.getParameter("user_pwd");
 	
-	/*
-	String url = "http://xxx:8080/retrieval-cluster";
-	HttpClient http = new HttpClient();
-	PostMethod method = new PostMethod(url);
-	NameValuePair paramUserName = new NameValuePair("user_name", "xxx");
-	NameValuePair paramUserPwd = new NameValuePair("user_pwd", "xxx");
-	NameValuePair paramNodeId = new NameValuePair("node_id", xxx);
-	method.setRequestBody(new NameValuePair[] { 
-		paramUserName, paramUserPwd, paramNodeId });
-	http.executeMethod(method);
-	System.out.println(method.getStatusLine()); //打印结果页面
-	String response=newString(method.getResponseBodyAsString().getBytes("8859_1"));
+	DefaultHttpClient httpclient = new DefaultHttpClient();
+	
+	HttpPost httpost = new HttpPost(url);
+    List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+    nvps.add(new BasicNameValuePair("user_name", userName));
+    nvps.add(new BasicNameValuePair("user_pwd", userPwd));
+    httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+    ResponseHandler<String> responseHandler = new BasicResponseHandler();
+    String responseBody = httpclient.execute(httpost, responseHandler);
+	
 	
 	//打印返回的信息
-	System.out.println(response);
-	method.releaseConnection();
-	*/
-	JSONObject j = new JSONObject("from response");
+	System.out.println(responseBody);
+
+	JSONObject j = new JSONObject(responseBody);
 	String author = j.getString("author");
 	String name = j.getString("name");
 	String enName = j.getString("name_en");
@@ -77,6 +80,11 @@
 // 		attrs.add(attr);
 // 	}
 %>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>ID: <%=nodeId %> FROM <%=url %></title>
+</head>
+<body>
 <table>
 	<tr><td>ID</td><td><%=nodeId %></td></tr>
 	<tr><td>NAME: </td><td><%=name %></td></tr>

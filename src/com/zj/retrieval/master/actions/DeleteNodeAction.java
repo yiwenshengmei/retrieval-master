@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.Util;
-import com.zj.retrieval.master.dao.NodeService;
+import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class DeleteNodeAction {
@@ -31,7 +31,7 @@ public class DeleteNodeAction {
 			nd.setId(node_id);
 			log.info("要删除的节点id为：" + nd.getId());
 			
-			NodeService ndService =  Util.getNodeService();
+			NodeDao ndService =  Util.getNodeDao();
 			
 			if (ndService.deleteNode(nd)) {
 				this.isError = false;

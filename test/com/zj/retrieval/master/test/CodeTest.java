@@ -23,7 +23,7 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 import com.zj.retrieval.master.Matrix;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.User;
-import com.zj.retrieval.master.dao.NodeService;
+import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class CodeTest {

@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.Util;
-import com.zj.retrieval.master.dao.NodeService;
+import com.zj.retrieval.master.dao.NodeDao;
 
 public class QueryNodeOWLAction {
 
@@ -20,7 +20,7 @@ public class QueryNodeOWLAction {
 			
 			log.info("查询owl的节点id为：" + node_id);
 			
-			NodeService ndService = Util.getNodeService();
+			NodeDao ndService = Util.getNodeDao();
 			
 			Node node = ndService.queryNodeById(node_id);
 			
