@@ -3,7 +3,7 @@
 <%@page import="java.util.Map"%>
 <%@page import="java.util.List"%>
 <%@page import="com.zj.retrieval.master.RetrievalResult"%>
-<%@page import="com.zj.retrieval.master.NodeRetrieval"%>
+<%@page import="com.zj.retrieval.master.dao.RetrievalDao"%>
 <%@page import="com.zj.retrieval.master.Util"%>
 <%@page import="com.zj.retrieval.master.dao.NodeDao"%>
 
@@ -14,49 +14,43 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>检索</title>
 <%
-	String node_id = request.getParameter("node_id");
-	String selected_state = request.getParameter("selected_state");
-	if (selected_state == null) selected_state = "";
-	List<String> result_node_ids = null;
-	String attr_name = null;
-	String attr_name_en = null;
-	String attr_desc = null;
-	List<String> attr_images = new ArrayList<String>();
-	String display_style = "block";
-	Map<String, String> attr_user_fields = null;
-	NodeDao node_service = Util.getNodeDao();
-	List<Node> root_childs = null;
+	String nodeId = request.getParameter("node_id");
+	String selectedState = request.getParameter("selected_state");
 	
-	// 如果存在node_id，则进一步读取selected_state
-	// 如果没有node_id，仅仅列出所有的根物种，然后配上RETRIEVAL FROM HERE按钮
-	if (node_id != null && !node_id.equals("")) {
-		NodeRetrieval node_retrieval = Util.getNodeRetrieval();
-		
-		RetrievalResult result = node_retrieval.retrieval(selected_state);
+	NodeDao nodeDao = Util.getNodeDao();
+	RetrievalDao retrievalDao = Util.getNodeRetrieval();
+	String nodeName = nodeDao.getNodeById(nodeId).getName();
+	
+	List<String> resultNodeIDs = null;
+	String attrName = null;
+	String attrNameEN = null;
+	String attrDesc = null;
+	List<String> attrImages = new ArrayList<String>();
+	Map<String, String> attrUserFields = null;
+	List<Node> rootChilds = null;
+	
+	if (nodeId != null && !nodeId.isEmpty()) {
+		// 进入检索环节
+		if (selectedState == null || selectedState.isEmpty()) 
+	selectedState = nodeId; // 要保证第一位是nodeId
+		RetrievalResult result = retrievalDao.retrieval(selectedState);
 		
 		if (result.hasResult()) {
-	result_node_ids = result.getResult();
+	resultNodeIDs = result.getResult();
 		} else {
-	attr_name = result.getNext().getName();
-	attr_name_en = result.getNext().getEnglishName();
-	attr_desc = result.getNext().getDesc();
-	attr_images.add(result.getNext().getImage());
-	attr_user_fields = result.getNext().getUserFields();
-		}
-	} else {
-		display_style = "none";
-		Node root = node_service.queryNodeById(Node.VIRTUAL_NODE_NAME);
-		root_childs = new ArrayList<Node>();
-		for (String id : root.getRetrievalDataSource().getChildNodes()) {
-	root_childs.add(node_service.queryNodeById(id));
+	attrName = result.getNext().getName();
+	attrNameEN = result.getNext().getEnglishName();
+	attrDesc = result.getNext().getDesc();
+	attrImages.add(result.getNext().getImage());
+	attrUserFields = result.getNext().getUserFields();
 		}
 	}
 %>
+<title>当前节点: <%=nodeName %> 检索进度: <%=selectedState %></title>
 <script type="text/javascript" src='jquery-1.7.1.js'></script>
 <script type="text/javascript">
-	var selected_state = '<%=selected_state%>';
+	var selected_state = '<%=selectedState%>';
 
 	function answer(answer) {
 		$('#selected_state_post').val(selected_state + ' ' + answer);
@@ -70,19 +64,19 @@
 </head>
 <body>
 
-	<form id='retrieval_form' style='display:<%=display_style%>;' action="retrieval.jsp" method="post">
+	<form id='retrieval_form' action="retrieval.jsp" method="post">
 		<input id='selected_state_post' type="hidden" name='selected_state'/>
-		<input id='node_id' type='hidden' name='node_id' value='<%=node_id%>'/>
-		<div style='display:<%=display_style%>;'><h1><%=attr_name%></h1><h3>( <%=attr_name_en %> )</h3></div>
-		<table style='display:<%=display_style%>'>
-			<tr><td>DESCRIPTION:&nbsp;</td><td><%=attr_desc%></td></tr>
+		<input id='node_id' type='hidden' name='node_id' value='<%=nodeId%>'/>
+		<div><h1><%=attrName%></h1><h3>( <%=attrNameEN %> )</h3></div>
+		<table>
+			<tr><td>DESCRIPTION:&nbsp;</td><td><%=attrDesc%></td></tr>
 		</table>
 		
-		<table style='display:<%=display_style%>'>
+		<table>
 			<tr>
-			<%
-				for (String image_url : attr_images) { out.print(String.format("<td><img src='%1%s'/></td>", image_url)); } 
-			%>
+			<% for (String imageURL : attrImages) { %> 
+				<td><img src=<%=imageURL %>/></td> 
+			<% } %>
 			</tr>
 		</table>
 		
@@ -92,16 +86,5 @@
 			<span onclick='answer(3)'>不知道</span>
 		</div>
 	</form>
-	
-	<% if ((node_id == null || node_id.equals("")) && root_childs != null) { %>
-	<table>
-		<tr><td>ID</td><td>中文名称</td><td>英文名称</td><td></td></tr>
-		<% for (Node nd : root_childs) { %>
-		<tr><td><%=nd.getId()%></td><td><%=nd.getName()%></td><td><%=nd.getEnglishName()%></td><a href='retrieval.jsp?node_id=<%=nd.getId()%>'>RETRIEVAL FROM HERE</a></tr>			
-		<% } %>
-	</table>	
-	<% } %>
-	
-
 </body>
 </html>

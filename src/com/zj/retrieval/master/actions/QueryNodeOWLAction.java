@@ -22,7 +22,7 @@ public class QueryNodeOWLAction {
 			
 			NodeDao ndService = Util.getNodeDao();
 			
-			Node node = ndService.queryNodeById(node_id);
+			Node node = ndService.getNodeById(node_id);
 			
 			this.owl = Boolean.valueOf(format) ? XMLUtil.format(node.getOwl(), 4) : node.getOwl();
 			return ActionSupport.SUCCESS;

@@ -82,14 +82,14 @@ public class AddNodeAction {
 			new_node.setImages(images_path);
 			
 			// 解析自定义字段
-			if (user_field != null && !user_field.equals("")) {
+			if (user_field != null && !user_field.isEmpty()) {
 				JSONArray user_field_jsonarray = new JSONArray(user_field);
 				new_node.setUserfields(UserField.parse(user_field_jsonarray));
 			}
 			
 			NodeDao ndService =  Util.getNodeDao();;
 			
-			Node parent_node = ndService.queryNodeById(new_node.getParentId());
+			Node parent_node = ndService.getNodeById(new_node.getParentId());
 			log.info("找到父节点：" + parent_node);
 			AttributeSelector attrSelector = ndService.getAttributeSelector(parent_node);
 			String[] selectedAttributes = parent_attr.equals("") ?

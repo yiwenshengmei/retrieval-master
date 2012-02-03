@@ -25,8 +25,8 @@ public class NodeDao {
 	private SimpleJdbcTemplate sqlclient;
 	private static Log log = LogFactory.getLog(NodeDao.class);
 	
-	public List<Node> queryAllNodeAsBrief() {
-		String sql = "select `id`, `name`, `parent_id` as parentId from `fish`, `detail_type` as detailType)";
+	public List<Node> getAllNodeAsBrief() {
+		String sql = "select `id`, `name`, `parent_id` as parentId, `detail_type` as detailType from `fish`)";
 		ParameterizedRowMapper<Node> rm = 
 				ParameterizedBeanPropertyRowMapper.newInstance(Node.class);
 		List<Node> queryResult = sqlclient.query(sql, rm);
@@ -36,9 +36,9 @@ public class NodeDao {
 	public boolean deleteNode(Node nd) {
 		try {
 			// 原先的nd只有id信息，现在根据id从数据库中取出该node的完整信息
-			nd = queryNodeById(nd.getId());
+			nd = getNodeById(nd.getId());
 			// 找到它的父节点
-			Node parent = queryNodeById(nd.getParentId());
+			Node parent = getNodeById(nd.getParentId());
 			
 			// 将nd在其父节点中的信息删除，即从父节点的子结点列表中删除nd
 			RetrievalDataSource dataSource = parent.getRetrievalDataSource();
@@ -55,7 +55,7 @@ public class NodeDao {
 				throw new Exception("更新父类时失败@NodeService.delNode()"); // Rollback
 			}
 			
-			// 开始从数据库中删除nd			
+			// 开始从数据库中删除nd
 			String sql = "DELETE FROM `fish` where id=?";
 			if (sqlclient.update(sql, nd.getId()) != 1)
 				throw new Exception(String.format("删除节点[id=%1$s]时失败", nd.getId()));
@@ -72,7 +72,7 @@ public class NodeDao {
 		return false;
 	}
 		
-	public Node queryNodeById(String id) {
+	public Node getNodeById(String id) {
 		try {
 			String sql = "select `id`, `uri_name` as uriName, `name`, " +
 					"`name_en` as englishName, `parent_id` as parentId, " +
@@ -89,7 +89,7 @@ public class NodeDao {
 		}
 	}
 
-	public Node findNodeByName(String name) {
+	public Node getNodeByName(String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -254,8 +254,8 @@ public class NodeDao {
 		}
 	}
 
-	public void addNodeBrief(Node newNode, Node parentNode,
-			AttributeSelector as) {
+	// 增加只包含检索信息的节点
+	public void addNodeBrief(Node newNode, Node parentNode, AttributeSelector as) {
 		try {
 			// 更新parent的matrix属性
 			log.info("更新父节点的特征矩阵");

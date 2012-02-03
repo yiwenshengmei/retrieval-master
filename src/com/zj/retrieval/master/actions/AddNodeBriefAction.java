@@ -73,7 +73,7 @@ public class AddNodeBriefAction {
 			
 			NodeDao ndService =  Util.getNodeDao();;
 			
-			Node parent_node = ndService.queryNodeById(new_node.getParentId());
+			Node parent_node = ndService.getNodeById(new_node.getParentId());
 			log.info("ÕÒµ½¸¸½Úµã£º" + parent_node);
 			AttributeSelector attrSelector = ndService.getAttributeSelector(parent_node);
 			String[] selectedAttributes = parent_attr.equals("") ?

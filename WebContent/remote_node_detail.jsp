@@ -42,6 +42,14 @@
 	System.out.println(responseBody);
 
 	JSONObject j = new JSONObject(responseBody);
+	boolean isError = j.getBoolean("isError");
+	if (isError) {
+		out.print("用户名或密码错误！");
+		out.print("</html>");
+		out.flush();
+		out.close();
+		return;
+	}
 	String author = j.getString("author");
 	String name = j.getString("name");
 	String enName = j.getString("name_en");

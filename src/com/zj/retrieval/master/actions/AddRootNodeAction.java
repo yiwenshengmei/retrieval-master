@@ -81,7 +81,7 @@ public class AddRootNodeAction {
 			root.setImages(images_path);
 			
 			// 解析自定义字段
-			if (user_field != null && !user_field.equals("")) {
+			if (user_field != null && !user_field.isEmpty()) {
 				JSONArray user_field_jsonarray = new JSONArray(user_field);
 				root.setUserfields(UserField.parse(user_field_jsonarray));
 			}
