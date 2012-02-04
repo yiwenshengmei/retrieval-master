@@ -21,12 +21,12 @@ public class RetrievalDao {
 	}
 	
 	private void initMappingRows() {
-		// åˆå§‹åŒ–çš„æ—¶matchRowsä¸­çš„å€¼å°±æ˜¯matrixä¸­æ‰€æœ‰çš„è¡Œå·
+		// ³õÊ¼»¯µÄÊ±matchRowsÖĞµÄÖµ¾ÍÊÇmatrixÖĞËùÓĞµÄĞĞºÅ
 		if (hasInited)
 			return;
 		if (mappingRows == null)
 			mappingRows = new ArrayList<Integer>();
-		// å› ä¸ºNodeRetrievalæ˜¯å•ä¾‹ï¼Œï¿½?ï¿½ï¿½æ¯æ¬¡éƒ½è¦å…ˆæ¸…ç©ºçŠ¶ï¿½?
+		// ÒòÎªNodeRetrievalÊÇµ¥Àı£¬????Ã¿´Î¶¼ÒªÏÈÇå¿Õ×´??
 		mappingRows.clear();
 		for (int i = 0; i < retrievalNode.getRetrievalDataSource().getChildNodes().size(); i++) {
 			mappingRows.add(i);
@@ -37,15 +37,15 @@ public class RetrievalDao {
 	public RetrievalDao() {}
 	
 	public RetrievalResult retrieval(String selectState) {
-		// selectStateçš„ç¬¬1ä¸ªå€¼ä»£è¡¨å½“å‰èŠ‚ç‚¹çš„idï¼Œä»ä¸‹æ ‡1å¼€å§‹æ‰æ˜¯answer
+		// selectStateµÄµÚ1¸öÖµ´ú±íµ±Ç°½ÚµãµÄid£¬´ÓÏÂ±ê1¿ªÊ¼²ÅÊÇanswer
 		for (int i = 1; i < selectState.length(); i++) {
 			int perAnswer = Integer.valueOf(selectState.substring(i, i + 1));
-			// å¦‚æœå›ç­”unknownï¼Œè½®ç©ºæœ¬æ¬¡ï¼Œè¿™å¯èƒ½å°†å¯¼è‡´æœ€ç»ˆç­”æ¡ˆå‡ºç°å¤šä¸ª
+			// Èç¹û»Ø´ğunknown£¬ÂÖ¿Õ±¾´Î£¬Õâ¿ÉÄÜ½«µ¼ÖÂ×îÖÕ´ğ°¸³öÏÖ¶à¸ö
 			if (perAnswer == Attribute.UNKNOW)
 				continue;
 			Matrix matrix = retrievalNode.getRetrievalDataSource().getMatrix();
 			Iterator<Integer> iter = mappingRows.iterator();
-			// iå¯¹åº”äºselectStateä¸­å¯¹ç¬¬iä¸ªç‰¹å¾çš„å›ç­”ï¼ŒåŒæ—¶å¯¹åº”äºmatrixä¸­ç¬¬i-1ï¿½?
+			// i¶ÔÓ¦ÓÚselectStateÖĞ¶ÔµÚi¸öÌØÕ÷µÄ»Ø´ğ£¬Í¬Ê±¶ÔÓ¦ÓÚmatrixÖĞµÚi-1??
 			int[] currComparedAttrCol = matrix.getCol(i - 1);
 			while (iter.hasNext()) {
 				if (currComparedAttrCol[iter.next()] == perAnswer)
@@ -54,17 +54,17 @@ public class RetrievalDao {
 					iter.remove();
 			}
 		}
-		// è¿™é‡Œåˆ¤æ–­è¯¥è¿”å›ä»€ä¹ˆç»“æœ
+		// ÕâÀïÅĞ¶Ï¸Ã·µ»ØÊ²Ã´½á¹û
 		RetrievalResult result = new RetrievalResult();
 		if ((selectState.length() - 1) >= retrievalNode.getRetrievalDataSource().getAttributes().size()
 				|| mappingRows.size() <= 1) {
-			// 1.ï¿½?ï¿½ï¿½è‡ªç„¶ç»“æŸçš„æƒ…å†µï¼Œå³æ‰€æœ‰ç‰¹å¾éƒ½å·²è¯¢é—®è¿‡
-			// 2.å¯èƒ½è¿˜æ²¡æœ‰è¯¢é—®è¿‡å…¨éƒ¨çš„ç‰¹å¾ï¼Œä½†æ˜¯å·²ç»ç¡®å®šæ²¡æœ‰åŒ¹é…çš„å­ç»“ç‚¹ï¿½?
-			// 3.åŒ¹é…çš„å­ç»“ç‚¹åˆ—è¡¨ä¸­åªå‰©ä¸‹ï¿½?ï¿½ï¿½å…ƒç´ ï¿½?
+			// 1.????×ÔÈ»½áÊøµÄÇé¿ö£¬¼´ËùÓĞÌØÕ÷¶¼ÒÑÑ¯ÎÊ¹ı
+			// 2.¿ÉÄÜ»¹Ã»ÓĞÑ¯ÎÊ¹ıÈ«²¿µÄÌØÕ÷£¬µ«ÊÇÒÑ¾­È·¶¨Ã»ÓĞÆ¥ÅäµÄ×Ó½áµã??
+			// 3.Æ¥ÅäµÄ×Ó½áµãÁĞ±íÖĞÖ»Ê£ÏÂ????ÔªËØ??
 			result.hasResult(true);
 			result.setResult(getMappedNode());
 		} else {
-			// ï¿½?ï¿½ï¿½è¿˜æ²¡æœ‰å®Œæˆï¼Œè¿”å›ä¸‹ä¸€ï¿½?ï¿½ï¿½è¯¢é—®çš„ç‰¹ï¿½?
+			// ????»¹Ã»ÓĞÍê³É£¬·µ»ØÏÂÒ»????Ñ¯ÎÊµÄÌØ??
 			result.hasResult(false);
 			int nextAttributeId = selectState.length() - 1;
 			result.setNext(retrievalNode.getRetrievalDataSource().getAttributes().get(nextAttributeId));

@@ -18,6 +18,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.ActionSupport;
+import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
 import com.zj.retrieval.master.UserField;
@@ -64,9 +65,11 @@ public class AddRootNodeAction {
 			root.setNodeType(NodeType.NODETYPE_CLASS);
 			root.setUri(uri);
 			root.setUriName(root.getUri() + "#" + uri_name);
+			root.setDetailType(DetailType.FULL);
+			root.setParentId(Node.VIRTUAL_NODE_NAME);
 			
 			// 解析images
-			List<String> images_path = new ArrayList<String>();
+			List<String> fullPaths = new ArrayList<String>();
 			String realpath = ServletActionContext.getServletContext().getRealPath("/images");
 			File folder = new File(realpath);
 			if(!folder.exists()) folder.mkdirs();
@@ -75,10 +78,10 @@ public class AddRootNodeAction {
 					String filename = UUID.randomUUID().toString() + ".jpg";
 					File destfile = new File(folder, filename);
 					FileUtils.copyFile(srcfile, destfile);
-					images_path.add("images/" + filename);
+					fullPaths.add("images/" + filename);
 				}
 			}
-			root.setImages(images_path);
+			root.setImages(fullPaths);
 			
 			// 解析自定义字段
 			if (user_field != null && !user_field.isEmpty()) {
@@ -86,8 +89,8 @@ public class AddRootNodeAction {
 				root.setUserfields(UserField.parse(user_field_jsonarray));
 			}
 			
-			NodeDao ndService = Util.getNodeDao();
-			ndService.addRootNode(root);
+			NodeDao nodeDao = Util.getNodeDao();
+			nodeDao.addRootNode(root);
 			
 			this.message = "Success, o(∩_∩)o...";
 			return ActionSupport.SUCCESS;

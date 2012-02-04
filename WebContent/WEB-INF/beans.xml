@@ -32,11 +32,11 @@
   	<property name="dataSource" ref="dataSource"/>
 </bean>
 
-<bean id="nodeService" class="com.zj.retrieval.master.dao.NodeService">
+<bean id="nodeDao" class="com.zj.retrieval.master.dao.NodeDao">
 	<property name="dataSource" ref="dataSource"></property>
 </bean>
 
-<bean id="nodeRetrieval" class="com.zj.retrieval.master.NodeRetrieval" />
+<bean id="retrievalDao" class="com.zj.retrieval.master.dao.RetrievalDao" />
 
 <!-- <bean id="fileUploadConfig" class="com.zj.fr.server.FileUploadConfig"> -->
 <!-- 	<property name="thumbfileFolderName" value="thumbImages"/> -->

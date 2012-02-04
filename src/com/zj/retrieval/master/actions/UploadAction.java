@@ -73,4 +73,12 @@ public class UploadAction {
 	public void setImage(File image) {
 		this.image = image;
 	}
+
+	public void setPost_user_name(String post_user_name) {
+		this.post_user_name = post_user_name;
+	}
+
+	public void setPost_user_password(String post_user_password) {
+		this.post_user_password = post_user_password;
+	}
 }

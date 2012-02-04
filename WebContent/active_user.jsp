@@ -14,7 +14,7 @@
 	$(function() {
 		$('.active_btn').click(function () {
 			var a = $(this);
-			a.attr('href', a.attr() + '&post_user_name=' + $('#post_user_name').val() + 
+			a.attr('href', a.attr('href') + '&post_user_name=' + $('#post_user_name').val() + 
 					'&post_user_password=' + $('#post_user_password').val());
 			return true;
 		});

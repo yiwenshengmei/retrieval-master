@@ -28,4 +28,15 @@
 		</action>
 	</package>
 	
+	<package name="user" namespace="/user" extends="struts-default">
+		<action name="add" class="com.zj.retrieval.master.actions.AddUserAction">
+			<result name="success">/common-message.jsp</result>
+			<result name="error">/common-message.jsp</result>
+		</action>
+		<action name="active" class="com.zj.retrieval.master.actions.ActiveUserAction">
+			<result name="success">/common-message.jsp</result>
+			<result name="error">/common-message.jsp</result>
+		</action>
+	</package>
+	
 </struts>

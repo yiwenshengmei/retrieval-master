@@ -21,7 +21,7 @@ public class DeleteNodeAction {
 	public String execute() {
 		try {
 			UserDao userDao = Util.getUserDao();
-			if (!userDao.verifyUser(post_user_name, post_user_password)) {
+			if (!userDao.verifySu(post_user_name, post_user_password)) {
 				this.isError = true;
 				this.message = "用户名或密码错误.";
 				return ActionSupport.ERROR;

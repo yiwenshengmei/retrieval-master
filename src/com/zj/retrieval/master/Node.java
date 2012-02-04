@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,14 @@ public class Node {
 	
 	public Node() {
 		retrievalDataSource = new RetrievalDataSource();
+	}
+	public void setImagesStr(String str) {
+		if (str == null) {
+			images = new ArrayList<String>();
+		} else {
+			String[] splited = str.split(";");
+			images = Arrays.asList(splited);
+		}
 	}
 	public String getUri() {
 		return uri;
@@ -115,6 +124,15 @@ public class Node {
 	public List<String> getImages() {
 		return images;
 	}
+	public String getImagesStr() {
+		if (images == null || images.isEmpty()) return "";
+		StringBuilder sb = new StringBuilder();
+		for (String image : images) {
+			sb.append(image + ";");
+		}
+		String result = sb.toString();
+		return result.substring(0, result.length() - 1);
+	}
 	public void setImages(List<String> image) {
 		this.images = image;
 	}
@@ -170,7 +188,7 @@ public class Node {
 					NodeList fields = attrElement.getElementsByTagName("field");
 					Map<String, String> attrUserfields = new HashMap<String, String>();
 					for (int j = 0; j < fields.getLength(); j++) {
-						Element field = (Element) fields.item(i);
+						Element field = (Element) fields.item(j);
 						attrUserfields.put(field.getAttribute("key"), field.getTextContent());
 					}
 					attr.setUserFields(attrUserfields);
@@ -213,14 +231,14 @@ public class Node {
 			// 解析userfields
 			Map<String, String> user_fields = new HashMap<String, String>();
 			try {
-				NodeList nodeFields = builder.xpathFind("/RDF/Class/userFields").getElement().getChildNodes();
+				NodeList nodeFields = builder.xpathFind("/RDF/Class/userfields").getElement().getChildNodes();
 				for (int i = 0; i < nodeFields.getLength(); i++) {
 					String key = ((Element) nodeFields.item(i)).getAttribute("key");
 					String value = nodeFields.item(i).getTextContent();
 					user_fields.put(key, value);
 				}
 			} catch (XPathExpressionException e) {
-				log.info("不存在节点/RDF/Class/childNodes");
+				log.info("不存在节点/RDF/Class/userfields");
 			}
 			
 			// 解析Desc
@@ -261,7 +279,7 @@ public class Node {
 			// 创建class类型节点的owl格式
 			if(nd.getNodeType() == NodeType.NODETYPE_CLASS) {
 				// Create <owl:Class>
-				String parentURI = nd.getParentId() == "virtual" ? "" : getParentUri(nd.getParentId(), jdbcOperations);
+				String parentURI = nd.getParentId() == Node.VIRTUAL_NODE_NAME ? "" : getParentUri(nd.getParentId(), jdbcOperations);
 				XMLBuilder elemClass = builder.e("owl:Class").a("rdf:ID", nd.getUri() + "#" + nd.getEnglishName());
 				elemClass.e("rdfs:subClassOf").a("rdf:resource", parentURI);
 				elemClass.e("rdfs:label").t(nd.getLabel());

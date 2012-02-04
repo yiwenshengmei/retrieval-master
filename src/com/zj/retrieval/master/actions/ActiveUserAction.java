@@ -44,4 +44,12 @@ public class ActiveUserAction {
 	public void setId(String id) {
 		this.id = id;
 	}
+
+	public void setPost_user_name(String post_user_name) {
+		this.post_user_name = post_user_name;
+	}
+
+	public void setPost_user_password(String post_user_password) {
+		this.post_user_password = post_user_password;
+	}
 }

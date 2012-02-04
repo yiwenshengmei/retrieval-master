@@ -26,16 +26,30 @@ public class Util {
 	
 	public static UserDao getUserDao() {
 		ApplicationContext ctx = getApplicationContext();
-		return (UserDao) ctx.getBean("userService");
+		return (UserDao) ctx.getBean("userDao");
 	}
 	
 	public static NodeDao getNodeDao() {
 		ApplicationContext ctx = getApplicationContext();
-		return (NodeDao) ctx.getBean("nodeService");
+		return (NodeDao) ctx.getBean("nodeDao");
 	}
 	
 	public static RetrievalDao getNodeRetrieval() {
 		ApplicationContext ctx = getApplicationContext();
-		return (RetrievalDao) ctx.getBean("nodeRetrieval");
+		return (RetrievalDao) ctx.getBean("retrievalDao");
+	}
+	
+	public static String html(String content) {
+		if(content==null) return "";        
+	    String html = content;
+	    html = html.replaceAll("'", "&apos;");
+	    html = html.replaceAll("\"", "&quot;");
+	    html = html.replaceAll("\t", "&nbsp;&nbsp;");
+	    html = html.replaceAll(" ", "&nbsp;");
+	    html = html.replaceAll("<", "&lt;");
+	    html = html.replaceAll(">", "&gt;");
+	    html = html.replaceAll("\n", "<br/>");
+//	    html = html.replaceAll("&", "&amp;");
+	    return html;
 	}
 }

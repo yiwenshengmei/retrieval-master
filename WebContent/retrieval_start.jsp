@@ -3,7 +3,7 @@
 <%@page import="java.util.Map"%>
 <%@page import="java.util.List"%>
 <%@page import="com.zj.retrieval.master.RetrievalResult"%>
-<%@page import="com.zj.retrieval.master.NodeRetrieval"%>
+<%@page import="com.zj.retrieval.master.dao.NodeDao"%>
 <%@page import="com.zj.retrieval.master.Util"%>
 <%@page import="com.zj.retrieval.master.dao.NodeDao"%>
 
@@ -17,7 +17,7 @@
 <title>检索</title>
 <%
 	NodeDao nodeDao = Util.getNodeDao();
-	Node root = nodeDao.queryNodeById(Node.VIRTUAL_NODE_NAME);
+	Node root = nodeDao.getNodeById(Node.VIRTUAL_NODE_NAME);
 	List<Node> rootChilds = new ArrayList<Node>();
 %>
 <script type="text/javascript" src='jquery-1.7.1.js'></script>

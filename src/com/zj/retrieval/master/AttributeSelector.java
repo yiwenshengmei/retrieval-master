@@ -12,7 +12,7 @@ public class AttributeSelector {
 		if (attributeMapping.containsKey(new Integer(index))) {
 			attributeMapping.put(index, flag);
 		} else {
-			throw new AttributeSelectedWrongException("indexå‚æ•°é”™è¯¯ï¼Œçˆ¶ç±»ä¸­æ²¡æœ‰è¯¥ç¼–å·çš„ç‰¹å¾ã€‚"); 
+			throw new AttributeSelectedWrongException("index²ÎÊı´íÎó£¬¸¸ÀàÖĞÃ»ÓĞ¸Ã±àºÅµÄÌØÕ÷¡£"); 
 		}
 	}
 	

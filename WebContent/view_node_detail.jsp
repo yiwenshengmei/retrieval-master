@@ -45,17 +45,17 @@
 		
 		boolean isFull = (nd.getDetailType() == DetailType.FULL);
 		if (isFull) {
-	images = nd.getImages();
-	uri = nd.getUri();
-	uri_name = nd.getUriName();
-	desc = nd.getDesc();
-	owl = XMLUtil.format(nd.getOwl(), 4);
-	label = nd.getLabel();
-	child_nodes = nd.getRetrievalDataSource().getChildNodes();
-	attrs = nd.getRetrievalDataSource().getAttributes();
-	user_filed = nd.getUserfields();
+			images = nd.getImages();
+			uri = nd.getUri();
+			uri_name = nd.getUriName();
+			desc = nd.getDesc();
+			owl = Util.html(XMLUtil.format(nd.getOwl(), 4));
+			label = nd.getLabel();
+			child_nodes = nd.getRetrievalDataSource().getChildNodes();
+			attrs = nd.getRetrievalDataSource().getAttributes();
+			user_filed = nd.getUserfields();
 		} else {
-	contact = nd.getContact();
+			contact = nd.getContact();
 		}
 		
 		

@@ -9,6 +9,7 @@ import java.util.UUID;
 import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedBeanPropertyRowMapper;
@@ -26,7 +27,7 @@ public class NodeDao {
 	private static Log log = LogFactory.getLog(NodeDao.class);
 	
 	public List<Node> getAllNodeAsBrief() {
-		String sql = "select `id`, `name`, `parent_id` as parentId, `detail_type` as detailType from `fish`)";
+		String sql = "select `id`, `images` as imagesStr, `name`, `parent_id` as parentId, `detail_type` as detailType from `fish`";
 		ParameterizedRowMapper<Node> rm = 
 				ParameterizedBeanPropertyRowMapper.newInstance(Node.class);
 		List<Node> queryResult = sqlclient.query(sql, rm);
@@ -35,34 +36,34 @@ public class NodeDao {
 	
 	public boolean deleteNode(Node nd) {
 		try {
-			// åŸå…ˆçš„ndåªæœ‰idä¿¡æ¯ï¼Œç°åœ¨æ ¹æ®idä»æ•°æ®åº“ä¸­å–å‡ºè¯¥nodeçš„å®Œæ•´ä¿¡æ¯
+			// Ô­ÏÈµÄndÖ»ÓĞidĞÅÏ¢£¬ÏÖÔÚ¸ù¾İid´ÓÊı¾İ¿âÖĞÈ¡³ö¸ÃnodeµÄÍêÕûĞÅÏ¢
 			nd = getNodeById(nd.getId());
-			// æ‰¾åˆ°å®ƒçš„çˆ¶èŠ‚ç‚¹
+			// ÕÒµ½ËüµÄ¸¸½Úµã
 			Node parent = getNodeById(nd.getParentId());
 			
-			// å°†ndåœ¨å…¶çˆ¶èŠ‚ç‚¹ä¸­çš„ä¿¡æ¯åˆ é™¤ï¼Œå³ä»çˆ¶èŠ‚ç‚¹çš„å­ç»“ç‚¹åˆ—è¡¨ä¸­åˆ é™¤nd
+			// ½«ndÔÚÆä¸¸½ÚµãÖĞµÄĞÅÏ¢É¾³ı£¬¼´´Ó¸¸½ÚµãµÄ×Ó½áµãÁĞ±íÖĞÉ¾³ınd
 			RetrievalDataSource dataSource = parent.getRetrievalDataSource();
 			int row = dataSource.getChildNodes().indexOf(nd.getId());
-			dataSource.getChildNodes().remove(new Integer(nd.getId()));
-			// åˆ é™¤çˆ¶èŠ‚ç‚¹çŸ©é˜µä¸­çš„ç›¸å…³ä¿¡æ¯
+			dataSource.getChildNodes().remove(nd.getId());
+			// É¾³ı¸¸½Úµã¾ØÕóÖĞµÄÏà¹ØĞÅÏ¢
 			dataSource.getMatrix().removeRow(row);
-			// æ›´æ–°çˆ¶èŠ‚ç‚¹çš„owl
+			// ¸üĞÂ¸¸½ÚµãµÄowl
 			parent.setOwl(Node.getOwlFromNode(parent, sqlclient));
-			// å°†çˆ¶èŠ‚ç‚¹å†™å›æ•°æ®åº“
+			// ½«¸¸½ÚµãĞ´»ØÊı¾İ¿â
 			String sqlUpdateParentNode = "UPDATE `fish` SET `owl`=:owl WHERE `id`=:id";
 			SqlParameterSource paramUpdateParentNode = new BeanPropertySqlParameterSource(parent);
 			if (sqlclient.update(sqlUpdateParentNode, paramUpdateParentNode) != 1) {
-				throw new Exception("æ›´æ–°çˆ¶ç±»æ—¶å¤±è´¥@NodeService.delNode()"); // Rollback
+				throw new Exception("¸üĞÂ¸¸ÀàÊ±Ê§°Ü@NodeService.delNode()"); // Rollback
 			}
 			
-			// å¼€å§‹ä»æ•°æ®åº“ä¸­åˆ é™¤nd
+			// ¿ªÊ¼´ÓÊı¾İ¿âÖĞÉ¾³ınd
 			String sql = "DELETE FROM `fish` where id=?";
 			if (sqlclient.update(sql, nd.getId()) != 1)
-				throw new Exception(String.format("åˆ é™¤èŠ‚ç‚¹[id=%1$s]æ—¶å¤±è´¥", nd.getId()));
+				throw new Exception(String.format("É¾³ı½Úµã[id=%1$s]Ê±Ê§°Ü", nd.getId()));
 			else
 				return true;
 		} catch (Exception ex) {
-			log.error("delNode()å‘ç”Ÿé”™è¯¯", ex);
+			log.error("delNode()·¢Éú´íÎó", ex);
 			return false;
 		}
 	}
@@ -72,9 +73,9 @@ public class NodeDao {
 		return false;
 	}
 		
-	public Node getNodeById(String id) {
+	public Node getNodeById(String id) throws Exception {
 		try {
-			String sql = "select `id`, `uri_name` as uriName, `name`, " +
+			String sql = "select `id`, `uri_name` as uriName, `name`, `images` as imagesStr, " +
 					"`name_en` as englishName, `parent_id` as parentId, " +
 					"`owl`, `uri` from `fish` where `id`=?";
 			ParameterizedRowMapper<Node> rowMapper = 
@@ -83,9 +84,11 @@ public class NodeDao {
 			
 			Node.parseNodeFromOWL(result);
 			return result;
+		} catch (EmptyResultDataAccessException ex) {
+			throw new Exception(String.format("IDÎª%1$sµÄ½Úµã²»´æÔÚ£¡", id));
 		} catch (Exception e) {
-			log.error(String.format("æŸ¥è¯¢èŠ‚ç‚¹æ—¶å‡ºé”™[id=%1$s]", id), e);
-			throw new RuntimeException("æŸ¥è¯¢èŠ‚ç‚¹æ—¶å‡ºé”™@NodeServiceImpl.findNodeById()", e);
+			log.error(String.format("²éÑ¯½ÚµãÊ±³ö´í[id=%1$s]", id), e);
+			throw new Exception("²éÑ¯½ÚµãÊ±³ö´í@NodeServiceImpl.findNodeById()", e);
 		}
 	}
 
@@ -105,66 +108,68 @@ public class NodeDao {
 
 	public void addNode(Node newNode, Node parentNode, AttributeSelector as) {
 		try {
-			// æ›´æ–°parentçš„matrixå±æ€§
-			log.info("æ›´æ–°çˆ¶èŠ‚ç‚¹çš„ç‰¹å¾çŸ©é˜µ");
+			// ¸üĞÂparentµÄmatrixÊôĞÔ
+			log.info("¸üĞÂ¸¸½ÚµãµÄÌØÕ÷¾ØÕó");
 			Matrix matrix = parentNode.getRetrievalDataSource().getMatrix();
-			//   å…ˆä¿®æ”¹è¡Œï¼šå°†newNodeå’ŒparentNodeä¸­å·²æœ‰ç‰¹æ€§çš„è¿›è¡ŒåŒ¹é…
-			//   å¦‚æœmatrixä¸ºç©º[åˆ—æ•°æˆ–è¡Œæ•°ç­‰äºé›¶]ï¼Œä»ç‰¹å¾çŸ©é˜µçš„è¯­ä¹‰ä¸Šæ¥è¯´æ— è®ºæ·»åŠ å¤šå°‘è¡Œ
-			//   éƒ½ç­‰äºæ²¡æœ‰æ·»åŠ ï¼Œå› ä¸ºæ²¡æœ‰å·²çŸ¥çš„ç‰¹æ€§ä¸å…¶åŒ¹é…
+			//   ÏÈĞŞ¸ÄĞĞ£º½«newNodeºÍparentNodeÖĞÒÑÓĞÌØĞÔµÄ½øĞĞÆ¥Åä
+			//   Èç¹ûmatrixÎª¿Õ[ÁĞÊı»òĞĞÊıµÈÓÚÁã]£¬´ÓÌØÕ÷¾ØÕóµÄÓïÒåÉÏÀ´ËµÎŞÂÛÌí¼Ó¶àÉÙĞĞ
+			//   ¶¼µÈÓÚÃ»ÓĞÌí¼Ó£¬ÒòÎªÃ»ÓĞÒÑÖªµÄÌØĞÔÓëÆäÆ¥Åä
 			int[] newRow = new int[matrix.getColSize()];
 			for(int i = 0; i < newRow.length; i++)
 				newRow[i] = as.getAttributeMapping().get(i) ? Attribute.YES : Attribute.NO;
 			matrix.addRow(newRow, 0, newRow.length);
 
-			//   å†ä¿®æ”¹åˆ—ï¼šå‘parentNodeæ·»åŠ åˆ›å»ºnewNodeæ—¶ä¸€èµ·æ·»åŠ çš„æ–°ç‰¹æ€§
-			//   åœ¨æ·»åŠ æ–°ç‰¹æ€§çš„åŒæ—¶å°†æ–°ç‰¹æ€§åŠ å…¥parentNodeçš„attributeåˆ—è¡¨
+			//   ÔÙĞŞ¸ÄÁĞ£ºÏòparentNodeÌí¼Ó´´½¨newNodeÊ±Ò»ÆğÌí¼ÓµÄĞÂÌØĞÔ
+			//   ÔÚÌí¼ÓĞÂÌØĞÔµÄÍ¬Ê±½«ĞÂÌØĞÔ¼ÓÈëparentNodeµÄattributeÁĞ±í
 			List<Attribute> parentAttributes = parentNode.getRetrievalDataSource().getAttributes();
 			for(Attribute attr : as.getNewAttributeMapping().keySet()) {
-				// matrixå¯èƒ½ä¸ºç©ºï¼Œå‘ç©ºçŸ©é˜µæ·»åŠ 1åˆ—éœ€è¦çš„é•¿åº¦å§‹ç»ˆæ˜¯1
+				// matrix¿ÉÄÜÎª¿Õ£¬Ïò¿Õ¾ØÕóÌí¼Ó1ÁĞĞèÒªµÄ³¤¶ÈÊ¼ÖÕÊÇ1
 				int[] newCol = matrix.getRowSize() == 0 ? new int[1] : new int[matrix.getRowSize()];
 				for(int j = 0; j < newCol.length; j++) {
 					newCol[j] = (j != newCol.length - 1 ? 0 : 
 						(as.getNewAttributeMapping().get(attr) ? Attribute.YES : Attribute.NO));
 				}
 				matrix.addCol(newCol, 0, newCol.length);
-				// åŒæ—¶æ›´æ–°parentNodeçš„attribteåˆ—è¡¨
+				// Í¬Ê±¸üĞÂparentNodeµÄattribteÁĞ±í
 				parentAttributes.add(attr);
 			}
 			
-			// åˆ›å»ºå¹¶è®¾ç½®newNodeçš„owlå­—ç¬¦ä¸²
-			log.info("åˆ›å»ºå¹¶è®¾ç½®æ–°èŠ‚ç‚¹çš„owlå­—ç¬¦ä¸²");
+			// ´´½¨²¢ÉèÖÃnewNodeµÄowl×Ö·û´®
+			log.info("´´½¨²¢ÉèÖÃĞÂ½ÚµãµÄowl×Ö·û´®");
 			newNode.setOwl(Node.getOwlFromNode(newNode, sqlclient));
 			
-			// å‘æ•°æ®åº“ä¸­æ’å…¥newNodeå¹¶ä¸”è·å¾—è‡ªåŠ¨ç”Ÿæˆçš„idå€¼
-			// å°†idå€¼è®¾ç½®åˆ°newNodeä¸­
-			log.info("å°†æ–°èŠ‚ç‚¹å†™å…¥æ•°æ®åº“");
-			newNode.setId(UUID.randomUUID().toString());
-			String sqlInsertNewNode = "insert into fish(`id`, `uriName`, `name`, " +
-					"`enName`, `parentId`, `owl`, `uri`) values(:id, :uriName, :name, :enName, :parentId, :owl, :uri)";
+			// ÏòÊı¾İ¿âÖĞ²åÈënewNode²¢ÇÒ»ñµÃ×Ô¶¯Éú³ÉµÄidÖµ
+			// ½«idÖµÉèÖÃµ½newNodeÖĞ
+			log.info("½«ĞÂ½ÚµãĞ´ÈëÊı¾İ¿â");
+			if (newNode.getId().isEmpty() || newNode.getId() == null) {
+				newNode.setId(UUID.randomUUID().toString());
+			}
+			String sqlInsertNewNode = "insert into fish(`id`, `uri_name`, `name`, `images`, " +
+					"`name_en`, `parent_id`, `owl`, `uri`) values(:id, :uriName, :name, :imagesStr, :englishName, :parentId, :owl, :uri)";
 			SqlParameterSource paramInsertNewNode = new BeanPropertySqlParameterSource(newNode) ;
 			if (sqlclient.update(sqlInsertNewNode, paramInsertNewNode) != 1) {
-				throw new Exception("æ’å…¥èŠ‚ç‚¹æ—¶å¤±è´¥@NodeService.addNode()"); // Rollback
+				throw new Exception("²åÈë½ÚµãÊ±Ê§°Ü@NodeService.addNode()"); // Rollback
 			}
 	
-			// å°†newNodeçš„idå€¼åŠ å…¥parentNodeçš„childNodesåˆ—è¡¨ä¸­
-			log.info("æ›´æ–°çˆ¶èŠ‚ç‚¹çš„å­ç»“ç‚¹åˆ—è¡¨");
+			// ½«newNodeµÄidÖµ¼ÓÈëparentNodeµÄchildNodesÁĞ±íÖĞ
+			log.info("¸üĞÂ¸¸½ÚµãµÄ×Ó½áµãÁĞ±í");
 			parentNode.getRetrievalDataSource().getChildNodes().add(newNode.getId());
-			// æ›´æ–°parentNodeçš„owlå­—ç¬¦ä¸²
-			log.info("æ›´æ–°çˆ¶èŠ‚ç‚¹çš„owlå­—ç¬¦ä¸²");
+			// ¸üĞÂparentNodeµÄowl×Ö·û´®
+			log.info("¸üĞÂ¸¸½ÚµãµÄowl×Ö·û´®");
 			parentNode.setOwl(Node.getOwlFromNode(parentNode, sqlclient));
 					
-			// å°†parentNodeé‡æ–°å†™å›æ•°æ®åº“
-			// ç”±äºåªä¿®æ”¹äº†parentNodeçš„owlä¿¡æ¯ï¼Œæ‰€ä»¥è¿™é‡Œåªæ›´æ–°owlå­—æ®µ
-			log.info("å°†çˆ¶èŠ‚ç‚¹å†™å›æ•°æ®åº“");
+			// ½«parentNodeÖØĞÂĞ´»ØÊı¾İ¿â
+			// ÓÉÓÚÖ»ĞŞ¸ÄÁËparentNodeµÄowlĞÅÏ¢£¬ËùÒÔÕâÀïÖ»¸üĞÂowl×Ö¶Î
+			log.info("½«¸¸½ÚµãĞ´»ØÊı¾İ¿â");
 			String sqlUpdateParentNode = "update `fish` set `owl`=:owl where id=:id";
 			SqlParameterSource paramUpdateParentNode = new BeanPropertySqlParameterSource(parentNode);
 			if (sqlclient.update(sqlUpdateParentNode, paramUpdateParentNode) != 1) {
-				throw new Exception("æ›´æ–°çˆ¶ç±»æ—¶å¤±è´¥@NodeService.addNode()"); // Rollback
+				throw new Exception("¸üĞÂ¸¸ÀàÊ±Ê§°Ü@NodeService.addNode()"); // Rollback
 			}
 			
 		} catch (Exception ex) {
-			log.error("NodeService.addNode()æ–¹æ³•å‘ç”Ÿé”™è¯¯", ex);
-			throw new RuntimeException("NodeService.addNode()æ–¹æ³•å‘ç”Ÿé”™è¯¯", ex);
+			log.error("NodeService.addNode()·½·¨·¢Éú´íÎó", ex);
+			throw new RuntimeException("NodeService.addNode()·½·¨·¢Éú´íÎó", ex);
 		}
 	}
 
@@ -175,51 +180,51 @@ public class NodeDao {
 	public void addRootNode(Node rootNode) {
 		try {
 
-			// 1.æ·»åŠ rootNode
-			log.info("å¼€å§‹æ’å…¥rootNode...");
-			rootNode.setParentId(""); // çˆ¶èŠ‚ç‚¹ä¿æŒpatentIdä¸ºç©ºå­—ç¬¦ä¸²
-			String new_node_id = UUID.randomUUID().toString();
-			rootNode.setId(new_node_id);
+			// 1.Ìí¼ÓrootNode
+			log.info("¿ªÊ¼²åÈërootNode...");
+			if (rootNode.getId().isEmpty() || rootNode.getId() == null) {
+				rootNode.setId(UUID.randomUUID().toString());
+			}
 			rootNode.setOwl(Node.getOwlFromNode(rootNode, sqlclient));
-			String sql = "insert into `fish`(`id`, `uri_name`, `name`, `name_en`, " +
-					"`parent_id`, `owl`, `uri`) values(:id, :uriName, :name, :englishName, :parentId, :owl, :uri)";
+			String sql = "insert into `fish`(`id`, `uri_name`, `name`, `name_en`, `images`, " +
+					"`parent_id`, `owl`, `uri`) values(:id, :uriName, :name, :englishName, :imagesStr, :parentId, :owl, :uri)";
 			SqlParameterSource param = new BeanPropertySqlParameterSource(rootNode);
 			int result = sqlclient.update(sql, param);
 			
-			if (result != 1) throw new Exception("æ’å…¥rootNodeæ—¶è¿”å›ç»“æœä¸ç­‰äº1.");
+			if (result != 1) throw new Exception("²åÈërootNodeÊ±·µ»Ø½á¹û²»µÈÓÚ1.");
 			
-			// 2.æ›´æ–°abstractRootNode[id="virtual_node"]èŠ‚ç‚¹çš„childNodeså±æ€§
-			log.info("å¼€å§‹æ›´æ–°abstractRootNodeçš„å­èŠ‚ç‚¹åˆ—è¡¨...");
-			String virtual_node_query_sql = "select `owl` from `fish` where `id`=?";
-			List<Node> vrtl_node_query_result = sqlclient.query(virtual_node_query_sql, new ParameterizedRowMapper<Node>() {
+			// 2.¸üĞÂabstractRootNode[id="virtual_node"]½ÚµãµÄchildNodesÊôĞÔ
+			log.info("¿ªÊ¼¸üĞÂabstractRootNodeµÄ×Ó½ÚµãÁĞ±í...");
+			String vtrlNodeQuerySQL = "select `owl` from `fish` where `id`=?";
+			List<Node> vrtlNodeQueryResult = sqlclient.query(vtrlNodeQuerySQL, new ParameterizedRowMapper<Node>() {
 
 				public Node mapRow(ResultSet rs, int rowNum) throws SQLException {
-					Node vrtl_node = null;
+					Node result = null;
 					try {
 						String owl = rs.getString("owl");
-						if(owl == null || owl.equals("")) {
-							log.error("VirtualNodeå­˜åœ¨ï¼Œä½†æ˜¯owlä¿¡æ¯ä¸ºç©ºï¼Œè¿™æ€ä¹ˆå¯èƒ½ï¼Ÿ");
+						if(owl == null || owl.isEmpty()) {
+							log.error("VirtualNode´æÔÚ£¬µ«ÊÇowlĞÅÏ¢Îª¿Õ£¬ÕâÔõÃ´¿ÉÄÜ£¿");
 							return null;
 						}
-						vrtl_node = Node.parseVirtualNodeFromOWL(owl);
+						result = Node.parseVirtualNodeFromOWL(owl);
 					} catch (Exception e) {
-						log.error("è§£æè™šæ‹ŸèŠ‚ç‚¹ä¸­çš„owlæ—¶å‡ºé”™ã€‚");
+						log.error("½âÎöĞéÄâ½ÚµãÖĞµÄowlÊ±³ö´í¡£");
 						return null;
 					}
-					return vrtl_node;
+					return result;
 				}
 			}, Node.VIRTUAL_NODE_NAME);
 			
 			Node virtual_node = null;
-			if (vrtl_node_query_result == null) {
-				log.error("æŸ¥è¯¢è™šæ‹ŸèŠ‚ç‚¹æ—¶å‡ºé”™ã€‚");
-				throw new Exception("æŸ¥è¯¢è™šæ‹ŸèŠ‚ç‚¹æ—¶å‡ºé”™ã€‚");
+			if (vrtlNodeQueryResult == null) {
+				log.error("²éÑ¯ĞéÄâ½ÚµãÊ±³ö´í¡£");
+				throw new Exception("²éÑ¯ĞéÄâ½ÚµãÊ±³ö´í¡£");
 			}
-			if (vrtl_node_query_result.size() == 0) {
-				// è¿™è¯´æ˜id="VirtualNode"çš„è®°å½•ä¸å­˜åœ¨
-				// è¿™ç§æƒ…å†µé€šå¸¸åªå‘ç”Ÿåœ¨ç¨‹åºç¬¬ä¸€æ¬¡è¿è¡Œæ—¶
-				// åˆ›å»ºä¸€ä¸ªæ–°çš„è™šæ ¹èŠ‚ç‚¹ï¼Œè®¾ç½®id="VirtualNode"ï¼Œå¹¶å†™å…¥æ•°æ®åº“
-				log.info("å› ä¸ºabstractRootNodeè®°å½•ä¸å­˜åœ¨ï¼Œå°†æ–°å»ºä¸€ä¸ªabstractRootNode");
+			if (vrtlNodeQueryResult.size() == 0) {
+				// ÕâËµÃ÷id="VirtualNode"µÄ¼ÇÂ¼²»´æÔÚ
+				// ÕâÖÖÇé¿öÍ¨³£Ö»·¢ÉúÔÚ³ÌĞòµÚÒ»´ÎÔËĞĞÊ±
+				// ´´½¨Ò»¸öĞÂµÄĞé¸ù½Úµã£¬ÉèÖÃid="VirtualNode"£¬²¢Ğ´ÈëÊı¾İ¿â
+				log.info("ÒòÎªvirtual_node¼ÇÂ¼²»´æÔÚ£¬½«ĞÂ½¨Ò»¸övirtual_node");
 				virtual_node = new Node();
 				int insert_vrtl_node_result = sqlclient.getJdbcOperations().update(
 						"INSERT INTO `fish`(" +
@@ -227,96 +232,96 @@ public class NodeDao {
 						"VALUES('virtual_node','','','',-1,'','');"
 				);
 				if (insert_vrtl_node_result != 1) {
-					log.error("åˆ›å»ºVirtualNodeå¤±è´¥ã€‚");
-					throw new Exception("åˆ›å»ºVirtualNodeå¤±è´¥ã€‚");
+					log.error("´´½¨VirtualNodeÊ§°Ü¡£");
+					throw new Exception("´´½¨VirtualNodeÊ§°Ü¡£");
 				}
-				log.info("æ–°å»ºçš„VirtualNodeæ’å…¥æ•°æ®åº“æˆåŠŸ");
+				log.info("ĞÂ½¨µÄVirtualNode²åÈëÊı¾İ¿â³É¹¦");
 			} else {
-				virtual_node = vrtl_node_query_result.get(0);
+				virtual_node = vrtlNodeQueryResult.get(0);
 			}
 			
-			virtual_node.getRetrievalDataSource().getChildNodes().add(new_node_id);
+			virtual_node.getRetrievalDataSource().getChildNodes().add(rootNode.getId());
 	
-			// é‡å»ºVirtualNodeçš„owlå­—æ®µ
+			// ÖØ½¨VirtualNodeµÄowl×Ö¶Î
 			virtual_node.setOwl(Node.getOwlFromNode(virtual_node, sqlclient));
-			log.info("ç”Ÿæˆæ–°çš„owlå­—ç¬¦ä¸²ï¼š" + virtual_node.getOwl());
+			log.info("Éú³ÉĞÂµÄowl×Ö·û´®£º" + virtual_node.getOwl());
 			
-			// å°†VirtualNodeå†™å›æ•°æ®åº“
-			log.info("å¼€å§‹å°†VirtualNodeå†™å›æ•°æ®...");
+			// ½«VirtualNodeĞ´»ØÊı¾İ¿â
+			log.info("¿ªÊ¼½«VirtualNodeĞ´»ØÊı¾İ...");
 			String update_vrtl_node_sql = "update `fish` set `owl`=:owl where `id`='virtual_node'";
 			SqlParameterSource vrtl_node_param = new BeanPropertySqlParameterSource(virtual_node);
 			sqlclient.update(update_vrtl_node_sql, vrtl_node_param);
-			log.info("VirtualNodeå†™å›æ•°æ®åº“æˆåŠŸ");
+			log.info("VirtualNodeĞ´»ØÊı¾İ¿â³É¹¦");
 			
 		} catch (Exception ex) {
-			log.error("æ·»åŠ rootNodeæ—¶å‘ç”Ÿé”™è¯¯ï¼Œäº‹åŠ¡å°†å›æ»š", ex);
-			throw new RuntimeException("æ·»åŠ rootNodeæ—¶å‘ç”Ÿé”™è¯¯", ex); // å›æ»š
+			log.error("Ìí¼ÓrootNodeÊ±·¢Éú´íÎó£¬ÊÂÎñ½«»Ø¹ö", ex);
+			throw new RuntimeException("Ìí¼ÓrootNodeÊ±·¢Éú´íÎó", ex); // »Ø¹ö
 		}
 	}
 
-	// å¢åŠ åªåŒ…å«æ£€ç´¢ä¿¡æ¯çš„èŠ‚ç‚¹
+	// Ôö¼ÓÖ»°üº¬¼ìË÷ĞÅÏ¢µÄ½Úµã
 	public void addNodeBrief(Node newNode, Node parentNode, AttributeSelector as) {
 		try {
-			// æ›´æ–°parentçš„matrixå±æ€§
-			log.info("æ›´æ–°çˆ¶èŠ‚ç‚¹çš„ç‰¹å¾çŸ©é˜µ");
+			// ¸üĞÂparentµÄmatrixÊôĞÔ
+			log.info("¸üĞÂ¸¸½ÚµãµÄÌØÕ÷¾ØÕó");
 			Matrix matrix = parentNode.getRetrievalDataSource().getMatrix();
-			//   å…ˆä¿®æ”¹è¡Œï¼šå°†newNodeå’ŒparentNodeä¸­å·²æœ‰ç‰¹æ€§çš„è¿›è¡ŒåŒ¹é…
-			//   å¦‚æœmatrixä¸ºç©º[åˆ—æ•°æˆ–è¡Œæ•°ç­‰äºé›¶]ï¼Œä»ç‰¹å¾çŸ©é˜µçš„è¯­ä¹‰ä¸Šæ¥è¯´æ— è®ºæ·»åŠ å¤šå°‘è¡Œ
-			//   éƒ½ç­‰äºæ²¡æœ‰æ·»åŠ ï¼Œå› ä¸ºæ²¡æœ‰å·²çŸ¥çš„ç‰¹æ€§ä¸å…¶åŒ¹é…
+			//   ÏÈĞŞ¸ÄĞĞ£º½«newNodeºÍparentNodeÖĞÒÑÓĞÌØĞÔµÄ½øĞĞÆ¥Åä
+			//   Èç¹ûmatrixÎª¿Õ[ÁĞÊı»òĞĞÊıµÈÓÚÁã]£¬´ÓÌØÕ÷¾ØÕóµÄÓïÒåÉÏÀ´ËµÎŞÂÛÌí¼Ó¶àÉÙĞĞ
+			//   ¶¼µÈÓÚÃ»ÓĞÌí¼Ó£¬ÒòÎªÃ»ÓĞÒÑÖªµÄÌØĞÔÓëÆäÆ¥Åä
 			int[] newRow = new int[matrix.getColSize()];
 			for(int i = 0; i < newRow.length; i++)
 				newRow[i] = as.getAttributeMapping().get(i) ? Attribute.YES : Attribute.NO;
 			matrix.addRow(newRow, 0, newRow.length);
 
-			//   å†ä¿®æ”¹åˆ—ï¼šå‘parentNodeæ·»åŠ åˆ›å»ºnewNodeæ—¶ä¸€èµ·æ·»åŠ çš„æ–°ç‰¹æ€§
-			//   åœ¨æ·»åŠ æ–°ç‰¹æ€§çš„åŒæ—¶å°†æ–°ç‰¹æ€§åŠ å…¥parentNodeçš„attributeåˆ—è¡¨
+			//   ÔÙĞŞ¸ÄÁĞ£ºÏòparentNodeÌí¼Ó´´½¨newNodeÊ±Ò»ÆğÌí¼ÓµÄĞÂÌØĞÔ
+			//   ÔÚÌí¼ÓĞÂÌØĞÔµÄÍ¬Ê±½«ĞÂÌØĞÔ¼ÓÈëparentNodeµÄattributeÁĞ±í
 			List<Attribute> parentAttributes = parentNode.getRetrievalDataSource().getAttributes();
 			for(Attribute attr : as.getNewAttributeMapping().keySet()) {
-				// matrixå¯èƒ½ä¸ºç©ºï¼Œå‘ç©ºçŸ©é˜µæ·»åŠ 1åˆ—éœ€è¦çš„é•¿åº¦å§‹ç»ˆæ˜¯1
+				// matrix¿ÉÄÜÎª¿Õ£¬Ïò¿Õ¾ØÕóÌí¼Ó1ÁĞĞèÒªµÄ³¤¶ÈÊ¼ÖÕÊÇ1
 				int[] newCol = matrix.getRowSize() == 0 ? new int[1] : new int[matrix.getRowSize()];
 				for(int j = 0; j < newCol.length; j++) {
 					newCol[j] = (j != newCol.length - 1 ? 0 : 
 						(as.getNewAttributeMapping().get(attr) ? Attribute.YES : Attribute.NO));
 				}
 				matrix.addCol(newCol, 0, newCol.length);
-				// åŒæ—¶æ›´æ–°parentNodeçš„attribteåˆ—è¡¨
+				// Í¬Ê±¸üĞÂparentNodeµÄattribteÁĞ±í
 				parentAttributes.add(attr);
 			}
 			
-			// åˆ›å»ºå¹¶è®¾ç½®newNodeçš„owlå­—ç¬¦ä¸²
-//			log.info("åˆ›å»ºå¹¶è®¾ç½®æ–°èŠ‚ç‚¹çš„owlå­—ç¬¦ä¸²");
+			// ´´½¨²¢ÉèÖÃnewNodeµÄowl×Ö·û´®
+//			log.info("´´½¨²¢ÉèÖÃĞÂ½ÚµãµÄowl×Ö·û´®");
 //			newNode.setOwl(Node.getOwlFromNode(newNode, sqlclient));
 			
-			log.info("å°†æ–°èŠ‚ç‚¹å†™å…¥æ•°æ®åº“");
-			// æ³¨æ„ï¼ŒbriefèŠ‚ç‚¹çš„IDå€¼æ˜¯ç”±å®¢æˆ·ç«¯æä¾›çš„ï¼ï¼ï¼
-			// ä¸ºæ–°èŠ‚ç‚¹detailTypeè®¾ç½®å€¼: brief
+			log.info("½«ĞÂ½ÚµãĞ´ÈëÊı¾İ¿â");
+			// ×¢Òâ£¬brief½ÚµãµÄIDÖµÊÇÓÉ¿Í»§¶ËÌá¹©µÄ£¡£¡£¡
+			// ÎªĞÂ½ÚµãdetailTypeÉèÖÃÖµ: brief
 			newNode.setDetailType(DetailType.BRIEF);
 			String sqlInsertNewNode = "insert into fish(`id`, `name`, `detail_type`" +
-					"`enName`, `parentId`, `contact`) values(:id, :name, :enName, :parentId, :detailType, :contact)";
+					"`name_en`, `parentId`, `contact`) values(:id, :name, :englishName, :parentId, :detailType, :contact)";
 			SqlParameterSource paramInsertNewNode = new BeanPropertySqlParameterSource(newNode) ;
 			if (sqlclient.update(sqlInsertNewNode, paramInsertNewNode) != 1) {
-				throw new Exception("æ’å…¥èŠ‚ç‚¹æ—¶å¤±è´¥@NodeService.addNode()"); // Rollback
+				throw new Exception("²åÈë½ÚµãÊ±Ê§°Ü@NodeService.addNode()"); // Rollback
 			}
 	
-			// å°†newNodeçš„idå€¼åŠ å…¥parentNodeçš„childNodesåˆ—è¡¨ä¸­
-			log.info("æ›´æ–°çˆ¶èŠ‚ç‚¹çš„å­ç»“ç‚¹åˆ—è¡¨");
+			// ½«newNodeµÄidÖµ¼ÓÈëparentNodeµÄchildNodesÁĞ±íÖĞ
+			log.info("¸üĞÂ¸¸½ÚµãµÄ×Ó½áµãÁĞ±í");
 			parentNode.getRetrievalDataSource().getChildNodes().add(newNode.getId());
-			// æ›´æ–°parentNodeçš„owlå­—ç¬¦ä¸²
-			log.info("æ›´æ–°çˆ¶èŠ‚ç‚¹çš„owlå­—ç¬¦ä¸²");
+			// ¸üĞÂparentNodeµÄowl×Ö·û´®
+			log.info("¸üĞÂ¸¸½ÚµãµÄowl×Ö·û´®");
 			parentNode.setOwl(Node.getOwlFromNode(parentNode, sqlclient));
 					
-			// å°†parentNodeé‡æ–°å†™å›æ•°æ®åº“
-			// ç”±äºåªä¿®æ”¹äº†parentNodeçš„owlä¿¡æ¯ï¼Œæ‰€ä»¥è¿™é‡Œåªæ›´æ–°owlå­—æ®µ
-			log.info("å°†çˆ¶èŠ‚ç‚¹å†™å›æ•°æ®åº“");
+			// ½«parentNodeÖØĞÂĞ´»ØÊı¾İ¿â
+			// ÓÉÓÚÖ»ĞŞ¸ÄÁËparentNodeµÄowlĞÅÏ¢£¬ËùÒÔÕâÀïÖ»¸üĞÂowl×Ö¶Î
+			log.info("½«¸¸½ÚµãĞ´»ØÊı¾İ¿â");
 			String sqlUpdateParentNode = "update `fish` set `owl`=:owl where id=:id";
 			SqlParameterSource paramUpdateParentNode = new BeanPropertySqlParameterSource(parentNode);
 			if (sqlclient.update(sqlUpdateParentNode, paramUpdateParentNode) != 1) {
-				throw new Exception("æ›´æ–°çˆ¶ç±»æ—¶å¤±è´¥@NodeService.addNode()"); // Rollback
+				throw new Exception("¸üĞÂ¸¸ÀàÊ±Ê§°Ü@NodeService.addNode()"); // Rollback
 			}
 			
 		} catch (Exception ex) {
-			log.error("NodeService.addNode()æ–¹æ³•å‘ç”Ÿé”™è¯¯", ex);
-			throw new RuntimeException("NodeService.addNode()æ–¹æ³•å‘ç”Ÿé”™è¯¯", ex);
+			log.error("NodeService.addNode()·½·¨·¢Éú´íÎó", ex);
+			throw new RuntimeException("NodeService.addNode()·½·¨·¢Éú´íÎó", ex);
 		}
 	}
 }

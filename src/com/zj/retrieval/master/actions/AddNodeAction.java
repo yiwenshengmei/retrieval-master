@@ -27,7 +27,9 @@ import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Attribute;
 import com.zj.retrieval.master.AttributeSelectedWrongException;
 import com.zj.retrieval.master.AttributeSelector;
+import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Node;
+import com.zj.retrieval.master.NodeType;
 import com.zj.retrieval.master.UserField;
 import com.zj.retrieval.master.Util;
 import com.zj.retrieval.master.dao.NodeDao;
@@ -36,8 +38,8 @@ import com.zj.retrieval.master.dao.UserDao;
 public class AddNodeAction {
 	private static Log log = LogFactory.getLog(AddNodeAction.class);
 	private String desc;
-	private String name_en;
-	private String name;
+	private String node_name_en;
+	private String node_name;
 	private int node_type;
 	private String parent_id;
 	private String uri;
@@ -65,40 +67,41 @@ public class AddNodeAction {
 				return ActionSupport.ERROR;
 			}
 			
-			Node new_node = new Node();
-			new_node.setDesc(desc);
-			new_node.setEnglishName(name_en);
-			new_node.setName(name);
-			new_node.setNodeType(node_type);
-			new_node.setParentId(parent_id);
-			new_node.setUri(uri);
-			new_node.setUriName(new_node.getUri() + "#" + new_node.getEnglishName());
+			Node newNode = new Node();
+			newNode.setDesc(desc);
+			newNode.setEnglishName(node_name_en);
+			newNode.setName(node_name);
+			newNode.setNodeType(NodeType.NODETYPE_CLASS); // 先暂时写死
+			newNode.setParentId(parent_id);
+			newNode.setUri(uri);
+			newNode.setUriName(newNode.getUri() + "#" + newNode.getEnglishName());
+			newNode.setDetailType(DetailType.FULL);
 			
 			// 解析images
-			List<String> images_path = new ArrayList<String>();
+			List<String> fullPaths = new ArrayList<String>();
 			for (String image_id : images.split(";")) {
-				images_path.add("images/" + image_id);
+				fullPaths.add("images/" + image_id);
 			}
-			new_node.setImages(images_path);
+			newNode.setImages(fullPaths);
 			
 			// 解析自定义字段
 			if (user_field != null && !user_field.isEmpty()) {
-				JSONArray user_field_jsonarray = new JSONArray(user_field);
-				new_node.setUserfields(UserField.parse(user_field_jsonarray));
+				JSONArray userFieldJSONArray = new JSONArray(user_field);
+				newNode.setUserfields(UserField.parse(userFieldJSONArray));
 			}
 			
-			NodeDao ndService =  Util.getNodeDao();;
+			NodeDao nodeDao =  Util.getNodeDao();
 			
-			Node parent_node = ndService.getNodeById(new_node.getParentId());
-			log.info("找到父节点：" + parent_node);
-			AttributeSelector attrSelector = ndService.getAttributeSelector(parent_node);
-			String[] selectedAttributes = parent_attr.equals("") ?
+			Node parentNode = nodeDao.getNodeById(newNode.getParentId());
+			log.info("找到父节点：" + parentNode);
+			AttributeSelector attrSelector = nodeDao.getAttributeSelector(parentNode);
+			String[] selectedAttributes = parent_attr.isEmpty() ?
 				new String[0] : parent_attr.split(" ");
 			for (int i = 0; i < selectedAttributes.length; i++) {
 				int selectedAttribute = Integer.valueOf(selectedAttributes[i]);
 				attrSelector.select(selectedAttribute, true);
 				log.info(String.format("选择父节点属性[id=%1$s, name=%2$s]", selectedAttribute, 
-						parent_node.getRetrievalDataSource().getAttributes().get(selectedAttribute).getName()));
+						parentNode.getRetrievalDataSource().getAttributes().get(selectedAttribute).getName()));
 			}
 			JSONArray jNewAttributes = new JSONArray(new_attr);
 			for (int i = 0; i < jNewAttributes.length(); i++) {
@@ -107,46 +110,41 @@ public class AddNodeAction {
 						                          jAttr.getString("new_attr_name_en"),
 						                          jAttr.getString("new_attr_desc"),
 						                          jAttr.getString("new_attr_image"));
-				JSONArray jAttrUserfields = jAttr.getJSONArray("user_fields");
+				JSONArray jAttrUserfields = jAttr.getJSONArray("new_attr_user_field");
 				newAttr.setUserFields(UserField.parse(jAttrUserfields));
 				log.info("新添加的属性：" + newAttr);
 				attrSelector.addNewAttribute(newAttr, true);
 			}
-			ndService.addNode(new_node, parent_node, attrSelector);
+			nodeDao.addNode(newNode, parentNode, attrSelector);
 			
 			this.message = "Success, o(∩_∩)o...";
 			return ActionSupport.SUCCESS;
 			
 		} catch (JSONException e) {
-			log.error("数据格式错误", e);
 			this.message = "客户端程序发送数据格式错误！请使用最新的客户端程序。";
 			return ActionSupport.ERROR;
 		} catch (AttributeSelectedWrongException e) {
-			log.info("不存在这样的父节点");
 			this.message = "不存在这样的父节点属性！";
 			return ActionSupport.ERROR;
 		} catch (NumberFormatException ex) {
-			log.info("客户端输入了错误的父节点属性");
 			this.message = "父节点属性格式错误！";
 			return ActionSupport.ERROR;
 		} catch (Exception ex) {
-			log.error("在添加子结点时发生未知错误", ex);
-			this.message = "在添加子结点时发生未知错误";
+			this.message = ex.getMessage();
 			return ActionSupport.ERROR;
 		}
-	
 	}
 
 	public void setDesc(String desc) {
 		this.desc = desc;
 	}
 
-	public void setName_en(String name_en) {
-		this.name_en = name_en;
+	public void setNode_name_en(String name_en) {
+		this.node_name_en = name_en;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setNode_name(String name) {
+		this.node_name = name;
 	}
 
 	public void setNode_type(int node_type) {
@@ -179,5 +177,13 @@ public class AddNodeAction {
 
 	public String getMessage() {
 		return message;
+	}
+
+	public void setPost_user_name(String post_user_name) {
+		this.post_user_name = post_user_name;
+	}
+
+	public void setPost_user_password(String post_user_password) {
+		this.post_user_password = post_user_password;
 	}
 }

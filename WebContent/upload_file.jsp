@@ -11,6 +11,7 @@
 	PostUserName: <input type='text' name='post_user_name'/>
 	PostUserPassword: <input type='text' name='post_user_password'/>
 	<input name='image' type="file"/>
+	<input name='submit' value='submit' type="submit"/>
 </form>
 </body>
 </html>

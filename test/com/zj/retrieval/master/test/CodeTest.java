@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -66,13 +67,7 @@ public class CodeTest {
 	
 	@Test
 	public void t5() {
-		List<Integer> array = new ArrayList<Integer>();
-		array.add(12);
-		array.add(14);
-//		array.remove(new Integer(12));
-		for(int x : array) {
-			System.out.println(x);
-		}
+		System.out.println(UUID.randomUUID().toString());
 	}
 	
 	@Test
