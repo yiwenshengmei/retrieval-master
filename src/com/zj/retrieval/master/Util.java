@@ -34,11 +34,6 @@ public class Util {
 		return (NodeDao) ctx.getBean("nodeDao");
 	}
 	
-	public static RetrievalDao getNodeRetrieval() {
-		ApplicationContext ctx = getApplicationContext();
-		return (RetrievalDao) ctx.getBean("retrievalDao");
-	}
-	
 	public static String html(String content) {
 		if(content==null) return "";        
 	    String html = content;

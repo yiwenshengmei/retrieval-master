@@ -18,9 +18,12 @@
 	String nodeId = request.getParameter("node_id");
 	String selectedState = request.getParameter("selected_state");
 	
+	boolean hasResult = false;
+	
 	NodeDao nodeDao = Util.getNodeDao();
-	RetrievalDao retrievalDao = Util.getNodeRetrieval();
-	String nodeName = nodeDao.getNodeById(nodeId).getName();
+	Node startNode = nodeDao.getNodeById(nodeId);
+	RetrievalDao retrievalDao = new RetrievalDao(startNode);
+	String nodeName = startNode.getName();
 	
 	List<String> resultNodeIDs = null;
 	String attrName = null;
@@ -33,17 +36,18 @@
 	if (nodeId != null && !nodeId.isEmpty()) {
 		// 进入检索环节
 		if (selectedState == null || selectedState.isEmpty()) 
-	selectedState = nodeId; // 要保证第一位是nodeId
-		RetrievalResult result = retrievalDao.retrieval(selectedState);
+			selectedState = "0"; // 要保证第一位必须有个数，随便是什么数字都可以，这一位以后可以用作其他用途的标志位
+			RetrievalResult result = retrievalDao.retrieval(selectedState);
 		
+		hasResult = result.hasResult();
 		if (result.hasResult()) {
-	resultNodeIDs = result.getResult();
+			resultNodeIDs = result.getResult();
 		} else {
-	attrName = result.getNext().getName();
-	attrNameEN = result.getNext().getEnglishName();
-	attrDesc = result.getNext().getDesc();
-	attrImages.add(result.getNext().getImage());
-	attrUserFields = result.getNext().getUserFields();
+			attrName = result.getNext().getName();
+			attrNameEN = result.getNext().getEnglishName();
+			attrDesc = result.getNext().getDesc();
+			attrImages.add(result.getNext().getImage());
+			attrUserFields = result.getNext().getUserFields();
 		}
 	}
 %>
@@ -53,7 +57,7 @@
 	var selected_state = '<%=selectedState%>';
 
 	function answer(answer) {
-		$('#selected_state_post').val(selected_state + ' ' + answer);
+		$('#selected_state_post').val(selected_state + answer);
 		$('#retrieval_form').submit();
 	}
 	
@@ -63,7 +67,7 @@
 </script>
 </head>
 <body>
-
+	<% if (!hasResult) { %>
 	<form id='retrieval_form' action="retrieval.jsp" method="post">
 		<input id='selected_state_post' type="hidden" name='selected_state'/>
 		<input id='node_id' type='hidden' name='node_id' value='<%=nodeId%>'/>
@@ -75,16 +79,35 @@
 		<table>
 			<tr>
 			<% for (String imageURL : attrImages) { %> 
-				<td><img src=<%=imageURL %>/></td> 
+				<td><img src=<%=imageURL %>/></td>
 			<% } %>
 			</tr>
 		</table>
 		
 		<div>
-			<span onclick='answer(2);'>是</span>
-			<span onclick='answer(1);'>否</span>
-			<span onclick='answer(3)'>不知道</span>
+			<a href='#' onclick='answer(2);'>是</a>
+			<a href='#' onclick='answer(1);'>否</a>
+			<a href='#' onclick='answer(3);'>不知道</a>
 		</div>
 	</form>
+	<% } %>
+	
+	<% if (hasResult) { 
+			List<Node> nodeResults = new ArrayList<Node>();
+			for (String id : resultNodeIDs) {
+				nodeResults.add(nodeDao.getNodeById(id));
+			}
+	%>
+			<div>结果（<%=nodeResults.size() %>个）：</div>
+			<table>
+				<% for (Node nd : nodeResults) { %>
+				<tr>
+					<td><%=nd.getName() %></td>
+					<td><%=nd.getEnglishName() %></td>
+					<td><a href='retrieval.jsp?node_id=<%=nd.getId()%>'>继续从这里检索</a></td>
+				</tr>
+				<% } %>
+			</table>
+	<% } %>
 </body>
 </html>

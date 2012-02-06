@@ -18,7 +18,7 @@
 <%
 	NodeDao nodeDao = Util.getNodeDao();
 	Node root = nodeDao.getNodeById(Node.VIRTUAL_NODE_NAME);
-	List<Node> rootChilds = new ArrayList<Node>();
+	List<String> ids = root.getRetrievalDataSource().getChildNodes();
 %>
 <script type="text/javascript" src='jquery-1.7.1.js'></script>
 </head>
@@ -26,7 +26,7 @@
 
 	<table>
 		<tr><td>ID</td><td>中文名称</td><td>英文名称</td><td></td></tr>
-		<% for (Node nd : rootChilds) { %>
+		<% for (String id : ids) { Node nd = nodeDao.getNodeById(id); %>
 		<tr>
 			<td><%=nd.getId()%></td>
 			<td><%=nd.getName()%></td>

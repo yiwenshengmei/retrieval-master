@@ -153,7 +153,7 @@
 			var new_attr_name = $("<tr><td>Name: </td><td><input id='new_attr_" + new_attr_index +"_name' type='text'/></td></tr>");
 			var new_attr_name_en = $("<tr><td>Attr English Name: </td><td><input id='new_attr_" + new_attr_index +"_name_en' type='text'/></td></tr>");
 			var new_attr_desc = $("<tr><td>Desc: </td><td><input id='new_attr_" + new_attr_index +"_desc' type='text'/></td></tr>");
-			var new_attr_image = $("<tr><td>Image(Only one): </td><td><input id='new_attr_" + new_attr_index +"_image' type='text'/></td></tr>");
+			var new_attr_image = $("<tr><td>Image(Only one): </td><td><input class='allow_empty' id='new_attr_" + new_attr_index +"_image' type='text'/></td></tr>");
 			var new_attr_add_user_field = $("<tr><td colspan='2'><a href='#' onclick='add_new_attr_user_field(" + new_attr_index + ")'>ADD USER FIELD</a></td></tr>");
 			var new_attr_user_filed_location = $("<tr id='new_attr_" + new_attr_index + "_user_field_location'><td colspan='2'></tr>");
 			var new_attr_delete = $("<tr><td colspan='2'><a href='#' onclick='delete_attr(" + new_attr_index +")'>DELETE</a></td></tr>");
@@ -217,7 +217,7 @@
 			<tr><td>URI:</td><td><input name="uri" type="text"/></td></tr>
 			<tr><td>URI Name: </td><td><input name="uri_name" type="text"/></td></tr>
 			<tr><td>Parents Attr: </td><td><input class='allow_empty' name='parent_attr' type='text'/></td></tr>
-			<tr><td>Images(多张图片请使用分号分隔): </td><td><input name='images' type='text'/></td></tr>
+			<tr><td>Images(多张图片请使用分号分隔): </td><td><input class='allow_empty' name='images' type='text'/></td></tr>
 		</table>
 		
 		<div style='height: 10px;'></div>
