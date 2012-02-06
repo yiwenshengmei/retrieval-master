@@ -34,8 +34,6 @@ public class RetrievalDao {
 		hasInited = true;
 	}
 	
-	public RetrievalDao() {}
-	
 	public RetrievalResult retrieval(String selectState) {
 		// selectState的第1个值代表当前节点的id，从下标1开始才是answer
 		for (int i = 1; i < selectState.length(); i++) {

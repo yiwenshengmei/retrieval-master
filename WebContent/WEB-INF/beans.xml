@@ -36,8 +36,6 @@
 	<property name="dataSource" ref="dataSource"></property>
 </bean>
 
-<bean id="retrievalDao" class="com.zj.retrieval.master.dao.RetrievalDao" />
-
 <!-- <bean id="fileUploadConfig" class="com.zj.fr.server.FileUploadConfig"> -->
 <!-- 	<property name="thumbfileFolderName" value="thumbImages"/> -->
 <!-- 	<property name="originalfileFolderName" value="originalImages"/> -->
