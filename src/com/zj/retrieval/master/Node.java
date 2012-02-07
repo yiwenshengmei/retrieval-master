@@ -1,15 +1,12 @@
 package com.zj.retrieval.master;
 
-import java.io.IOException;
 import java.io.StringReader;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.logging.Log;
@@ -18,7 +15,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import com.jamesmurty.utils.XMLBuilder;
 import com.zj.retrieval.master.dao.RetrievalDataSource;
@@ -48,7 +44,7 @@ public class Node {
 		retrievalDataSource = new RetrievalDataSource();
 	}
 	public void setImagesStr(String str) {
-		if (str == null) {
+		if (str == null || str.isEmpty()) {
 			images = new ArrayList<String>();
 		} else {
 			String[] splited = str.split(";");
