@@ -77,12 +77,13 @@ public class NodeDao {
 		try {
 			String sql = "select `id`, `uri_name` as uriName, `name`, `images` as imagesStr, " +
 					"`name_en` as englishName, `parent_id` as parentId, " +
-					"`owl`, `uri` from `fish` where `id`=?";
+					"`owl`, `uri`, `detail_type` as detailType, `contact` from `fish` where `id`=?";
 			ParameterizedRowMapper<Node> rowMapper = 
 				ParameterizedBeanPropertyRowMapper.newInstance(Node.class);
 			Node result = sqlclient.queryForObject(sql, rowMapper, id);
-			
-			Node.parseNodeFromOWL(result);
+			if (result.getDetailType() == DetailType.FULL) {
+				Node.parseNodeFromOWL(result);
+			}
 			return result;
 		} catch (EmptyResultDataAccessException ex) {
 			throw new Exception(String.format("ID为%1$s的节点不存在！", id));
@@ -296,8 +297,8 @@ public class NodeDao {
 			// 注意，brief节点的ID值是由客户端提供的！！！
 			// 为新节点detailType设置值: brief
 			newNode.setDetailType(DetailType.BRIEF);
-			String sqlInsertNewNode = "insert into fish(`id`, `name`, `detail_type`" +
-					"`name_en`, `parentId`, `contact`) values(:id, :name, :englishName, :parentId, :detailType, :contact)";
+			String sqlInsertNewNode = "insert into fish(`id`, `name`, `name_en`, `parent_id`, `contact`, `detail_type`) values(" +
+					                                    ":id, :name, :englishName, :parentId, :contact, :detailType)";
 			SqlParameterSource paramInsertNewNode = new BeanPropertySqlParameterSource(newNode) ;
 			if (sqlclient.update(sqlInsertNewNode, paramInsertNewNode) != 1) {
 				throw new Exception("插入节点时失败@NodeService.addNode()"); // Rollback

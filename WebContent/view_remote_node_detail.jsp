@@ -9,7 +9,7 @@
 <body>
 	<form action="remote_node_detail.jsp">
 		<table>
-			<tr><td>URL: </td><td><input name='url' type="text"/></td></tr>
+			<tr><td>URL: </td><td><input name='url' type="text" style="width: 600px;"/></td></tr>
 			<tr><td>NODE ID: </td><td><input name='node_id' type='text'/></td></tr>
 			<tr><td>USER NAME: </td><td><input name='user_name' type="text"/></td></tr>
 			<tr><td>USER PWD: </td><td><input name='user_pwd' type='text'/></td></tr>

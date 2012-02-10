@@ -1,3 +1,4 @@
+<%@page import="com.zj.retrieval.master.Util"%>
 <%@page import="org.apache.http.impl.client.BasicResponseHandler"%>
 <%@page import="org.apache.http.client.ResponseHandler"%>
 <%@page import="org.apache.http.HttpEntity"%>
@@ -29,28 +30,29 @@
 	
 	DefaultHttpClient httpclient = new DefaultHttpClient();
 	
-	HttpPost httpost = new HttpPost(url);
+	HttpPost httpost = new HttpPost(Util.urlConnect(url, "node/query_for_remote"));
     List <NameValuePair> nvps = new ArrayList <NameValuePair>();
     nvps.add(new BasicNameValuePair("user_name", userName));
     nvps.add(new BasicNameValuePair("user_pwd", userPwd));
+    nvps.add(new BasicNameValuePair("node_id", nodeId));
     httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
     String responseBody = httpclient.execute(httpost, responseHandler);
 	
 	
 	//打印返回的信息
+	responseBody = responseBody.trim();
 	System.out.println(responseBody);
 
-	JSONObject j = new JSONObject(responseBody);
-	boolean isError = j.getBoolean("isError");
+	JSONObject jResp = new JSONObject(responseBody);
+	boolean isError = jResp.getBoolean("isError");
 	if (isError) {
-		out.print("用户名或密码错误！");
+		out.print(jResp.getString("message"));
 		out.print("</html>");
 		out.flush();
-		out.close();
 		return;
 	}
-	String author = j.getString("author");
+	JSONObject j = jResp.getJSONObject("message");
 	String name = j.getString("name");
 	String enName = j.getString("name_en");
 	String desc = j.getString("desc");
@@ -60,7 +62,7 @@
 	List<String> images = new ArrayList<String>();
 	JSONArray jImages = j.getJSONArray("images");
 	for (int i = 0; i < jImages.length(); i++) {
-		images.add(jImages.getString(i));
+		images.add(Util.urlConnect(url, jImages.getString(i)));
 	}
 	JSONArray jUserFields = j.getJSONArray("user_field");
 	Map<String, String> userField = new HashMap<String, String>();
@@ -68,25 +70,6 @@
 		JSONObject jField = jUserFields.getJSONObject(i);
 		userField.put(jField.getString("key"), jField.getString("value"));
 	}
-// 	JSONArray jAttr = j.getJSONArray("attr");
-// 	List<Attribute> attrs = new ArrayList<Attribute>();
-// 	for (int i = 0; i < jAttr.length(); i++) {
-// 		JSONObject ja = jAttr.getJSONObject(i);
-// 		Attribute attr = new Attribute();
-// 		attr.setName(ja.getString("name"));
-// 		attr.setEnName(ja.getString("name_en"));
-// 		attr.setImage(ja.getString("image"));
-// 		attr.setDesc(ja.getString("desc"));
-// 		Map<String, String> attrUserFields = new HashMap<String, String>();
-// 		JSONArray jAttrUserFields = ja.getJSONArray("user_filed");
-// 		for (int k = 0; k < jAttrUserFields.length(); k++) {
-// 			attrUserFields.put(
-// 					jAttrUserFields.getJSONObject(k).getString("key"), 
-// 					jAttrUserFields.getJSONObject(k).getString("value"));
-// 		}
-// 		attr.setUserFields(attrUserFields);
-// 		attrs.add(attr);
-// 	}
 %>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -97,7 +80,6 @@
 	<tr><td>ID</td><td><%=nodeId %></td></tr>
 	<tr><td>NAME: </td><td><%=name %></td></tr>
 	<tr><td>NAME_EN: </td><td><%=enName %></td></tr>
-	<tr><td>AUTHOR: </td><td><%=author %></td></tr>
 	<tr><td>DESC: </td><td><%=desc %></td></tr>
 	<tr><td>URI: </td><td><%=uri %></td></tr>
 	<tr><td>URI_NAME: </td><td><%=uriName %></td></tr>

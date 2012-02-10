@@ -80,11 +80,16 @@
 	function validate_input() {
 		var has_no_value_input = false;
 		$('input:text').each(function() {
-			if ($(this).val() == '') {
-				has_no_value_input = true;
-				$(this).addClass('no_value_input');
+			var input = $(this);
+			if (input.val() == '') {
+				if (input.attr('class') != undefined && input.attr('class').indexOf('allow_empty') != -1) {
+					input.removeClass('no_value_input');
+				} else {
+					has_no_value_input = true;
+					input.addClass('no_value_input');
+				}
 			} else {
-				$(this).removeClass('no_value_input');
+				input.removeClass('no_value_input');
 			}
 		});
 		if (has_no_value_input) {
@@ -117,7 +122,7 @@
 			var new_attr_name = $("<tr><td>Name: </td><td><input id='new_attr_" + new_attr_index +"_name' type='text'/></td></tr>");
 			var new_attr_name_en = $("<tr><td>Attr English Name: </td><td><input id='new_attr_" + new_attr_index +"_name_en' type='text'/></td></tr>");
 			var new_attr_desc = $("<tr><td>Desc: </td><td><input id='new_attr_" + new_attr_index +"_desc' type='text'/></td></tr>");
-			var new_attr_image = $("<tr><td>Image: </td><td><input id='new_attr_" + new_attr_index +"_image' type='text'/></td></tr>");
+			var new_attr_image = $("<tr><td>Image: </td><td><input class='allow_empty' id='new_attr_" + new_attr_index +"_image' type='text'/></td></tr>");
 			var new_attr_add_user_field = $("<tr><td colspan='2'><a href='#' onclick='add_new_attr_user_field(" + new_attr_index + ")'>ADD USER FIELD</a></td></tr>");
 			var new_attr_user_filed_location = $("<tr id='new_attr_" + new_attr_index + "_user_field_location'><td colspan='2'></tr>");
 			var new_attr_delete = $("<tr><td colspan='2'><a href='#' onclick='delete_attr(" + new_attr_index +")'>DELETE</a></td></tr>");
@@ -134,15 +139,15 @@
 		$("#submit_form").click(function() {
 			
 			// 检验表单
-// 			if (!validate_input())
-// 				return false;
+			if (!validate_input())
+				return false;
 			
 			process_new_attr();
 			
-			alert('debug[隐藏字段new_attr]: ' + $('#new_attr').val());
+// 			alert('debug[隐藏字段new_attr]: ' + $('#new_attr').val());
 
 			// 提交表单
-			// $('#add_node_form').submit();
+			$('#add_node_form').submit();
 			return false;
 		});
 	}); // end of $(function() {
@@ -152,9 +157,10 @@
 	<form style="width:700px;margin:0 auto;" id="add_node_form" action="briefnode/add" method="post" enctype="multipart/form-data" >
 		<table id="base_info">
 			<tr><td>ID: </td><td><input name="node_id" type="text"/></td></tr>
+			<tr><td>Parent ID: </td><td><input name="parent_id" type="text"/></td></tr>
 			<tr><td>Name: </td><td><input name="node_name" type="text"/></td></tr>
 			<tr><td>English Name: </td><td><input name="node_name_en" type="text"/></td></tr>
-			<tr><td>Parents Attr: </td><td><input name='parent_attr' type='text'/></td></tr>
+			<tr><td>Parents Attr: </td><td><input class='allow_empty' name='parent_attr' type='text'/></td></tr>
 			<tr><td>联系方式: </td><td><input name='contact' type='text'/></td></tr>
 		</table>
 		
@@ -172,8 +178,6 @@
 			-->
 		</div>
 		
-		
-		<input id='user_field' type="hidden" name="user_field"/>
 		<input id='new_attr' type='hidden' name='new_attr'/>
 		<div style="margin-top: 20px;">
 			PostUserName: <input type='text' name='post_user_name'/>

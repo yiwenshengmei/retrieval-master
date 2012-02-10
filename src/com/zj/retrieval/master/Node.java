@@ -155,6 +155,7 @@ public class Node {
 				rds.setChildNodes(new ArrayList<String>());
 				rds.setMatrix(new Matrix());
 				nd.setRetrievalDataSource(rds);
+				return;
 			}
 			
 			XMLBuilder builder = XMLBuilder.parse(new InputSource(new StringReader(nd.getOwl())));

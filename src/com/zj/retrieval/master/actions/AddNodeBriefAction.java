@@ -1,32 +1,16 @@
 package com.zj.retrieval.master.actions;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.struts2.ServletActionContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Attribute;
 import com.zj.retrieval.master.AttributeSelectedWrongException;
 import com.zj.retrieval.master.AttributeSelector;
+import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
 import com.zj.retrieval.master.UserField;
@@ -36,8 +20,8 @@ import com.zj.retrieval.master.dao.UserDao;
 
 public class AddNodeBriefAction {
 	private static Log log = LogFactory.getLog(AddNodeBriefAction.class);
-	private String name_en;
-	private String name;
+	private String node_name_en;
+	private String node_name;
 	private String parent_id;
 	private String parent_attr;
 	private String new_attr;
@@ -65,11 +49,12 @@ public class AddNodeBriefAction {
 			
 			Node new_node = new Node();
 			new_node.setId(node_id);
-			new_node.setEnglishName(name_en);
-			new_node.setName(name);
+			new_node.setEnglishName(node_name_en);
+			new_node.setName(node_name);
 			new_node.setNodeType(NodeType.NODETYPE_INDIVIDUAL);
 			new_node.setParentId(parent_id);
 			new_node.setContact(contact);
+			new_node.setDetailType(DetailType.BRIEF);
 			
 			NodeDao ndService =  Util.getNodeDao();;
 			
@@ -91,7 +76,7 @@ public class AddNodeBriefAction {
 						                          jAttr.getString("new_attr_name_en"),
 						                          jAttr.getString("new_attr_desc"),
 						                          jAttr.getString("new_attr_image"));
-				JSONArray jAttrUserfields = jAttr.getJSONArray("user_fields");
+				JSONArray jAttrUserfields = jAttr.getJSONArray("new_attr_user_field");
 				newAttr.setUserFields(UserField.parse(jAttrUserfields));
 				log.info("新添加的属性：" + newAttr);
 				attrSelector.addNewAttribute(newAttr, true);
@@ -122,12 +107,12 @@ public class AddNodeBriefAction {
 	
 	}
 
-	public void setName_en(String name_en) {
-		this.name_en = name_en;
+	public void setNode_name_en(String name_en) {
+		this.node_name_en = name_en;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setNode_name(String name) {
+		this.node_name = name;
 	}
 
 	public void setParent_id(String parent_id) {
@@ -152,5 +137,13 @@ public class AddNodeBriefAction {
 
 	public void setNode_id(String node_id) {
 		this.node_id = node_id;
+	}
+
+	public void setPost_user_name(String post_user_name) {
+		this.post_user_name = post_user_name;
+	}
+
+	public void setPost_user_password(String post_user_password) {
+		this.post_user_password = post_user_password;
 	}
 }

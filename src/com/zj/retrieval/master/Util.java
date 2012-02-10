@@ -47,4 +47,12 @@ public class Util {
 //	    html = html.replaceAll("&", "&amp;");
 	    return html;
 	}
+	
+	public static String urlConnect(String url, String connect) {
+		return endsWithSlash(url) ? url + connect : url + "/" + connect;
+	}
+	
+	private static boolean endsWithSlash(String str) {
+		return str.endsWith("/") || str.endsWith("\\");
+	}
 }
