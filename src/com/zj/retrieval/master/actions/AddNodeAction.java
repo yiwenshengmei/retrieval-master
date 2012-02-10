@@ -1,27 +1,13 @@
 package com.zj.retrieval.master.actions;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.struts2.ServletActionContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Attribute;
@@ -40,7 +26,6 @@ public class AddNodeAction {
 	private String desc;
 	private String node_name_en;
 	private String node_name;
-	private int node_type;
 	private String parent_id;
 	private String uri;
 	private String images;
@@ -145,10 +130,6 @@ public class AddNodeAction {
 
 	public void setNode_name(String name) {
 		this.node_name = name;
-	}
-
-	public void setNode_type(int node_type) {
-		this.node_type = node_type;
 	}
 
 	public void setParent_id(String parent_id) {

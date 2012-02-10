@@ -8,7 +8,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.zj.retrieval.master.dao.NodeDao;
-import com.zj.retrieval.master.dao.RetrievalDao;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class Util {

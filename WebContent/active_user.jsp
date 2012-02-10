@@ -30,9 +30,9 @@
 POST_NAME: <input id='post_user_name' type='text'/>
 POST_PASSWORD: <input id='post_user_password' type='text'/>
 </div>
-<table>
+<table style="border: solid 1px; width: 400px; margin: 10px auto;">
 	<% for (User user : result) { %>
-		<tr><td><%=user.getName() %></td><td><a class='active_btn' href='user/active?id=<%=user.getId()%>'>ACTIVE</a></td></tr>
+		<tr><td width="50%"><%=user.getName() %></td><td width="50%"><a class='active_btn' href='user/active?id=<%=user.getId()%>'>ACTIVE</a></td></tr>
 	<% } %>
 </table>
 </body>
