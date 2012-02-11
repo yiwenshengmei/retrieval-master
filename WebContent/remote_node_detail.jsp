@@ -25,6 +25,7 @@
 <%
 	String nodeId = request.getParameter("node_id");
 	String url = request.getParameter("url");
+	url = url.startsWith("http://") ? url : "http://" + url;
 	String userName = request.getParameter("user_name");
 	String userPwd = request.getParameter("user_pwd");
 	
@@ -73,6 +74,7 @@
 %>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="common.css" type="text/css" rel="stylesheet" />
 <title>ID: <%=nodeId %> FROM <%=url %></title>
 </head>
 <body>

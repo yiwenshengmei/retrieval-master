@@ -4,6 +4,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link href="common.css" type="text/css" rel="stylesheet" />
 	<title>添加根物种</title>
 	<style type="text/css">
 		.no_value_input {

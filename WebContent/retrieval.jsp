@@ -14,6 +14,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="common.css" type="text/css" rel="stylesheet" />
 <%
 	String nodeId = request.getParameter("node_id");
 	String selectedState = request.getParameter("selected_state");
@@ -79,7 +80,7 @@
 		<table>
 			<tr>
 			<% for (String imageURL : attrImages) { %> 
-				<td><img src=<%=imageURL %>/></td>
+				<td><img src='<%="images/" + imageURL %>'/></td>
 			<% } %>
 			</tr>
 		</table>

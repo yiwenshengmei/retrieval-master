@@ -15,6 +15,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="common.css" type="text/css" rel="stylesheet" />
 <title>查看物种详细信息</title>
 </head>
 <body>
@@ -87,7 +88,17 @@
 <%
 	}
 %>
-<tr><td></td><td></td></tr>
+<tr><td colspan='2'>====== Attributes ======</td></tr>
+<% for (Attribute attr : attrs) { %>
+<tr><td>attr_name</td><td><%=attr.getName() %></td></tr>
+<tr><td>attr_name_en</td><td><%=attr.getEnglishName() %></td></tr>
+<tr><td>attr_desc</td><td><%=attr.getDesc() %></td></tr>
+<tr><td>attr_image</td><td><img src='<%="images/" + attr.getImage() %>'/></td></tr>
+<tr><td colspan='2'>====== ====== ======</td></tr>
+<% for (Entry<String, String> entry : attr.getUserFields().entrySet()) { %>
+<tr><td>KEY: <%=entry.getKey() %></td><td>VALUE: <%=entry.getValue() %></td></tr>
+<% } %>
+<% } %>
 <tr><td></td><td></td></tr>
 <tr><td></td><td></td></tr>
 <tr><td></td><td></td></tr>
