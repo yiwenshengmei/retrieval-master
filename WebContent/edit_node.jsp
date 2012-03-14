@@ -17,8 +17,8 @@
 	NodeDao nodedao = Util.getNodeDao();
 	Node node = nodedao.getNodeById(nodeid);
 	StringBuilder imgStrBuilder = new StringBuilder();
-	for (String image : node.getImages()) {
-		imgStrBuilder.append(image + ";");
+	for (String imageUrl : node.getImages()) {
+		imgStrBuilder.append(Util.getImageNameExcludePath(imageUrl) + ";");
 	}
 	String imageStr = imgStrBuilder.substring(0, imgStrBuilder.length() - 1);
 %>
@@ -218,22 +218,22 @@
 // 			alert('debug[隐藏字段new_attr]: ' + $('#new_attr').val());
 
 			// 提交表单
-			$('#add_node_form').submit();
+			$('#update_node_form').submit();
 			return false;
 		});
 	}); // end of $(function() {
 	</script>
 </head>
 <body>
-	<form style="width:700px;margin:0 auto;" id="add_node_form" action="node/add" method="post" enctype="multipart/form-data" >
+	<form style="width:700px;margin:0 auto;" id="update_node_form" action="node/update" method="post" enctype="multipart/form-data" >
 		<table id="base_info">
 			<tr><td>Name: </td><td><input name="node_name" type="text" value="<%=node.getName()%>"/></td></tr>
 			<tr><td>English Name: </td><td><input name="node_name_en" type="text" value="<%=node.getEnglishName()%>"/></td></tr>
-			<tr><td>Parent ID: </td><td><input name="parent_id" type="text"/></td></tr>
+			<tr><td>Parent ID: </td><td><%=node.getParentId()%></td></tr>
 			<tr><td>Description: </td><td><input name="desc" type="text" value="<%=node.getDesc()%>"/></td></tr>
 			<tr><td>URI:</td><td><input name="uri" type="text" value="<%=node.getUri()%>"/></td></tr>
-			<tr><td>URI Name: </td><td><input name="uri_name" type="text" <%=node.getUriName()%>/></td></tr>
-			<tr><td>Parents Attr: </td><td><input class='allow_empty' name='parent_attr' type='text'/></td></tr>
+			<tr><td>URI Name: </td><td><input name="uri_name" type="text" value="<%=node.getEnglishName()%>"/></td></tr>
+			<!-- <tr><td>Parents Attr: </td><td><input class='allow_empty' name='parent_attr' type='text'/></td></tr>-->
 			<tr><td>Images(多张图片请使用分号分隔): </td><td><input class='allow_empty' name='images' type='text' value="<%=imageStr%>"/><a target='_blank' href='upload.jsp'>去上传文件</a></td></tr>
 		</table>
 		
@@ -245,11 +245,11 @@
 			int attrIndex = 0;
 			List<Attribute> attrs = node.getRetrievalDataSource().getAttributes();
 			for (Attribute attr : attrs) {
-				attrBuilder.append("<table id='new_attr_" + attrIndex + "'>");
-				attrBuilder.append("<tr><td>Name: </td><td><input id='new_attr_" + attrIndex +"_name' type='text value='" + attr.getName() + "''/></td></tr>");
+				attrBuilder.append("<table style='margin-top: 10px;border-style:solid;' id='new_attr_" + attrIndex + "'>");
+				attrBuilder.append("<tr><td>Name: </td><td><input id='new_attr_" + attrIndex +"_name' type='text' value='" + attr.getName() + "'/></td></tr>");
 				attrBuilder.append("<tr><td>Attr English Name: </td><td><input id='new_attr_" + attrIndex +"_name_en' type='text' value='" + attr.getEnglishName() + "'/></td></tr>");
 				attrBuilder.append("<tr><td>Desc: </td><td><input id='new_attr_" + attrIndex +"_desc' type='text' value='" + attr.getDesc() + "'/></td></tr>");
-				attrBuilder.append("<tr><td>Image(Only one): </td><td><input class='allow_empty' id='new_attr_" + attrIndex +"_image' type='text'/><a target='_blank' href='upload.jsp'>去上传文件</a></td></tr>");
+				attrBuilder.append("<tr><td>Image(Only one): </td><td><input value='" + attr.getImage() + "' class='allow_empty' id='new_attr_" + attrIndex +"_image' type='text'/><a target='_blank' href='upload.jsp'>去上传文件</a></td></tr>");
 				attrBuilder.append("<tr><td colspan='2'><a href='#' onclick='add_new_attr_user_field(" + attrIndex + ")'>ADD USER FIELD</a></td></tr>");
 				attrBuilder.append("<tr id='new_attr_" + attrIndex + "_user_field_location'><td colspan='2'></tr>");
 				Map<String, String> attrUserfieldMap = attr.getUserFields();

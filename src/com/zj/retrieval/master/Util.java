@@ -12,6 +12,7 @@ import com.zj.retrieval.master.dao.UserDao;
 
 public class Util {
 	public static ApplicationContext applicationContext = null;
+	public static String IMAGE_PATH_PREFIX = "images/";
 	
 	public static ApplicationContext getApplicationContext() {
 		if (applicationContext == null) {
@@ -21,6 +22,10 @@ public class Util {
 		} else {
 			return applicationContext;
 		}
+	}
+	
+	public static String getImageNameExcludePath(String url) {
+		return url.substring(IMAGE_PATH_PREFIX.length(), url.length());
 	}
 	
 	public static UserDao getUserDao() {
