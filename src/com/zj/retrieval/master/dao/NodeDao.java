@@ -146,7 +146,8 @@ public class NodeDao {
 				newNode.setId(UUID.randomUUID().toString());
 			}
 			String sqlInsertNewNode = "insert into fish(`id`, `uri_name`, `name`, `images`, " +
-					"`name_en`, `parent_id`, `owl`, `uri`) values(:id, :uriName, :name, :imagesStr, :englishName, :parentId, :owl, :uri)";
+					"`name_en`, `parent_id`, `owl`, `uri`) values(:id, :uriName, :name, :imagesStr, " +
+					":englishName, :parentId, :owl, :uri)";
 			SqlParameterSource paramInsertNewNode = new BeanPropertySqlParameterSource(newNode) ;
 			if (sqlclient.update(sqlInsertNewNode, paramInsertNewNode) != 1) {
 				throw new Exception("插入节点时失败@NodeService.addNode()"); // Rollback

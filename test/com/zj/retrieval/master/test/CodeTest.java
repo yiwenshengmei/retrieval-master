@@ -89,5 +89,12 @@ public class CodeTest {
 			System.out.println(user);
 		}
 	}
+	
+	@Test
+	public void t7() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("123");
+		System.out.println(sb.substring(0, sb.length() - 1));
+	}
 
 }
