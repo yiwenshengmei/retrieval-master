@@ -68,9 +68,27 @@ public class NodeDao {
 		}
 	}
 
-	public boolean updateNode(Node nd) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean updateNode(Node nd) throws Exception {
+		try {
+			nd.setOwl(Node.getOwlFromNode(nd, sqlclient));
+			String sql = "update fish " +
+					"set `id` = :id, " +
+					"set `uri_name` = :uriName, " +
+					"set `name` = :name, " +
+					"set `images` = :imagesStr, " +
+					"set `name_en` = :englishName, " +
+					"set `parent_id` = :parentId, " +
+					"set `owl` = :owl, " +
+					"set `uri` = :uri";
+			SqlParameterSource param = new BeanPropertySqlParameterSource(nd);
+			if (sqlclient.update(sql, param) != 1) {
+				throw new Exception("更新节点返回结果不为1"); // Rollback
+			}
+			return true;
+		} catch (Exception ex) {
+			log.error(String.format("查询节点时出错[id=%1$s]", nd.getId()), ex);
+			throw new Exception("更新节点时出错", ex);
+		}
 	}
 		
 	public Node getNodeById(String id) throws Exception {
@@ -148,7 +166,7 @@ public class NodeDao {
 			String sqlInsertNewNode = "insert into fish(`id`, `uri_name`, `name`, `images`, " +
 					"`name_en`, `parent_id`, `owl`, `uri`) values(:id, :uriName, :name, :imagesStr, " +
 					":englishName, :parentId, :owl, :uri)";
-			SqlParameterSource paramInsertNewNode = new BeanPropertySqlParameterSource(newNode) ;
+			SqlParameterSource paramInsertNewNode = new BeanPropertySqlParameterSource(newNode);
 			if (sqlclient.update(sqlInsertNewNode, paramInsertNewNode) != 1) {
 				throw new Exception("插入节点时失败@NodeService.addNode()"); // Rollback
 			}
