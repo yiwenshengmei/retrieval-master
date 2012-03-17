@@ -12,10 +12,18 @@
 			<result name="success">/common-json.jsp</result>
 			<result name="error">/common-json.jsp</result>
 		</action>
+		<action name="edit" class="com.zj.retrieval.master.actions.UpdateNodeAction" method="execute">
+			<result name="success">/common-message.jsp</result>
+			<result name="error">/common-message.jsp</result>
+		</action>
 	</package>
 	
 	<package name="rootNodeService" namespace="/root-node" extends="struts-default">
 		<action name="add" class="com.zj.retrieval.master.actions.AddRootNodeAction" method="execute">
+			<result name="success">/common-message.jsp</result>
+			<result name="error">/common-message.jsp</result>
+		</action>
+		<action name="edit" class="com.zj.retrieval.master.actions.UpdateRootNodeAction" method="execute">
 			<result name="success">/common-message.jsp</result>
 			<result name="error">/common-message.jsp</result>
 		</action>

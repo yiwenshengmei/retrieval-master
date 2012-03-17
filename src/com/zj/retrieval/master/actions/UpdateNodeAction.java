@@ -53,13 +53,13 @@ public class UpdateNodeAction {
 				return ActionSupport.ERROR;
 			}
 			
-			Node nd = new Node();
+			NodeDao nodeDao =  Util.getNodeDao();
+			Node nd = nodeDao.getNodeById(node_id);
 			nd.setId(node_id);
 			nd.setDesc(desc);
 			nd.setEnglishName(node_name_en);
 			nd.setName(node_name);
 			nd.setNodeType(NodeType.NODETYPE_CLASS); // œ»‘› ±–¥À¿
-			nd.setParentId(parent_id);
 			nd.setUri(uri);
 			nd.setUriName(nd.getUri() + "#" + nd.getEnglishName());
 			nd.setDetailType(DetailType.FULL);
@@ -77,7 +77,6 @@ public class UpdateNodeAction {
 				nd.setUserfields(UserField.parse(userFieldJSONArray));
 			}
 			
-			NodeDao nodeDao =  Util.getNodeDao();
 			
 			nodeDao.updateNode(nd);
 			

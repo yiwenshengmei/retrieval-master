@@ -225,7 +225,8 @@
 	</script>
 </head>
 <body>
-	<form style="width:700px;margin:0 auto;" id="update_node_form" action="node/update" method="post" enctype="multipart/form-data" >
+	<form style="width:700px;margin:0 auto;" id="update_node_form" action="node/edit" method="post" enctype="multipart/form-data" >
+		<input id='node_id' type='hidden' name='node_id' value='<%=node.getId()%>'/>
 		<table id="base_info">
 			<tr><td>Name: </td><td><input name="node_name" type="text" value="<%=node.getName()%>"/></td></tr>
 			<tr><td>English Name: </td><td><input name="node_name_en" type="text" value="<%=node.getEnglishName()%>"/></td></tr>
@@ -237,34 +238,34 @@
 			<tr><td>Images(多张图片请使用分号分隔): </td><td><input class='allow_empty' name='images' type='text' value="<%=imageStr%>"/><a target='_blank' href='upload.jsp'>去上传文件</a></td></tr>
 		</table>
 		
-		<div style='height: 10px;'></div>
-		<a id='add_new_attr' href='#'>Add New Attr</a>
-		<div id='add_new_attr_location'>
+<!-- 		<div style='height: 10px;'></div> -->
+<!-- 		<a id='add_new_attr' href='#'>Add New Attr</a> -->
+<!-- 		<div id='add_new_attr_location'> -->
 			<%
-			StringBuilder attrBuilder = new StringBuilder();
-			int attrIndex = 0;
-			List<Attribute> attrs = node.getRetrievalDataSource().getAttributes();
-			for (Attribute attr : attrs) {
-				attrBuilder.append("<table style='margin-top: 10px;border-style:solid;' id='new_attr_" + attrIndex + "'>");
-				attrBuilder.append("<tr><td>Name: </td><td><input id='new_attr_" + attrIndex +"_name' type='text' value='" + attr.getName() + "'/></td></tr>");
-				attrBuilder.append("<tr><td>Attr English Name: </td><td><input id='new_attr_" + attrIndex +"_name_en' type='text' value='" + attr.getEnglishName() + "'/></td></tr>");
-				attrBuilder.append("<tr><td>Desc: </td><td><input id='new_attr_" + attrIndex +"_desc' type='text' value='" + attr.getDesc() + "'/></td></tr>");
-				attrBuilder.append("<tr><td>Image(Only one): </td><td><input value='" + attr.getImage() + "' class='allow_empty' id='new_attr_" + attrIndex +"_image' type='text'/><a target='_blank' href='upload.jsp'>去上传文件</a></td></tr>");
-				attrBuilder.append("<tr><td colspan='2'><a href='#' onclick='add_new_attr_user_field(" + attrIndex + ")'>ADD USER FIELD</a></td></tr>");
-				attrBuilder.append("<tr id='new_attr_" + attrIndex + "_user_field_location'><td colspan='2'></tr>");
-				Map<String, String> attrUserfieldMap = attr.getUserFields();
-				for (Entry<String, String> attrUserfield : attrUserfieldMap.entrySet()) {
-					attrBuilder.append("<tr>");
-					attrBuilder.append("<td>Key: <input type='text' post_type='user_field_key' value='" + attrUserfield.getKey() + "'></td>");
-					attrBuilder.append("<td>Value: <input type='text' post_type='user_field_value' value='" + attrUserfield.getValue() + "'><a href='#' onclick='delete_self($(this).parent().parent())'>DEL</a></td>");
-					attrBuilder.append("</tr>");
-				}
-				attrBuilder.append("</table>");
-				out.print(attrBuilder.toString());
-				attrIndex++;
-			}
+// 			StringBuilder attrBuilder = new StringBuilder();
+// 			int attrIndex = 0;
+// 			List<Attribute> attrs = node.getRetrievalDataSource().getAttributes();
+// 			for (Attribute attr : attrs) {
+// 				attrBuilder.append("<table style='margin-top: 10px;border-style:solid;' id='new_attr_" + attrIndex + "'>");
+// 				attrBuilder.append("<tr><td>Name: </td><td><input id='new_attr_" + attrIndex +"_name' type='text' value='" + attr.getName() + "'/></td></tr>");
+// 				attrBuilder.append("<tr><td>Attr English Name: </td><td><input id='new_attr_" + attrIndex +"_name_en' type='text' value='" + attr.getEnglishName() + "'/></td></tr>");
+// 				attrBuilder.append("<tr><td>Desc: </td><td><input id='new_attr_" + attrIndex +"_desc' type='text' value='" + attr.getDesc() + "'/></td></tr>");
+// 				attrBuilder.append("<tr><td>Image(Only one): </td><td><input value='" + attr.getImage() + "' class='allow_empty' id='new_attr_" + attrIndex +"_image' type='text'/><a target='_blank' href='upload.jsp'>去上传文件</a></td></tr>");
+// 				attrBuilder.append("<tr><td colspan='2'><a href='#' onclick='add_new_attr_user_field(" + attrIndex + ")'>ADD USER FIELD</a></td></tr>");
+// 				attrBuilder.append("<tr id='new_attr_" + attrIndex + "_user_field_location'><td colspan='2'></tr>");
+// 				Map<String, String> attrUserfieldMap = attr.getUserFields();
+// 				for (Entry<String, String> attrUserfield : attrUserfieldMap.entrySet()) {
+// 					attrBuilder.append("<tr>");
+// 					attrBuilder.append("<td>Key: <input type='text' post_type='user_field_key' value='" + attrUserfield.getKey() + "'></td>");
+// 					attrBuilder.append("<td>Value: <input type='text' post_type='user_field_value' value='" + attrUserfield.getValue() + "'><a href='#' onclick='delete_self($(this).parent().parent())'>DEL</a></td>");
+// 					attrBuilder.append("</tr>");
+// 				}
+// 				attrBuilder.append("</table>");
+// 				out.print(attrBuilder.toString());
+// 				attrIndex++;
+// 			}
 			%>
-		</div>
+<!-- 		</div> -->
 		
 		<div style='height: 10px;'></div>
 		<a id="add_user_field" href="#">Add Your Field</a>

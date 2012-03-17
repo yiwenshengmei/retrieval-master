@@ -65,9 +65,11 @@
 					"<td>%4$s</td>" +
 					"<td><a href='#' onclick=\"delete_node('%1$s')\">DELETE</a></td>" +
 					"<td><a target='_blank' href='view_node_detail.jsp?node_id=%1$s'>View Detail</a></td>" + 
-					"<td><a target='_blank' href='edit_node.jsp?node_id=%1$s'>EDIT</a></td>" +
+					"<td><a target='_blank' href='%5$s?node_id=%1$s'>EDIT</a></td>" +
 				"</tr>", 
-	nd.getId(), nd.getName(), nd.getParentId(), nd.getDetailType() == DetailType.FULL ? "是" : "否"));
+			nd.getId(), nd.getName(), nd.getParentId(), 
+			nd.getDetailType() == DetailType.FULL ? "是" : "否", 
+			nd.getParentId().equals("virtual_node") ? "edit_root_node.jsp" : "edit_node.jsp"));
 	}
 %>
 </table>

@@ -72,14 +72,14 @@ public class NodeDao {
 		try {
 			nd.setOwl(Node.getOwlFromNode(nd, sqlclient));
 			String sql = "update fish " +
-					"set `id` = :id, " +
 					"set `uri_name` = :uriName, " +
-					"set `name` = :name, " +
-					"set `images` = :imagesStr, " +
-					"set `name_en` = :englishName, " +
-					"set `parent_id` = :parentId, " +
-					"set `owl` = :owl, " +
-					"set `uri` = :uri";
+					"`name` = :name, " +
+					"`images` = :imagesStr, " +
+					"`name_en` = :englishName, " +
+					"`parent_id` = :parentId, " +
+					"`owl` = :owl, " +
+					"`uri` = :uri " +
+					"where `id` = :id";
 			SqlParameterSource param = new BeanPropertySqlParameterSource(nd);
 			if (sqlclient.update(sql, param) != 1) {
 				throw new Exception("更新节点返回结果不为1"); // Rollback
@@ -89,6 +89,23 @@ public class NodeDao {
 			log.error(String.format("查询节点时出错[id=%1$s]", nd.getId()), ex);
 			throw new Exception("更新节点时出错", ex);
 		}
+	}
+	
+	public boolean updateRootNode(Node root) throws Exception {
+		try {
+			root.setOwl(Node.getOwlFromNode(root, sqlclient));
+			String sql = "update `fish` set `uri_name`=:uriName, `name`=:name, `name_en`=:englishName, `images`=:imagesStr, " +
+					"`owl`=:owl, `uri`=:uri where `id`=:id";
+			SqlParameterSource param = new BeanPropertySqlParameterSource(root);
+			int result = sqlclient.update(sql, param);
+			
+			if (result != 1) throw new Exception("插入rootNode时返回结果不等于1.");
+			return true;
+		} catch (Exception ex) {
+			log.error(String.format("查询节点时出错[id=%1$s]", root.getId()), ex);
+			throw new Exception("更新节点时出错", ex);
+		}
+		
 	}
 		
 	public Node getNodeById(String id) throws Exception {
@@ -344,4 +361,6 @@ public class NodeDao {
 			throw new RuntimeException("NodeService.addNode()方法发生错误", ex);
 		}
 	}
+
+
 }
