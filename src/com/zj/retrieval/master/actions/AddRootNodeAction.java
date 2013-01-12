@@ -49,7 +49,7 @@ public class AddRootNodeAction {
 			UserDao userDao = Util.getUserDao();
 			if (!userDao.verifyUser(post_user_name, post_user_password)) {
 				this.isError = true;
-				this.message = "ç”¨æˆ·åæˆ–å¯†ç é”™è¯¯.";
+				this.message = "ÓÃ»§Ãû»òÃÜÂë´íÎó.";
 				return ActionSupport.ERROR;
 			}
 			
@@ -63,7 +63,7 @@ public class AddRootNodeAction {
 			root.setDetailType(DetailType.FULL);
 			root.setParentId(Node.VIRTUAL_NODE_NAME);
 			
-			// è§£æimages
+			// ½âÎöimages
 			List<String> fullPaths = new ArrayList<String>();
 			String realpath = ServletActionContext.getServletContext().getRealPath("/images");
 			File folder = new File(realpath);
@@ -78,7 +78,7 @@ public class AddRootNodeAction {
 			}
 			root.setImages(fullPaths);
 			
-			// è§£æè‡ªå®šä¹‰å­—æ®µ
+			// ½âÎö×Ô¶¨Òå×Ö¶Î
 			if (user_field != null && !user_field.isEmpty()) {
 				JSONArray user_field_jsonarray = new JSONArray(user_field);
 				root.setUserfields(UserField.parse(user_field_jsonarray));
@@ -87,16 +87,16 @@ public class AddRootNodeAction {
 			NodeDao nodeDao = Util.getNodeDao();
 			nodeDao.addRootNode(root);
 			
-			this.message = "Success, o(âˆ©_âˆ©)o...";
+			this.message = "Success, o(¡É_¡É)o...";
 			return ActionSupport.SUCCESS;
 			
 		} catch (JSONException e) {
-			this.message = "è‡ªå®šä¹‰å­—æ®µå­˜åœ¨éæ³•å­—ç¬¦ï¼Œè¯·æ£€æŸ¥ã€‚";
-			log.error("JSONå­—ç¬¦ä¸²è§£æé”™è¯¯", e);
+			this.message = "×Ô¶¨Òå×Ö¶Î´æÔÚ·Ç·¨×Ö·û£¬Çë¼ì²é¡£";
+			log.error("JSON×Ö·û´®½âÎö´íÎó", e);
 			return ActionSupport.ERROR;
 		} catch (Exception e) {
-			this.message = "å‘ç”Ÿå†…éƒ¨é€»è¾‘é”™è¯¯: " + e.getMessage();
-			log.error("å‘ç”Ÿå†…éƒ¨é€»è¾‘é”™è¯¯", e);
+			this.message = "·¢ÉúÄÚ²¿Âß¼­´íÎó: " + e.getMessage();
+			log.error("·¢ÉúÄÚ²¿Âß¼­´íÎó", e);
 			return ActionSupport.ERROR;
 		}
 	}

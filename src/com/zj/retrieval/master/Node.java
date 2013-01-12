@@ -142,7 +142,7 @@ public class Node {
 			String text = elemNode.getTextContent();
 			result.getRetrievalDataSource().getChildNodes().add(text);
 		}
-		log.info("è§£æå‡ºVirtualNodeçš„å­ç»“ç‚¹åˆ—è¡¨" + result.getRetrievalDataSource().getChildNodes());
+		log.info("½âÎö³öVirtualNodeµÄ×Ó½áµãÁĞ±í" + result.getRetrievalDataSource().getChildNodes());
 		return result;
 	}
 	public static void parseNodeFromOWL(Node nd) throws Exception {
@@ -160,15 +160,15 @@ public class Node {
 			
 			XMLBuilder builder = XMLBuilder.parse(new InputSource(new StringReader(nd.getOwl())));
 			
-//			// è§£æèŠ‚ç‚¹ç±»å‹
+//			// ½âÎö½ÚµãÀàĞÍ
 //			int nodeType = -1;
 //			try {
 //				nodeType = Integer.valueOf(builder.xpathFind("/RDF/Class/nodeType").getElement().getTextContent());
 //			} catch (XPathExpressionException e) {
-//				//throw new Exception("ä¸å­˜åœ¨èŠ‚ç‚¹/RDF/Class/nodeType", e);
+//				//throw new Exception("²»´æÔÚ½Úµã/RDF/Class/nodeType", e);
 //			}
 			
-			// è§£æAttribute
+			// ½âÎöAttribute
 			List<Attribute> attrs = new ArrayList<Attribute>();
 			try {
 				NodeList attributesElements = builder.xpathFind("/RDF/Class/attributes").getElement().getChildNodes();
@@ -192,10 +192,10 @@ public class Node {
 					attrs.add(attrIndex, attr);
 				}
 			} catch (XPathExpressionException e) {
-				log.info("ä¸å­˜åœ¨èŠ‚ç‚¹/RDF/Class/attributes");
+				log.info("²»´æÔÚ½Úµã/RDF/Class/attributes");
 			}
 			
-			// è§£æMatrix
+			// ½âÎöMatrix
 			Matrix matrix = new Matrix();
 			try {
 				NodeList rowElements = builder.xpathFind("/RDF/Class/matrix").getElement().getChildNodes();
@@ -210,10 +210,10 @@ public class Node {
 					matrix.addRow(row, 0, row.length);
 				}
 			} catch (XPathExpressionException e) {
-				log.info("ä¸å­˜åœ¨èŠ‚ç‚¹/RDF/Class/matrix");
+				log.info("²»´æÔÚ½Úµã/RDF/Class/matrix");
 			}
 
-			// è§£æChildList
+			// ½âÎöChildList
 			List<String> child_nodes = new ArrayList<String>();
 			try {
 				NodeList nodeElements = builder.xpathFind("/RDF/Class/childNodes").getElement().getChildNodes();
@@ -222,10 +222,10 @@ public class Node {
 					child_nodes.add(child_node_id);
 				}
 			} catch (XPathExpressionException e) {
-				log.info("ä¸å­˜åœ¨èŠ‚ç‚¹/RDF/Class/childNodes");
+				log.info("²»´æÔÚ½Úµã/RDF/Class/childNodes");
 			}
 			
-			// è§£æuserfields
+			// ½âÎöuserfields
 			Map<String, String> user_fields = new HashMap<String, String>();
 			try {
 				NodeList nodeFields = builder.xpathFind("/RDF/Class/userfields").getElement().getChildNodes();
@@ -235,15 +235,15 @@ public class Node {
 					user_fields.put(key, value);
 				}
 			} catch (XPathExpressionException e) {
-				log.info("ä¸å­˜åœ¨èŠ‚ç‚¹/RDF/Class/userfields");
+				log.info("²»´æÔÚ½Úµã/RDF/Class/userfields");
 			}
 			
-			// è§£æDesc
+			// ½âÎöDesc
 			String desc = "";
 			try {
 				desc = builder.xpathFind("/RDF/Class/desc").getElement().getTextContent();
 			} catch(XPathExpressionException e) {
-				log.info("ä¸å­˜åœ¨èŠ‚ç‚¹/RDF/Class/desc, descå°†ä¿æŒä¸ºç©º");
+				log.info("²»´æÔÚ½Úµã/RDF/Class/desc, desc½«±£³ÖÎª¿Õ");
 			}
 			
 			RetrievalDataSource data_source = new RetrievalDataSource();
@@ -256,8 +256,8 @@ public class Node {
 			nd.setUserfields(user_fields);
 			
 		} catch (Exception e) {
-			log.error("è§£æOWLæ—¶å‡ºé”™", e);
-			throw new Exception("è§£æOWLæ—¶å‡ºé”™@NodeServiceImpl.getRetrievalDataSource()", e);
+			log.error("½âÎöOWLÊ±³ö´í", e);
+			throw new Exception("½âÎöOWLÊ±³ö´í@NodeServiceImpl.getRetrievalDataSource()", e);
 		}
 	
 	}
@@ -273,7 +273,7 @@ public class Node {
 			builder.a("xmlns:rdfs", "http://www.w3.org/2000/01/rdf-schema#");
 			builder.a("xmlns:xsd", "http://www.w3.org/2001/XMLSchema#");
 			
-			// åˆ›å»ºclassç±»å‹èŠ‚ç‚¹çš„owlæ ¼å¼
+			// ´´½¨classÀàĞÍ½ÚµãµÄowl¸ñÊ½
 			if(nd.getNodeType() == NodeType.NODETYPE_CLASS) {
 				// Create <owl:Class>
 				String parentURI = nd.getParentId() == Node.VIRTUAL_NODE_NAME ? "" : getParentUri(nd.getParentId(), jdbcOperations);
@@ -331,7 +331,7 @@ public class Node {
 				}
 			} // end of if(nd.getNodeType() == Node.NODETYPE_CLASS) {
 			
-			// åˆ›å»ºindividualç±»å‹èŠ‚ç‚¹çš„owlæ ¼å¼
+			// ´´½¨individualÀàĞÍ½ÚµãµÄowl¸ñÊ½
 			if(nd.getNodeType() == NodeType.NODETYPE_INDIVIDUAL) {
 				String parentEnName = jdbcOperations.queryForObject(
 						"select `enName` from fishes where id=?",
@@ -358,8 +358,8 @@ public class Node {
 			result = builder.asString();
 			
 		} catch (Exception ex) {
-			log.error("æ„å»ºOWLå­—ç¬¦ä¸²æ—¶å‡ºé”™", ex);
-			throw new RuntimeException("æ„å»ºOWLå­—ç¬¦ä¸²æ—¶å‡ºé”™", ex);
+			log.error("¹¹½¨OWL×Ö·û´®Ê±³ö´í", ex);
+			throw new RuntimeException("¹¹½¨OWL×Ö·û´®Ê±³ö´í", ex);
 		}
 		return result;
 	
@@ -373,7 +373,7 @@ public class Node {
 					java.lang.String.class, id);
 		} catch (Exception ex) {
 			uri = "";
-			log.info(String.format("åœ¨è¯•å›¾è·å¾—çˆ¶èŠ‚ç‚¹çš„uriæ—¶å‘ç°è¯¥çˆ¶èŠ‚ç‚¹ä¸å­˜åœ¨[id=%1$s]ï¼Œuriå°†ä¿æŒä¸ºç©ºã€‚", id));
+			log.info(String.format("ÔÚÊÔÍ¼»ñµÃ¸¸½ÚµãµÄuriÊ±·¢ÏÖ¸Ã¸¸½Úµã²»´æÔÚ[id=%1$s]£¬uri½«±£³ÖÎª¿Õ¡£", id));
 		}
 		return uri;
 	}

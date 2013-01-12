@@ -23,19 +23,19 @@ public class DeleteNodeAction {
 			UserDao userDao = Util.getUserDao();
 			if (!userDao.verifySu(post_user_name, post_user_password)) {
 				this.isError = true;
-				this.message = "ç”¨æˆ·åæˆ–å¯†ç é”™è¯¯.";
+				this.message = "ÓÃ»§Ãû»òÃÜÂë´íÎó.";
 				return ActionSupport.ERROR;
 			}
 			
 			Node nd = new Node();
 			nd.setId(node_id);
-			log.info("è¦åˆ é™¤çš„èŠ‚ç‚¹idä¸ºï¼š" + nd.getId());
+			log.info("ÒªÉ¾³ıµÄ½ÚµãidÎª£º" + nd.getId());
 			
 			NodeDao ndService =  Util.getNodeDao();
 			
 			if (ndService.deleteNode(nd)) {
 				this.isError = false;
-				this.message = "Success, o(âˆ©_âˆ©)o...";
+				this.message = "Success, o(¡É_¡É)o...";
 				return ActionSupport.SUCCESS;
 			} else {
 				this.isError = true;
@@ -44,7 +44,7 @@ public class DeleteNodeAction {
 			}
 			
 		} catch (Exception ex) {
-			log.error("åœ¨åˆ é™¤ç»“ç‚¹æ—¶å‘ç”ŸæœªçŸ¥é”™è¯¯", ex);
+			log.error("ÔÚÉ¾³ı½áµãÊ±·¢ÉúÎ´Öª´íÎó", ex);
 			this.isError = true;
 			this.message = "Fail.";
 			return ActionSupport.ERROR;

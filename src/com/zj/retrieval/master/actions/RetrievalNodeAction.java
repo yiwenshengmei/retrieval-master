@@ -36,7 +36,7 @@
 //		req.setCharacterEncoding("utf-8");
 //		try {
 //			String jSource = req.getParameter("json");
-//			log.info("æœåŠ¡ç«¯æ¥æ”¶åˆ°jsonæ•°æ®ï¼š" + jSource);
+//			log.info("·şÎñ¶Ë½ÓÊÕµ½jsonÊı¾İ£º" + jSource);
 //			JSONObject j = new JSONObject(jSource);
 //			String startNodeId = j.getString("start_node_id");
 //			String selectState = j.getString("select_state");
@@ -53,7 +53,7 @@
 //			jResult.put("hasResult", result.hasResult());
 //			jResult.put("lastState", result.getLastState());
 //			if (result.hasResult()) {
-//				// å¦‚æœå·²ç»æœ‰äº†ç»“æœï¼Œéœ€è¦è¿”å›ä¸‹ä¸€ä¸ªèŠ‚ç‚¹çš„æ‰€æœ‰åŸºæœ¬ä¿¡æ¯
+//				// Èç¹ûÒÑ¾­ÓĞÁË½á¹û£¬ĞèÒª·µ»ØÏÂÒ»¸ö½ÚµãµÄËùÓĞ»ù±¾ĞÅÏ¢
 //				JSONArray jResultNodeArray = new JSONArray();
 //				for (String resultNodeId : result.getResult()) {
 //					JSONObject jResultNode = new JSONObject();
@@ -73,7 +73,7 @@
 //				}
 //				jResult.put("result", jResultNodeArray);
 //			} else {
-//				// å¦‚æœæ²¡æœ‰ç»“æœï¼Œè¿”å›ä¸‹ä¸€ä¸ªç‰¹å¾çš„åŸºæœ¬ä¿¡æ¯
+//				// Èç¹ûÃ»ÓĞ½á¹û£¬·µ»ØÏÂÒ»¸öÌØÕ÷µÄ»ù±¾ĞÅÏ¢
 //				JSONObject jNextAttr = new JSONObject();
 //				jNextAttr.put("name", result.getNext().getName());
 //				jNextAttr.put("enName", result.getNext().getEnglishName());
@@ -83,14 +83,14 @@
 //				jResult.put("next", jNextAttr);
 //			}
 //			String resultString = jResult.toString();
-//			log.info("è¿”å›æ•°æ®: " + resultString);
+//			log.info("·µ»ØÊı¾İ: " + resultString);
 //			resp.getWriter().write(resultString);
 //		} catch (JSONException e) {
-//			resp.getWriter().write("å‚æ•°æ ¼å¼é”™è¯¯");
-//			log.error("å‚æ•°æ ¼å¼é”™è¯¯");
+//			resp.getWriter().write("²ÎÊı¸ñÊ½´íÎó");
+//			log.error("²ÎÊı¸ñÊ½´íÎó");
 //		} catch (Exception ex) {
 //			resp.getWriter().write(ex.getMessage());
-//			log.error("æ£€ç´¢è¿‡ç¨‹å‡ºé”™", ex);
+//			log.error("¼ìË÷¹ı³Ì³ö´í", ex);
 //		}
 //	}
 //}

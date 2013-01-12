@@ -18,7 +18,7 @@ public class QueryNodeOWLAction {
 	protected String execute() {
 		try {
 			
-			log.info("æŸ¥è¯¢owlçš„èŠ‚ç‚¹idä¸ºï¼š" + node_id);
+			log.info("²éÑ¯owlµÄ½ÚµãidÎª£º" + node_id);
 			
 			NodeDao ndService = Util.getNodeDao();
 			
@@ -28,7 +28,7 @@ public class QueryNodeOWLAction {
 			return ActionSupport.SUCCESS;
 			
 		} catch (Exception ex) {
-			log.error("è·å¾—OWLæ—¶å‘ç”Ÿé”™è¯¯", ex);
+			log.error("»ñµÃOWLÊ±·¢Éú´íÎó", ex);
 			return ActionSupport.ERROR;
 		}
 		

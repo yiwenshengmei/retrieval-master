@@ -19,7 +19,7 @@ public class UserField {
 			try {
 				jField.put("key", key);
 				jField.put("value", fields.get(key));
-			} catch (JSONException e) { log.error("åœ¨å°†è‡ªå®šä¹‰å­—æ®µè½¬æ¢æˆjsonæ ¼å¼æ—¶å‘ç”Ÿé”™è¯¯ã€‚", e); }
+			} catch (JSONException e) { log.error("ÔÚ½«×Ô¶¨Òå×Ö¶Î×ª»»³Éjson¸ñÊ½Ê±·¢Éú´íÎó¡£", e); }
 			result.put(jField);
 		}
 		return result;
@@ -34,7 +34,7 @@ public class UserField {
 			}
 			return result;
 		} catch (JSONException e) { 
-			log.error("åœ¨å°†jsonå­—ç¬¦ä¸²è§£ææˆè‡ªå®šä¹‰å­—æ®µæ—¶å‘ç”Ÿé”™è¯¯ã€‚", e);
+			log.error("ÔÚ½«json×Ö·û´®½âÎö³É×Ô¶¨Òå×Ö¶ÎÊ±·¢Éú´íÎó¡£", e);
 			return null;
 		}
 	}

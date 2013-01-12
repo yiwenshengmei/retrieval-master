@@ -7,9 +7,9 @@ import com.zj.retrieval.master.Attribute;
 import com.zj.retrieval.master.Matrix;
 
 public class RetrievalDataSource {
-	// key浠ｈ〃鐗瑰緛涓捐瘉涓殑鍒楀彿锛寁alue浠ｈ〃璇ュ垪鍙峰搴旂殑鐗瑰緛瀵硅薄
+	// key代表特征举证中的列号，value代表该列号对应的特征对象
 	private List<Attribute> attributes;
-	// key浠ｈ〃鐗瑰緛鐭╅樀涓殑琛屽彿锛寁alue浠ｈ〃瀛愮粨鐐瑰湪鏁版嵁搴撲腑鐨刬d
+	// key代表特征矩阵中的行号，value代表子结点在数据库中的id
 	private List<String> childNodes;
 	private Matrix matrix;
 	

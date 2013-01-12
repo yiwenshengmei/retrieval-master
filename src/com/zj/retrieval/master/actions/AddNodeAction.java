@@ -48,7 +48,7 @@ public class AddNodeAction {
 			UserDao userDao = Util.getUserDao();
 			if (!userDao.verifyUser(post_user_name, post_user_password)) {
 				this.isError = true;
-				this.message = "ç”¨æˆ·åæˆ–å¯†ç é”™è¯¯.";
+				this.message = "ÓÃ»§Ãû»òÃÜÂë´íÎó.";
 				return ActionSupport.ERROR;
 			}
 			
@@ -56,20 +56,20 @@ public class AddNodeAction {
 			newNode.setDesc(desc);
 			newNode.setEnglishName(node_name_en);
 			newNode.setName(node_name);
-			newNode.setNodeType(NodeType.NODETYPE_CLASS); // å…ˆæš‚æ—¶å†™æ­»
+			newNode.setNodeType(NodeType.NODETYPE_CLASS); // ÏÈÔİÊ±Ğ´ËÀ
 			newNode.setParentId(parent_id);
 			newNode.setUri(uri);
 			newNode.setUriName(newNode.getUri() + "#" + newNode.getEnglishName());
 			newNode.setDetailType(DetailType.FULL);
 			
-			// è§£æimages
+			// ½âÎöimages
 			List<String> fullPaths = new ArrayList<String>();
 			for (String image_id : images.split(";")) {
 				fullPaths.add("images/" + image_id);
 			}
 			newNode.setImages(fullPaths);
 			
-			// è§£æè‡ªå®šä¹‰å­—æ®µ
+			// ½âÎö×Ô¶¨Òå×Ö¶Î
 			if (user_field != null && !user_field.isEmpty()) {
 				JSONArray userFieldJSONArray = new JSONArray(user_field);
 				newNode.setUserfields(UserField.parse(userFieldJSONArray));
@@ -78,14 +78,14 @@ public class AddNodeAction {
 			NodeDao nodeDao =  Util.getNodeDao();
 			
 			Node parentNode = nodeDao.getNodeById(newNode.getParentId());
-			log.info("æ‰¾åˆ°çˆ¶èŠ‚ç‚¹ï¼š" + parentNode);
+			log.info("ÕÒµ½¸¸½Úµã£º" + parentNode);
 			AttributeSelector attrSelector = nodeDao.getAttributeSelector(parentNode);
 			String[] selectedAttributes = parent_attr.isEmpty() ?
 				new String[0] : parent_attr.split(" ");
 			for (int i = 0; i < selectedAttributes.length; i++) {
 				int selectedAttribute = Integer.valueOf(selectedAttributes[i]);
 				attrSelector.select(selectedAttribute, true);
-				log.info(String.format("é€‰æ‹©çˆ¶èŠ‚ç‚¹å±æ€§[id=%1$s, name=%2$s]", selectedAttribute, 
+				log.info(String.format("Ñ¡Ôñ¸¸½ÚµãÊôĞÔ[id=%1$s, name=%2$s]", selectedAttribute, 
 						parentNode.getRetrievalDataSource().getAttributes().get(selectedAttribute).getName()));
 			}
 			JSONArray jNewAttributes = new JSONArray(new_attr);
@@ -97,22 +97,22 @@ public class AddNodeAction {
 						                          jAttr.getString("new_attr_image"));
 				JSONArray jAttrUserfields = jAttr.getJSONArray("new_attr_user_field");
 				newAttr.setUserFields(UserField.parse(jAttrUserfields));
-				log.info("æ–°æ·»åŠ çš„å±æ€§ï¼š" + newAttr);
+				log.info("ĞÂÌí¼ÓµÄÊôĞÔ£º" + newAttr);
 				attrSelector.addNewAttribute(newAttr, true);
 			}
 			nodeDao.addNode(newNode, parentNode, attrSelector);
 			
-			this.message = "Success, o(âˆ©_âˆ©)o...";
+			this.message = "Success, o(¡É_¡É)o...";
 			return ActionSupport.SUCCESS;
 			
 		} catch (JSONException e) {
-			this.message = "å®¢æˆ·ç«¯ç¨‹åºå‘é€æ•°æ®æ ¼å¼é”™è¯¯ï¼è¯·ä½¿ç”¨æœ€æ–°çš„å®¢æˆ·ç«¯ç¨‹åºã€‚";
+			this.message = "¿Í»§¶Ë³ÌĞò·¢ËÍÊı¾İ¸ñÊ½´íÎó£¡ÇëÊ¹ÓÃ×îĞÂµÄ¿Í»§¶Ë³ÌĞò¡£";
 			return ActionSupport.ERROR;
 		} catch (AttributeSelectedWrongException e) {
-			this.message = "ä¸å­˜åœ¨è¿™æ ·çš„çˆ¶èŠ‚ç‚¹å±æ€§ï¼";
+			this.message = "²»´æÔÚÕâÑùµÄ¸¸½ÚµãÊôĞÔ£¡";
 			return ActionSupport.ERROR;
 		} catch (NumberFormatException ex) {
-			this.message = "çˆ¶èŠ‚ç‚¹å±æ€§æ ¼å¼é”™è¯¯ï¼";
+			this.message = "¸¸½ÚµãÊôĞÔ¸ñÊ½´íÎó£¡";
 			return ActionSupport.ERROR;
 		} catch (Exception ex) {
 			this.message = ex.getMessage();
