@@ -9,6 +9,8 @@ import java.util.UUID;
 import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -24,7 +26,7 @@ import com.zj.retrieval.master.Node;
 public class NodeDao {
 	
 	private SimpleJdbcTemplate sqlclient;
-	private static Log log = LogFactory.getLog(NodeDao.class);
+	private static Logger logger = LoggerFactory.getLogger(NodeDao.class);
 	
 	public List<Node> getAllNodeAsBrief() {
 		String sql = "select `id`, `images` as imagesStr, `name`, `parent_id` as parentId, `detail_type` as detailType from `fish`";
@@ -63,7 +65,7 @@ public class NodeDao {
 			else
 				return true;
 		} catch (Exception ex) {
-			log.error("delNode()发生错误", ex);
+			logger.error("delNode()发生错误", ex);
 			return false;
 		}
 	}
@@ -86,7 +88,7 @@ public class NodeDao {
 			}
 			return true;
 		} catch (Exception ex) {
-			log.error(String.format("查询节点时出错[id=%1$s]", nd.getId()), ex);
+			logger.error(String.format("查询节点时出错[id=%1$s]", nd.getId()), ex);
 			throw new Exception("更新节点时出错", ex);
 		}
 	}
@@ -102,7 +104,7 @@ public class NodeDao {
 			if (result != 1) throw new Exception("插入rootNode时返回结果不等于1.");
 			return true;
 		} catch (Exception ex) {
-			log.error(String.format("查询节点时出错[id=%1$s]", root.getId()), ex);
+			logger.error(String.format("查询节点时出错[id=%1$s]", root.getId()), ex);
 			throw new Exception("更新节点时出错", ex);
 		}
 		
@@ -123,7 +125,7 @@ public class NodeDao {
 		} catch (EmptyResultDataAccessException ex) {
 			throw new Exception(String.format("ID为%1$s的节点不存在！", id));
 		} catch (Exception e) {
-			log.error(String.format("查询节点时出错[id=%1$s]", id), e);
+			logger.error(String.format("查询节点时出错[id=%1$s]", id), e);
 			throw new Exception("查询节点时出错@NodeServiceImpl.findNodeById()", e);
 		}
 	}
@@ -145,7 +147,7 @@ public class NodeDao {
 	public void addNode(Node newNode, Node parentNode, AttributeSelector as) {
 		try {
 			// 更新parent的matrix属性
-			log.info("更新父节点的特征矩阵");
+			logger.info("更新父节点的特征矩阵");
 			Matrix matrix = parentNode.getRetrievalDataSource().getMatrix();
 			//   先修改行：将newNode和parentNode中已有特性的进行匹配
 			//   如果matrix为空[列数或行数等于零]，从特征矩阵的语义上来说无论添加多少行
@@ -171,12 +173,12 @@ public class NodeDao {
 			}
 			
 			// 创建并设置newNode的owl字符串
-			log.info("创建并设置新节点的owl字符串");
+			logger.info("创建并设置新节点的owl字符串");
 			newNode.setOwl(Node.getOwlFromNode(newNode, sqlclient));
 			
 			// 向数据库中插入newNode并且获得自动生成的id值
 			// 将id值设置到newNode中
-			log.info("将新节点写入数据库");
+			logger.info("将新节点写入数据库");
 			if (newNode.getId().isEmpty() || newNode.getId() == null) {
 				newNode.setId(UUID.randomUUID().toString());
 			}
@@ -189,15 +191,15 @@ public class NodeDao {
 			}
 	
 			// 将newNode的id值加入parentNode的childNodes列表中
-			log.info("更新父节点的子结点列表");
+			logger.info("更新父节点的子结点列表");
 			parentNode.getRetrievalDataSource().getChildNodes().add(newNode.getId());
 			// 更新parentNode的owl字符串
-			log.info("更新父节点的owl字符串");
+			logger.info("更新父节点的owl字符串");
 			parentNode.setOwl(Node.getOwlFromNode(parentNode, sqlclient));
 					
 			// 将parentNode重新写回数据库
 			// 由于只修改了parentNode的owl信息，所以这里只更新owl字段
-			log.info("将父节点写回数据库");
+			logger.info("将父节点写回数据库");
 			String sqlUpdateParentNode = "update `fish` set `owl`=:owl where id=:id";
 			SqlParameterSource paramUpdateParentNode = new BeanPropertySqlParameterSource(parentNode);
 			if (sqlclient.update(sqlUpdateParentNode, paramUpdateParentNode) != 1) {
@@ -205,7 +207,7 @@ public class NodeDao {
 			}
 			
 		} catch (Exception ex) {
-			log.error("NodeService.addNode()方法发生错误", ex);
+			logger.error("NodeService.addNode()方法发生错误", ex);
 			throw new RuntimeException("NodeService.addNode()方法发生错误", ex);
 		}
 	}
@@ -218,7 +220,7 @@ public class NodeDao {
 		try {
 
 			// 1.添加rootNode
-			log.info("开始插入rootNode...");
+			logger.info("开始插入rootNode...");
 			if (rootNode.getId().isEmpty() || rootNode.getId() == null) {
 				rootNode.setId(UUID.randomUUID().toString());
 			}
@@ -231,7 +233,7 @@ public class NodeDao {
 			if (result != 1) throw new Exception("插入rootNode时返回结果不等于1.");
 			
 			// 2.更新abstractRootNode[id="virtual_node"]节点的childNodes属性
-			log.info("开始更新abstractRootNode的子节点列表...");
+			logger.info("开始更新abstractRootNode的子节点列表...");
 			String vtrlNodeQuerySQL = "select `owl` from `fish` where `id`=?";
 			List<Node> vrtlNodeQueryResult = sqlclient.query(vtrlNodeQuerySQL, new ParameterizedRowMapper<Node>() {
 
@@ -240,12 +242,12 @@ public class NodeDao {
 					try {
 						String owl = rs.getString("owl");
 						if(owl == null || owl.isEmpty()) {
-							log.error("VirtualNode存在，但是owl信息为空，这怎么可能？");
+							logger.error("VirtualNode存在，但是owl信息为空，这怎么可能？");
 							return null;
 						}
 						result = Node.parseVirtualNodeFromOWL(owl);
 					} catch (Exception e) {
-						log.error("解析虚拟节点中的owl时出错。");
+						logger.error("解析虚拟节点中的owl时出错。");
 						return null;
 					}
 					return result;
@@ -254,14 +256,14 @@ public class NodeDao {
 			
 			Node virtual_node = null;
 			if (vrtlNodeQueryResult == null) {
-				log.error("查询虚拟节点时出错。");
+				logger.error("查询虚拟节点时出错。");
 				throw new Exception("查询虚拟节点时出错。");
 			}
 			if (vrtlNodeQueryResult.size() == 0) {
 				// 这说明id="VirtualNode"的记录不存在
 				// 这种情况通常只发生在程序第一次运行时
 				// 创建一个新的虚根节点，设置id="VirtualNode"，并写入数据库
-				log.info("因为virtual_node记录不存在，将新建一个virtual_node");
+				logger.info("因为virtual_node记录不存在，将新建一个virtual_node");
 				virtual_node = new Node();
 				int insert_vrtl_node_result = sqlclient.getJdbcOperations().update(
 						"INSERT INTO `fish`(" +
@@ -269,10 +271,10 @@ public class NodeDao {
 						"VALUES('virtual_node','','','',-1,'','');"
 				);
 				if (insert_vrtl_node_result != 1) {
-					log.error("创建VirtualNode失败。");
+					logger.error("创建VirtualNode失败。");
 					throw new Exception("创建VirtualNode失败。");
 				}
-				log.info("新建的VirtualNode插入数据库成功");
+				logger.info("新建的VirtualNode插入数据库成功");
 			} else {
 				virtual_node = vrtlNodeQueryResult.get(0);
 			}
@@ -281,17 +283,17 @@ public class NodeDao {
 	
 			// 重建VirtualNode的owl字段
 			virtual_node.setOwl(Node.getOwlFromNode(virtual_node, sqlclient));
-			log.info("生成新的owl字符串：" + virtual_node.getOwl());
+			logger.info("生成新的owl字符串：" + virtual_node.getOwl());
 			
 			// 将VirtualNode写回数据库
-			log.info("开始将VirtualNode写回数据...");
+			logger.info("开始将VirtualNode写回数据...");
 			String update_vrtl_node_sql = "update `fish` set `owl`=:owl where `id`='virtual_node'";
 			SqlParameterSource vrtl_node_param = new BeanPropertySqlParameterSource(virtual_node);
 			sqlclient.update(update_vrtl_node_sql, vrtl_node_param);
-			log.info("VirtualNode写回数据库成功");
+			logger.info("VirtualNode写回数据库成功");
 			
 		} catch (Exception ex) {
-			log.error("添加rootNode时发生错误，事务将回滚", ex);
+			logger.error("添加rootNode时发生错误，事务将回滚", ex);
 			throw new RuntimeException("添加rootNode时发生错误", ex); // 回滚
 		}
 	}
@@ -300,7 +302,7 @@ public class NodeDao {
 	public void addNodeBrief(Node newNode, Node parentNode, AttributeSelector as) {
 		try {
 			// 更新parent的matrix属性
-			log.info("更新父节点的特征矩阵");
+			logger.info("更新父节点的特征矩阵");
 			Matrix matrix = parentNode.getRetrievalDataSource().getMatrix();
 			//   先修改行：将newNode和parentNode中已有特性的进行匹配
 			//   如果matrix为空[列数或行数等于零]，从特征矩阵的语义上来说无论添加多少行
@@ -329,7 +331,7 @@ public class NodeDao {
 //			log.info("创建并设置新节点的owl字符串");
 //			newNode.setOwl(Node.getOwlFromNode(newNode, sqlclient));
 			
-			log.info("将新节点写入数据库");
+			logger.info("将新节点写入数据库");
 			// 注意，brief节点的ID值是由客户端提供的！！！
 			// 为新节点detailType设置值: brief
 			newNode.setDetailType(DetailType.BRIEF);
@@ -341,15 +343,15 @@ public class NodeDao {
 			}
 	
 			// 将newNode的id值加入parentNode的childNodes列表中
-			log.info("更新父节点的子结点列表");
+			logger.info("更新父节点的子结点列表");
 			parentNode.getRetrievalDataSource().getChildNodes().add(newNode.getId());
 			// 更新parentNode的owl字符串
-			log.info("更新父节点的owl字符串");
+			logger.info("更新父节点的owl字符串");
 			parentNode.setOwl(Node.getOwlFromNode(parentNode, sqlclient));
 					
 			// 将parentNode重新写回数据库
 			// 由于只修改了parentNode的owl信息，所以这里只更新owl字段
-			log.info("将父节点写回数据库");
+			logger.info("将父节点写回数据库");
 			String sqlUpdateParentNode = "update `fish` set `owl`=:owl where id=:id";
 			SqlParameterSource paramUpdateParentNode = new BeanPropertySqlParameterSource(parentNode);
 			if (sqlclient.update(sqlUpdateParentNode, paramUpdateParentNode) != 1) {
@@ -357,7 +359,7 @@ public class NodeDao {
 			}
 			
 		} catch (Exception ex) {
-			log.error("NodeService.addNode()方法发生错误", ex);
+			logger.error("NodeService.addNode()方法发生错误", ex);
 			throw new RuntimeException("NodeService.addNode()方法发生错误", ex);
 		}
 	}

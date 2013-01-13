@@ -11,6 +11,8 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -20,7 +22,7 @@ import com.jamesmurty.utils.XMLBuilder;
 import com.zj.retrieval.master.dao.RetrievalDataSource;
 
 public class Node {
-	private static Log log = LogFactory.getLog(Node.class);
+	private static Logger logger = LoggerFactory.getLogger(Node.class);
 		
 	public final static String VIRTUAL_NODE_NAME = "virtual_node";
 	
@@ -142,7 +144,7 @@ public class Node {
 			String text = elemNode.getTextContent();
 			result.getRetrievalDataSource().getChildNodes().add(text);
 		}
-		log.info("解析出VirtualNode的子结点列表" + result.getRetrievalDataSource().getChildNodes());
+		logger.info("解析出VirtualNode的子结点列表" + result.getRetrievalDataSource().getChildNodes());
 		return result;
 	}
 	public static void parseNodeFromOWL(Node nd) throws Exception {
@@ -192,7 +194,7 @@ public class Node {
 					attrs.add(attrIndex, attr);
 				}
 			} catch (XPathExpressionException e) {
-				log.info("不存在节点/RDF/Class/attributes");
+				logger.info("不存在节点/RDF/Class/attributes");
 			}
 			
 			// 解析Matrix
@@ -210,7 +212,7 @@ public class Node {
 					matrix.addRow(row, 0, row.length);
 				}
 			} catch (XPathExpressionException e) {
-				log.info("不存在节点/RDF/Class/matrix");
+				logger.info("不存在节点/RDF/Class/matrix");
 			}
 
 			// 解析ChildList
@@ -222,7 +224,7 @@ public class Node {
 					child_nodes.add(child_node_id);
 				}
 			} catch (XPathExpressionException e) {
-				log.info("不存在节点/RDF/Class/childNodes");
+				logger.info("不存在节点/RDF/Class/childNodes");
 			}
 			
 			// 解析userfields
@@ -235,7 +237,7 @@ public class Node {
 					user_fields.put(key, value);
 				}
 			} catch (XPathExpressionException e) {
-				log.info("不存在节点/RDF/Class/userfields");
+				logger.info("不存在节点/RDF/Class/userfields");
 			}
 			
 			// 解析Desc
@@ -243,7 +245,7 @@ public class Node {
 			try {
 				desc = builder.xpathFind("/RDF/Class/desc").getElement().getTextContent();
 			} catch(XPathExpressionException e) {
-				log.info("不存在节点/RDF/Class/desc, desc将保持为空");
+				logger.info("不存在节点/RDF/Class/desc, desc将保持为空");
 			}
 			
 			RetrievalDataSource data_source = new RetrievalDataSource();
@@ -256,7 +258,7 @@ public class Node {
 			nd.setUserfields(user_fields);
 			
 		} catch (Exception e) {
-			log.error("解析OWL时出错", e);
+			logger.error("解析OWL时出错", e);
 			throw new Exception("解析OWL时出错@NodeServiceImpl.getRetrievalDataSource()", e);
 		}
 	
@@ -358,7 +360,7 @@ public class Node {
 			result = builder.asString();
 			
 		} catch (Exception ex) {
-			log.error("构建OWL字符串时出错", ex);
+			logger.error("构建OWL字符串时出错", ex);
 			throw new RuntimeException("构建OWL字符串时出错", ex);
 		}
 		return result;
@@ -373,7 +375,7 @@ public class Node {
 					java.lang.String.class, id);
 		} catch (Exception ex) {
 			uri = "";
-			log.info(String.format("在试图获得父节点的uri时发现该父节点不存在[id=%1$s]，uri将保持为空。", id));
+			logger.info(String.format("在试图获得父节点的uri时发现该父节点不存在[id=%1$s]，uri将保持为空。", id));
 		}
 		return uri;
 	}

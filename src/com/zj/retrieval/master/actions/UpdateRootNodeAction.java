@@ -11,6 +11,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.struts2.ServletActionContext;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.DetailType;
@@ -23,7 +25,7 @@ import com.zj.retrieval.master.dao.UserDao;
 
 public class UpdateRootNodeAction {
 
-	private static Log log = LogFactory.getLog(UpdateRootNodeAction.class);
+	private static Logger logger = LoggerFactory.getLogger(UpdateRootNodeAction.class);
 	
 	private String node_name;
 	private String node_name_en;
@@ -84,11 +86,11 @@ public class UpdateRootNodeAction {
 			
 		} catch (JSONException e) {
 			this.message = "自定义字段存在非法字符，请检查。";
-			log.error("JSON字符串解析错误", e);
+			logger.error("JSON字符串解析错误", e);
 			return ActionSupport.ERROR;
 		} catch (Exception e) {
 			this.message = "发生内部逻辑错误: " + e.getMessage();
-			log.error("发生内部逻辑错误", e);
+			logger.error("发生内部逻辑错误", e);
 			return ActionSupport.ERROR;
 		}
 	}

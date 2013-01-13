@@ -5,6 +5,8 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Attribute;
@@ -19,7 +21,7 @@ import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class AddNodeBriefAction {
-	private static Log log = LogFactory.getLog(AddNodeBriefAction.class);
+	private static Logger logger = LoggerFactory.getLogger(AddNodeBriefAction.class);
 	private String node_name_en;
 	private String node_name;
 	private String parent_id;
@@ -59,14 +61,14 @@ public class AddNodeBriefAction {
 			NodeDao ndService =  Util.getNodeDao();;
 			
 			Node parent_node = ndService.getNodeById(new_node.getParentId());
-			log.info("找到父节点：" + parent_node);
+			logger.info("找到父节点：" + parent_node);
 			AttributeSelector attrSelector = ndService.getAttributeSelector(parent_node);
 			String[] selectedAttributes = parent_attr.equals("") ?
 				new String[0] : parent_attr.split(" ");
 			for (int i = 0; i < selectedAttributes.length; i++) {
 				int selectedAttribute = Integer.valueOf(selectedAttributes[i]);
 				attrSelector.select(selectedAttribute, true);
-				log.info(String.format("选择父节点属性[id=%1$s, name=%2$s]", selectedAttribute, 
+				logger.info(String.format("选择父节点属性[id=%1$s, name=%2$s]", selectedAttribute, 
 						parent_node.getRetrievalDataSource().getAttributes().get(selectedAttribute).getName()));
 			}
 			JSONArray jNewAttributes = new JSONArray(new_attr);
@@ -78,7 +80,7 @@ public class AddNodeBriefAction {
 						                          jAttr.getString("new_attr_image"));
 				JSONArray jAttrUserfields = jAttr.getJSONArray("new_attr_user_field");
 				newAttr.setUserFields(UserField.parse(jAttrUserfields));
-				log.info("新添加的属性：" + newAttr);
+				logger.info("新添加的属性：" + newAttr);
 				attrSelector.addNewAttribute(newAttr, true);
 			}
 			ndService.addNodeBrief(new_node, parent_node, attrSelector);
@@ -88,19 +90,19 @@ public class AddNodeBriefAction {
 			return ActionSupport.SUCCESS;
 			
 		} catch (JSONException e) {
-			log.error("数据格式错误", e);
+			logger.error("数据格式错误", e);
 			this.message = "客户端程序发送数据格式错误！请使用最新的客户端程序。";
 			return ActionSupport.ERROR;
 		} catch (AttributeSelectedWrongException e) {
-			log.info("不存在这样的父节点");
+			logger.info("不存在这样的父节点");
 			this.message = "不存在这样的父节点属性！";
 			return ActionSupport.ERROR;
 		} catch (NumberFormatException ex) {
-			log.info("客户端输入了错误的父节点属性");
+			logger.info("客户端输入了错误的父节点属性");
 			this.message = "父节点属性格式错误！";
 			return ActionSupport.ERROR;
 		} catch (Exception ex) {
-			log.error("在添加子结点时发生未知错误", ex);
+			logger.error("在添加子结点时发生未知错误", ex);
 			this.message = "在添加子结点时发生未知错误";
 			return ActionSupport.ERROR;
 		}

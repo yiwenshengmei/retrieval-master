@@ -2,6 +2,9 @@ package com.zj.retrieval.master.actions;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.Util;
@@ -10,7 +13,7 @@ import com.zj.retrieval.master.dao.UserDao;
 
 public class DeleteNodeAction {
 
-	private static Log log = LogFactory.getLog(AddNodeAction.class);
+	private static Logger logger = LoggerFactory.getLogger(AddNodeAction.class);
 	private String node_id;
 	private String message;
 	private boolean isError;
@@ -29,7 +32,7 @@ public class DeleteNodeAction {
 			
 			Node nd = new Node();
 			nd.setId(node_id);
-			log.info("要删除的节点id为：" + nd.getId());
+			logger.info("要删除的节点id为：" + nd.getId());
 			
 			NodeDao ndService =  Util.getNodeDao();
 			
@@ -44,7 +47,7 @@ public class DeleteNodeAction {
 			}
 			
 		} catch (Exception ex) {
-			log.error("在删除结点时发生未知错误", ex);
+			logger.error("在删除结点时发生未知错误", ex);
 			this.isError = true;
 			this.message = "Fail.";
 			return ActionSupport.ERROR;

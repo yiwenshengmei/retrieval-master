@@ -8,9 +8,11 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserField {
-	private static Log log = LogFactory.getLog(UserField.class);
+	private static Logger logger = LoggerFactory.getLogger(UserField.class);
 	
 	public static JSONArray parse(Map<String, String> fields) {
 		JSONArray result = new JSONArray();
@@ -19,7 +21,7 @@ public class UserField {
 			try {
 				jField.put("key", key);
 				jField.put("value", fields.get(key));
-			} catch (JSONException e) { log.error("在将自定义字段转换成json格式时发生错误。", e); }
+			} catch (JSONException e) { logger.error("在将自定义字段转换成json格式时发生错误。", e); }
 			result.put(jField);
 		}
 		return result;
@@ -34,7 +36,7 @@ public class UserField {
 			}
 			return result;
 		} catch (JSONException e) { 
-			log.error("在将json字符串解析成自定义字段时发生错误。", e);
+			logger.error("在将json字符串解析成自定义字段时发生错误。", e);
 			return null;
 		}
 	}

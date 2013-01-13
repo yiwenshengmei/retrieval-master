@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.struts2.ServletActionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Node;
@@ -29,14 +29,15 @@ public class UploadAction {
 	private String post_user_name;
 	private String post_user_password;
 	
-	private static Log log = LogFactory.getLog(Node.class);
+	private static Logger logger = LoggerFactory.getLogger(Node.class);
 	
 	public String execute() {
 		try {
 			UserDao userDao = Util.getUserDao();
 			if (!userDao.verifyUser(post_user_name, post_user_password)) {
 				this.isError = true;
-				this.message = "用户名或密码错误.";
+				this.message = "用户名或密码错误！";
+				
 				return ActionSupport.ERROR;
 			}
 						
@@ -44,23 +45,28 @@ public class UploadAction {
 			List<String> images_path = new ArrayList<String>();
 			String realpath = ServletActionContext.getServletContext().getRealPath("/images");
 			File folder = new File(realpath);
-			if(!folder.exists()) folder.mkdirs();
+			if(!folder.exists()) {
+				folder.mkdirs();
+				logger.debug("用于存放图片的文件夹不存在，现已创建。" + folder.toString());
+			}
 			if (null != image) {
 				filename = UUID.randomUUID().toString() + ".jpg";
 				File destfile = new File(folder, filename);
 				FileUtils.copyFile(image, destfile);
-				images_path.add("images/" + filename);
+				String fullName = "images/" + filename;
+				images_path.add(fullName);
+				logger.debug("保存文件成功: " + destfile.getPath());
 			} else {
 				throw new IllegalArgumentException("服务端没有接收到文件！");
 			}
 			this.message = "文件id: " + filename;
 			return ActionSupport.SUCCESS;
 		} catch (IOException e) {
-			log.error("服务端保存文件时失败", e);
+			logger.error("服务端保存文件时失败", e);
 			this.message = "服务端保存文件时失败";
 			return ActionSupport.ERROR;
 		} catch (IllegalArgumentException e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			this.message = e.getMessage();
 			return ActionSupport.ERROR;
 		}

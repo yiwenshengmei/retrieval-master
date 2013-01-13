@@ -8,6 +8,8 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Attribute;
@@ -22,7 +24,7 @@ import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class UpdateNodeAction {
-	private static Log log = LogFactory.getLog(AddNodeAction.class);
+	private static Logger logger = LoggerFactory.getLogger(AddNodeAction.class);
 	private String desc;
 	private String node_name_en;
 	private String node_name;

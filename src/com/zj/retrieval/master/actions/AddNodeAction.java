@@ -8,6 +8,8 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Attribute;
@@ -22,7 +24,7 @@ import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class AddNodeAction {
-	private static Log log = LogFactory.getLog(AddNodeAction.class);
+	private static Logger logger = LoggerFactory.getLogger(AddNodeAction.class);
 	private String desc;
 	private String node_name_en;
 	private String node_name;
@@ -78,14 +80,14 @@ public class AddNodeAction {
 			NodeDao nodeDao =  Util.getNodeDao();
 			
 			Node parentNode = nodeDao.getNodeById(newNode.getParentId());
-			log.info("找到父节点：" + parentNode);
+			logger.info("找到父节点：" + parentNode);
 			AttributeSelector attrSelector = nodeDao.getAttributeSelector(parentNode);
 			String[] selectedAttributes = parent_attr.isEmpty() ?
 				new String[0] : parent_attr.split(" ");
 			for (int i = 0; i < selectedAttributes.length; i++) {
 				int selectedAttribute = Integer.valueOf(selectedAttributes[i]);
 				attrSelector.select(selectedAttribute, true);
-				log.info(String.format("选择父节点属性[id=%1$s, name=%2$s]", selectedAttribute, 
+				logger.info(String.format("选择父节点属性[id=%1$s, name=%2$s]", selectedAttribute, 
 						parentNode.getRetrievalDataSource().getAttributes().get(selectedAttribute).getName()));
 			}
 			JSONArray jNewAttributes = new JSONArray(new_attr);
@@ -97,7 +99,7 @@ public class AddNodeAction {
 						                          jAttr.getString("new_attr_image"));
 				JSONArray jAttrUserfields = jAttr.getJSONArray("new_attr_user_field");
 				newAttr.setUserFields(UserField.parse(jAttrUserfields));
-				log.info("新添加的属性：" + newAttr);
+				logger.info("新添加的属性：" + newAttr);
 				attrSelector.addNewAttribute(newAttr, true);
 			}
 			nodeDao.addNode(newNode, parentNode, attrSelector);
