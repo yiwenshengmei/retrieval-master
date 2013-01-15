@@ -12,14 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionSupport;
-import com.zj.retrieval.master.Attribute;
+import com.zj.retrieval.master.NodeAttribute;
 import com.zj.retrieval.master.AttributeSelectedWrongException;
 import com.zj.retrieval.master.AttributeSelector;
 import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
 import com.zj.retrieval.master.UserField;
-import com.zj.retrieval.master.Util;
+import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
@@ -48,15 +48,15 @@ public class UpdateNodeAction {
 	
 	public String execute() {
 		try {
-			UserDao userDao = Util.getUserDao();
+			UserDao userDao = Configuration.getUserDao();
 			if (!userDao.verifyUser(post_user_name, post_user_password)) {
 				this.isError = true;
 				this.message = "用户名或密码错误.";
 				return ActionSupport.ERROR;
 			}
 			
-			NodeDao nodeDao =  Util.getNodeDao();
-			Node nd = nodeDao.getNodeById(node_id);
+			NodeDao nodeDao =  Configuration.getNodeDao();
+			Node nd = nodeDao.queryById(node_id);
 			nd.setId(node_id);
 			nd.setDesc(desc);
 			nd.setEnglishName(node_name_en);
@@ -80,7 +80,7 @@ public class UpdateNodeAction {
 			}
 			
 			
-			nodeDao.updateNode(nd);
+			nodeDao.update(nd);
 			
 //			Node parentNode = nodeDao.getNodeById(newNode.getParentId());
 //			log.info("找到父节点：" + parentNode);

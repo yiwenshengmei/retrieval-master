@@ -12,14 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionSupport;
-import com.zj.retrieval.master.Attribute;
+import com.zj.retrieval.master.NodeAttribute;
 import com.zj.retrieval.master.AttributeSelectedWrongException;
 import com.zj.retrieval.master.AttributeSelector;
 import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
 import com.zj.retrieval.master.UserField;
-import com.zj.retrieval.master.Util;
+import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
@@ -47,7 +47,7 @@ public class AddNodeAction {
 	
 	public String execute() {
 		try {
-			UserDao userDao = Util.getUserDao();
+			UserDao userDao = Configuration.getUserDao();
 			if (!userDao.verifyUser(post_user_name, post_user_password)) {
 				this.isError = true;
 				this.message = "用户名或密码错误.";
@@ -77,9 +77,9 @@ public class AddNodeAction {
 				newNode.setUserfields(UserField.parse(userFieldJSONArray));
 			}
 			
-			NodeDao nodeDao =  Util.getNodeDao();
+			NodeDao nodeDao =  Configuration.getNodeDao();
 			
-			Node parentNode = nodeDao.getNodeById(newNode.getParentId());
+			Node parentNode = nodeDao.queryById(newNode.getParentId());
 			logger.info("找到父节点：" + parentNode);
 			AttributeSelector attrSelector = nodeDao.getAttributeSelector(parentNode);
 			String[] selectedAttributes = parent_attr.isEmpty() ?
@@ -93,7 +93,7 @@ public class AddNodeAction {
 			JSONArray jNewAttributes = new JSONArray(new_attr);
 			for (int i = 0; i < jNewAttributes.length(); i++) {
 				JSONObject jAttr = jNewAttributes.getJSONObject(i);
-				Attribute newAttr = new Attribute(jAttr.getString("new_attr_name"),
+				NodeAttribute newAttr = new NodeAttribute(jAttr.getString("new_attr_name"),
 						                          jAttr.getString("new_attr_name_en"),
 						                          jAttr.getString("new_attr_desc"),
 						                          jAttr.getString("new_attr_image"));

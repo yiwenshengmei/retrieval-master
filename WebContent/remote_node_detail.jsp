@@ -1,4 +1,4 @@
-<%@page import="com.zj.retrieval.master.Util"%>
+<%@page import="com.zj.retrieval.master.Configuration"%>
 <%@page import="org.apache.http.impl.client.BasicResponseHandler"%>
 <%@page import="org.apache.http.client.ResponseHandler"%>
 <%@page import="org.apache.http.HttpEntity"%>
@@ -12,7 +12,7 @@
 <%@page import="org.apache.http.client.HttpClient"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="com.zj.retrieval.master.Attribute"%>
+<%@page import="com.zj.retrieval.master.NodeAttribute"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -31,7 +31,7 @@
 	
 	DefaultHttpClient httpclient = new DefaultHttpClient();
 	
-	HttpPost httpost = new HttpPost(Util.urlConnect(url, "node/query_for_remote"));
+	HttpPost httpost = new HttpPost(Configuration.urlConnect(url, "node/query_for_remote"));
     List <NameValuePair> nvps = new ArrayList <NameValuePair>();
     nvps.add(new BasicNameValuePair("user_name", userName));
     nvps.add(new BasicNameValuePair("user_pwd", userPwd));
@@ -63,7 +63,7 @@
 	List<String> images = new ArrayList<String>();
 	JSONArray jImages = j.getJSONArray("images");
 	for (int i = 0; i < jImages.length(); i++) {
-		images.add(Util.urlConnect(url, jImages.getString(i)));
+		images.add(Configuration.urlConnect(url, jImages.getString(i)));
 	}
 	JSONArray jUserFields = j.getJSONArray("user_field");
 	Map<String, String> userField = new HashMap<String, String>();

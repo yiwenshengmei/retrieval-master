@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class AttributeSelector {
 	private Map<Integer, Boolean> attributeMapping;
-	private Map<Attribute, Boolean> newAttributeMapping;
+	private Map<NodeAttribute, Boolean> newAttributeMapping;
 	
 	public void select(int index, boolean flag) throws AttributeSelectedWrongException {
 		if (attributeMapping.containsKey(new Integer(index))) {
@@ -26,12 +26,12 @@ public class AttributeSelector {
 			data.put(id, Boolean.FALSE);
 		}
 		this.attributeMapping = data;
-		this.newAttributeMapping = new HashMap<Attribute, Boolean>();
+		this.newAttributeMapping = new HashMap<NodeAttribute, Boolean>();
 	}
 	
 	public AttributeSelector() {
 		this.attributeMapping = new HashMap<Integer, Boolean>();
-		this.newAttributeMapping = new HashMap<Attribute, Boolean>();
+		this.newAttributeMapping = new HashMap<NodeAttribute, Boolean>();
 	}
 
 	public Map<Integer, Boolean> getAttributeMapping() {
@@ -45,15 +45,15 @@ public class AttributeSelector {
 		}
 	}
 
-	public void addNewAttribute(Attribute newAttribute, boolean newAttributeFlag) {
+	public void addNewAttribute(NodeAttribute newAttribute, boolean newAttributeFlag) {
 		newAttributeMapping.put(newAttribute, Boolean.valueOf(newAttributeFlag));		
 	}
 
-	public Map<Attribute, Boolean> getNewAttributeMapping() {
+	public Map<NodeAttribute, Boolean> getNewAttributeMapping() {
 		return newAttributeMapping;
 	}
 
-	public void setNewAttributeMapping(Map<Attribute, Boolean> newAttributeMapping) {
+	public void setNewAttributeMapping(Map<NodeAttribute, Boolean> newAttributeMapping) {
 		this.newAttributeMapping = newAttributeMapping;
 	}
 

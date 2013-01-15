@@ -1,5 +1,5 @@
 <%@page import="java.util.Map.Entry"%>
-<%@page import="com.zj.retrieval.master.Util"%>
+<%@page import="com.zj.retrieval.master.Configuration"%>
 <%@page import="com.zj.retrieval.master.Node"%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
     pageEncoding="UTF-8"%>
@@ -9,10 +9,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <%
 	String nodeid = request.getParameter("node_id");
-	Node nd = Util.getNodeDao().getNodeById(nodeid);
+	Node nd = Configuration.getNodeDao().queryById(nodeid);
 	StringBuilder imagesBuilder = new StringBuilder();
 	for (String imageUrl : nd.getImages()) {
-		imagesBuilder.append(Util.getImageNameExcludePath(imageUrl) + ";");
+		imagesBuilder.append(Configuration.getImageNameExcludePath(imageUrl) + ";");
 	}
 	String imagesStr = imagesBuilder.substring(0, imagesBuilder.length() - 1);
 %>

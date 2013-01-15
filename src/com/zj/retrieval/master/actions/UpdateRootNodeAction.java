@@ -19,7 +19,7 @@ import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
 import com.zj.retrieval.master.UserField;
-import com.zj.retrieval.master.Util;
+import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
@@ -53,16 +53,16 @@ public class UpdateRootNodeAction {
 	public String execute() {
 		try {
 			
-			UserDao userDao = Util.getUserDao();
+			UserDao userDao = Configuration.getUserDao();
 			if (!userDao.verifyUser(post_user_name, post_user_password)) {
 				this.isError = true;
 				this.message = "用户名或密码错误.";
 				return ActionSupport.ERROR;
 			}
 			
-			NodeDao nodeDao = Util.getNodeDao();
+			NodeDao nodeDao = Configuration.getNodeDao();
 			
-			Node root = nodeDao.getNodeById(node_id);
+			Node root = nodeDao.queryById(node_id);
 			root.setDesc(desc);
 			root.setEnglishName(node_name_en);
 			root.setName(node_name);
@@ -70,7 +70,7 @@ public class UpdateRootNodeAction {
 			root.setUri(uri);
 			root.setUriName(root.getUri() + "#" + uri_name);
 			root.setDetailType(DetailType.FULL);
-			root.setParentId(Node.VIRTUAL_NODE_NAME);
+			root.setParentId(Node.VIRTUAL_NODE_ID);
 			root.setImagesStr(images);
 			
 			// 解析自定义字段

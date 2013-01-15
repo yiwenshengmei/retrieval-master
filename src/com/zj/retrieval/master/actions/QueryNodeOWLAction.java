@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Node;
-import com.zj.retrieval.master.Util;
+import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.NodeDao;
 
 public class QueryNodeOWLAction {
@@ -23,9 +23,9 @@ public class QueryNodeOWLAction {
 			
 			logger.info("查询owl的节点id为：" + node_id);
 			
-			NodeDao ndService = Util.getNodeDao();
+			NodeDao ndService = Configuration.getNodeDao();
 			
-			Node node = ndService.getNodeById(node_id);
+			Node node = ndService.queryById(node_id);
 			
 			this.owl = Boolean.valueOf(format) ? XMLUtil.format(node.getOwl(), 4) : node.getOwl();
 			return ActionSupport.SUCCESS;

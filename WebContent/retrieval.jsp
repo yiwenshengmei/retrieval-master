@@ -4,7 +4,7 @@
 <%@page import="java.util.List"%>
 <%@page import="com.zj.retrieval.master.RetrievalResult"%>
 <%@page import="com.zj.retrieval.master.dao.RetrievalDao"%>
-<%@page import="com.zj.retrieval.master.Util"%>
+<%@page import="com.zj.retrieval.master.Configuration"%>
 <%@page import="com.zj.retrieval.master.dao.NodeDao"%>
 
 <%@page language="java" 
@@ -21,8 +21,8 @@
 	
 	boolean hasResult = false;
 	
-	NodeDao nodeDao = Util.getNodeDao();
-	Node startNode = nodeDao.getNodeById(nodeId);
+	NodeDao nodeDao = Configuration.getNodeDao();
+	Node startNode = nodeDao.queryById(nodeId);
 	RetrievalDao retrievalDao = new RetrievalDao(startNode);
 	String nodeName = startNode.getName();
 	
@@ -37,22 +37,22 @@
 	if (nodeId != null && !nodeId.isEmpty()) {
 		// 进入检索环节
 		if (selectedState == null || selectedState.isEmpty()) 
-			selectedState = "0"; // 要保证第一位必须有个数，随便是什么数字都可以，这一位以后可以用作其他用途的标志位
-			RetrievalResult result = retrievalDao.retrieval(selectedState);
+	selectedState = "0"; // 要保证第一位必须有个数，随便是什么数字都可以，这一位以后可以用作其他用途的标志位
+	RetrievalResult result = retrievalDao.retrieval(selectedState);
 		
 		hasResult = result.hasResult();
 		if (result.hasResult()) {
-			resultNodeIDs = result.getResult();
+	resultNodeIDs = result.getResult();
 		} else {
-			attrName = result.getNext().getName();
-			attrNameEN = result.getNext().getEnglishName();
-			attrDesc = result.getNext().getDesc();
-			attrImages.add(result.getNext().getImage());
-			attrUserFields = result.getNext().getUserFields();
+	attrName = result.getNext().getName();
+	attrNameEN = result.getNext().getEnglishName();
+	attrDesc = result.getNext().getDesc();
+	attrImages.add(result.getNext().getImage());
+	attrUserFields = result.getNext().getUserFields();
 		}
 	}
 %>
-<title>当前节点: <%=nodeName %> 检索进度: <%=selectedState %></title>
+<title>当前节点: <%=nodeName%> 检索进度: <%=selectedState%></title>
 <script type="text/javascript" src='jquery-1.7.1.js'></script>
 <script type="text/javascript">
 	var selected_state = '<%=selectedState%>';
@@ -68,20 +68,26 @@
 </script>
 </head>
 <body>
-	<% if (!hasResult) { %>
+	<%
+		if (!hasResult) {
+	%>
 	<form id='retrieval_form' action="retrieval.jsp" method="post">
 		<input id='selected_state_post' type="hidden" name='selected_state'/>
 		<input id='node_id' type='hidden' name='node_id' value='<%=nodeId%>'/>
-		<div><h1><%=attrName%></h1><h3>( <%=attrNameEN %> )</h3></div>
+		<div><h1><%=attrName%></h1><h3>( <%=attrNameEN%> )</h3></div>
 		<table>
 			<tr><td>DESCRIPTION:&nbsp;</td><td><%=attrDesc%></td></tr>
 		</table>
 		
 		<table>
 			<tr>
-			<% for (String imageURL : attrImages) { %> 
-				<td><img src='<%="images/" + imageURL %>'/></td>
-			<% } %>
+			<%
+				for (String imageURL : attrImages) {
+			%> 
+				<td><img src='<%="images/" + imageURL%>'/></td>
+			<%
+				}
+			%>
 			</tr>
 		</table>
 		
@@ -91,14 +97,17 @@
 			<a href='#' onclick='answer(3);'>不知道</a>
 		</div>
 	</form>
-	<% } %>
+	<%
+		}
+	%>
 	
-	<% if (hasResult) { 
+	<%
+			if (hasResult) { 
 			List<Node> nodeResults = new ArrayList<Node>();
 			for (String id : resultNodeIDs) {
-				nodeResults.add(nodeDao.getNodeById(id));
+				nodeResults.add(nodeDao.queryById(id));
 			}
-	%>
+		%>
 			<div>结果（<%=nodeResults.size() %>个）：</div>
 			<table>
 				<% for (Node nd : nodeResults) { %>

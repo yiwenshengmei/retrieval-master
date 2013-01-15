@@ -7,10 +7,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.zj.retrieval.master.dao.NodeAttributeDao;
 import com.zj.retrieval.master.dao.NodeDao;
+import com.zj.retrieval.master.dao.NodeImageDao;
 import com.zj.retrieval.master.dao.UserDao;
 
-public class Util {
+public class Configuration {
 	public static ApplicationContext applicationContext = null;
 	public static String IMAGE_PATH_PREFIX = "images/";
 	
@@ -33,9 +35,19 @@ public class Util {
 		return (UserDao) ctx.getBean("userDao");
 	}
 	
+	public static NodeImageDao getNodeImageDao() {
+		ApplicationContext ctx = getApplicationContext();
+		return (NodeImageDao) ctx.getBean("nodeImageDao");
+	}
+	
 	public static NodeDao getNodeDao() {
 		ApplicationContext ctx = getApplicationContext();
 		return (NodeDao) ctx.getBean("nodeDao");
+	}
+	
+	public static NodeAttributeDao getNodeAttributeDao() {
+		ApplicationContext ctx = getApplicationContext();
+		return (NodeAttributeDao) ctx.getBean("nodeAttributeDao");
 	}
 	
 	public static String html(String content) {

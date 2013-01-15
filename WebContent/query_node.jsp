@@ -1,3 +1,4 @@
+<%@page import="com.zj.retrieval.master.Configuration"%>
 <%@page import="com.zj.retrieval.master.DetailType"%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
     pageEncoding="utf-8"
@@ -54,22 +55,22 @@
 <table width="100%">
 	<tr><td>编号</td><td>名称</td><td>父节点ID</td><td>信息是否完整</td><td><!-- DELETE --></td><td><!-- View Detail --></td><td><!-- EDIT --></td></tr>
 <%
-	NodeDao nodeDao = Util.getNodeDao();
+	NodeDao nodeDao = Configuration.getNodeDao();
 	List<Node> nodes = nodeDao.getAllNodeAsBrief();
 	for (Node nd : nodes) {
 		out.print(String.format(
-				"<tr id='%1$s'>" +
-					"<td>%1$s</td>" +
-					"<td>%2$s</td>" + 
-					"<td>%3$s</td>" +
-					"<td>%4$s</td>" +
-					"<td><a href='#' onclick=\"delete_node('%1$s')\">DELETE</a></td>" +
-					"<td><a target='_blank' href='view_node_detail.jsp?node_id=%1$s'>View Detail</a></td>" + 
-					"<td><a target='_blank' href='%5$s?node_id=%1$s'>EDIT</a></td>" +
-				"</tr>", 
-			nd.getId(), nd.getName(), nd.getParentId(), 
-			nd.getDetailType() == DetailType.FULL ? "是" : "否", 
-			nd.getParentId().equals("virtual_node") ? "edit_root_node.jsp" : "edit_node.jsp"));
+		"<tr id='%1$s'>" +
+			"<td>%1$s</td>" +
+			"<td>%2$s</td>" + 
+			"<td>%3$s</td>" +
+			"<td>%4$s</td>" +
+			"<td><a href='#' onclick=\"delete_node('%1$s')\">DELETE</a></td>" +
+			"<td><a target='_blank' href='view_node_detail.jsp?node_id=%1$s'>View Detail</a></td>" + 
+			"<td><a target='_blank' href='%5$s?node_id=%1$s'>EDIT</a></td>" +
+		"</tr>", 
+	nd.getId(), nd.getName(), nd.getParentId(), 
+	nd.getDetailType() == DetailType.FULL ? "是" : "否", 
+	nd.getParentId().equals("virtual_node") ? "edit_root_node.jsp" : "edit_node.jsp"));
 	}
 %>
 </table>

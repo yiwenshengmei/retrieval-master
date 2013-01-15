@@ -1,7 +1,7 @@
 <%@page import="com.zj.retrieval.master.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.zj.retrieval.master.dao.UserDao"%>
-<%@page import="com.zj.retrieval.master.Util"%>
+<%@page import="com.zj.retrieval.master.Configuration"%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
     pageEncoding="utf-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -24,7 +24,7 @@
 </head>
 <body>
 <%
-	UserDao dao = Util.getUserDao();
+	UserDao dao = Configuration.getUserDao();
 	List<User> result = dao.getAllNotActiveUser();
 %>
 <div>

@@ -24,7 +24,7 @@ import com.zj.retrieval.master.dao.RetrievalDataSource;
 public class Node {
 	private static Logger logger = LoggerFactory.getLogger(Node.class);
 		
-	public final static String VIRTUAL_NODE_NAME = "virtual_node";
+	public final static String VIRTUAL_NODE_ID = "virtual_node";
 	
 	private String uri = "";
 	private String id = "";
@@ -39,19 +39,11 @@ public class Node {
 	private int nodeType = NodeType.NODETYPE_CLASS;
 	private int detailType = DetailType.FULL;
 	private String contact;
-	private List<String> images = new ArrayList<String>();
+	private List<NodeImage> images = new ArrayList<NodeImage>();
 	private Map<String, String> userfields = new HashMap<String, String>();
 	
 	public Node() {
 		retrievalDataSource = new RetrievalDataSource();
-	}
-	public void setImagesStr(String str) {
-		if (str == null || str.isEmpty()) {
-			images = new ArrayList<String>();
-		} else {
-			String[] splited = str.split(";");
-			images = Arrays.asList(splited);
-		}
 	}
 	public String getUri() {
 		return uri;
@@ -119,22 +111,12 @@ public class Node {
 	public void setNodeType(int nodeType) {
 		this.nodeType = nodeType;
 	}
-	public List<String> getImages() {
+	public List<NodeImage> getImages() {
 		return images;
 	}
-	public String getImagesStr() {
-		if (images == null || images.isEmpty()) return "";
-		StringBuilder sb = new StringBuilder();
-		for (String image : images) {
-			sb.append(image + ";");
-		}
-		String result = sb.toString();
-		return result.substring(0, result.length() - 1);
-	}
-	public void setImages(List<String> image) {
+	public void setImages(List<NodeImage> image) {
 		this.images = image;
 	}
-	
 	public static Node parseVirtualNodeFromOWL(String owl) throws Exception {
 		Node result = new Node();
 		XMLBuilder builder = XMLBuilder.parse(new InputSource(new StringReader(owl)));
@@ -153,7 +135,7 @@ public class Node {
 			if (nd.getOwl() == null || nd.getOwl().equals("")) {
 				nd.setDesc("");
 				RetrievalDataSource rds = new RetrievalDataSource();
-				rds.setAttributes(new ArrayList<Attribute>());
+				rds.setAttributes(new ArrayList<NodeAttribute>());
 				rds.setChildNodes(new ArrayList<String>());
 				rds.setMatrix(new Matrix());
 				nd.setRetrievalDataSource(rds);
@@ -171,7 +153,7 @@ public class Node {
 //			}
 			
 			// 解析Attribute
-			List<Attribute> attrs = new ArrayList<Attribute>();
+			List<NodeAttribute> attrs = new ArrayList<NodeAttribute>();
 			try {
 				NodeList attributesElements = builder.xpathFind("/RDF/Class/attributes").getElement().getChildNodes();
 				for(int i = 0; i < attributesElements.getLength(); i++) {
@@ -182,7 +164,7 @@ public class Node {
 					String attrDesc = attrElement.getElementsByTagName("desc").item(0).getTextContent();
 					String attrImage = attrElement.getElementsByTagName("image").item(0).getTextContent();
 					
-					Attribute attr = new Attribute(attrName, attrEnName, attrDesc, attrImage);
+					NodeAttribute attr = new NodeAttribute(attrName, attrEnName, attrDesc, attrImage);
 					
 					NodeList fields = attrElement.getElementsByTagName("field");
 					Map<String, String> attrUserfields = new HashMap<String, String>();
@@ -263,129 +245,7 @@ public class Node {
 		}
 	
 	}
-	public static String getOwlFromNode(Node nd, SimpleJdbcTemplate jdbcOperations) {
 
-		String result = null;
-		try {
-			
-			XMLBuilder builder = XMLBuilder.create("rdf:RDF");
-			
-			builder.a("xmlns:rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-			builder.a("xmlns:owl", "http://www.w3.org/2002/07/owl#");
-			builder.a("xmlns:rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-			builder.a("xmlns:xsd", "http://www.w3.org/2001/XMLSchema#");
-			
-			// 创建class类型节点的owl格式
-			if(nd.getNodeType() == NodeType.NODETYPE_CLASS) {
-				// Create <owl:Class>
-				String parentURI = nd.getParentId() == Node.VIRTUAL_NODE_NAME ? "" : getParentUri(nd.getParentId(), jdbcOperations);
-				XMLBuilder elemClass = builder.e("owl:Class").a("rdf:ID", nd.getUri() + "#" + nd.getEnglishName());
-				elemClass.e("rdfs:subClassOf").a("rdf:resource", parentURI);
-				elemClass.e("rdfs:label").t(nd.getLabel());
-				
-				// Create <desc>
-				elemClass.e("desc").t(nd.getDesc());
-				
-				// Create <images>
-				XMLBuilder eImages = elemClass.e("images");
-				for (String image_path : nd.getImages()) {
-					eImages.e("item").t(image_path);
-				}
-				
-				// Create <userfields>
-				XMLBuilder elemUserfields = elemClass.e("userfields");
-				Map<String, String> userfields = nd.getUserfields();
-				for (String key : userfields.keySet()) {
-					elemUserfields.e("field").a("key", key).t(userfields.get(key));
-				}
-				
-				// Create <attributes>
-				List<Attribute> attrs = nd.getRetrievalDataSource().getAttributes();
-				XMLBuilder elemAttributes = elemClass.e("attributes");
-				for(int index = 0; index < attrs.size(); index ++) {
-					XMLBuilder elemAttribute = elemAttributes.e("attribute");
-					elemAttribute.a("name", attrs.get(index).getName())
-						         .a("enName", attrs.get(index).getEnglishName())
-						         .a("index", String.valueOf(index))
-							         .e("desc").t(attrs.get(index).getDesc()).up()
-							         .e("image").t(attrs.get(index).getImage());
-					Map<String, String> attrUserfields = attrs.get(index).getUserFields();
-					XMLBuilder elemAttrUserfields = elemAttribute.element("userfields");
-					for (String key : attrUserfields.keySet()) {
-						elemAttrUserfields.e("field").a("key", key).t(attrUserfields.get(key));
-					}
-				}
-
-				// Create <matrix>
-				XMLBuilder elemMatrix = elemClass.e("matrix");
-				Matrix matrix = nd.getRetrievalDataSource().getMatrix();
-				for(int rowindex = 0; rowindex < matrix.getRowSize(); rowindex++) {
-					int[] row = matrix.getRow(rowindex);
-					elemMatrix.e("row").a("index", String.valueOf(rowindex)).t(integerArray2String(row));
-				}
-				
-				// Create <childNodes>
-				XMLBuilder elemChildNodes = elemClass.e("childNodes");
-				List<String> childNodes = nd.getRetrievalDataSource().getChildNodes();
-				for(int index = 0; index < childNodes.size(); index++) {
-					elemChildNodes.e("node").a("index", String.valueOf(index))
-						.t(childNodes.get(index));
-				}
-			} // end of if(nd.getNodeType() == Node.NODETYPE_CLASS) {
-			
-			// 创建individual类型节点的owl格式
-			if(nd.getNodeType() == NodeType.NODETYPE_INDIVIDUAL) {
-				String parentEnName = jdbcOperations.queryForObject(
-						"select `enName` from fishes where id=?",
-						java.lang.String.class, nd.getParentId());
-				XMLBuilder individual = builder.e(parentEnName);
-				individual.a("rdf:ID", nd.getUri() + "#" + nd.getEnglishName())
-					.e("label").t(nd.getLabel()).up()
-					.e("name").t(nd.getName()).up()
-					.e("desc").t(nd.getDesc());
-
-				XMLBuilder eImages = individual.e("images");
-				for (String image_path : nd.getImages()) {
-					eImages.e("item").t(image_path);
-				}
-				
-				// Create <userfields>
-				XMLBuilder elemUserfields = individual.e("userfields");
-				Map<String, String> userfields = nd.getUserfields();
-				for (String key : userfields.keySet()) {
-					elemUserfields.e("field").a("key", key).t(userfields.get(key));
-				}
-			}
-			
-			result = builder.asString();
-			
-		} catch (Exception ex) {
-			logger.error("构建OWL字符串时出错", ex);
-			throw new RuntimeException("构建OWL字符串时出错", ex);
-		}
-		return result;
-	
-	}
-	
-	private static String getParentUri(String id, SimpleJdbcTemplate sqlclient) {
-		String uri = null;
-		try {
-			uri = sqlclient.queryForObject(
-					"select uri_name as uriName from fishes where id=?", 
-					java.lang.String.class, id);
-		} catch (Exception ex) {
-			uri = "";
-			logger.info(String.format("在试图获得父节点的uri时发现该父节点不存在[id=%1$s]，uri将保持为空。", id));
-		}
-		return uri;
-	}
-	
-	private static String integerArray2String(int[] array) {
-		StringBuilder sb = new StringBuilder();
-		for(int i : array) 
-			sb.append(String.valueOf(i));
-		return sb.toString();
-	}
 	public Map<String, String> getUserfields() {
 		return userfields;
 	}

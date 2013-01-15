@@ -3,11 +3,11 @@
 <%@page import="java.util.Map.Entry"%>
 <%@page import="com.zj.retrieval.master.actions.XMLUtil"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="com.zj.retrieval.master.Attribute"%>
+<%@page import="com.zj.retrieval.master.NodeAttribute"%>
 <%@page import="java.util.List"%>
 <%@page import="com.zj.retrieval.master.DetailType"%>
 <%@page import="com.zj.retrieval.master.Node"%>
-<%@page import="com.zj.retrieval.master.Util"%>
+<%@page import="com.zj.retrieval.master.Configuration"%>
 <%@page import="com.zj.retrieval.master.dao.NodeDao"%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
     pageEncoding="utf-8"%>
@@ -32,31 +32,31 @@
 	String uri_name = "";
 	List<String> images = new ArrayList<String>();
 	List<String> child_nodes = new ArrayList<String>();
-	List<Attribute> attrs = new ArrayList<Attribute>();
+	List<NodeAttribute> attrs = new ArrayList<NodeAttribute>();
 	String node_id = request.getParameter("node_id");
 	Map<String, String> user_filed = new HashMap<String, String>();
 	
 	try {	
-		NodeDao ns = Util.getNodeDao();
+		NodeDao ns = Configuration.getNodeDao();
 		
-		Node nd = ns.getNodeById(node_id);
+		Node nd = ns.queryById(node_id);
 		name = nd.getName();
 		name_en = nd.getEnglishName();
 		parent_id = nd.getParentId();
 		
 		boolean isFull = (nd.getDetailType() == DetailType.FULL);
 		if (isFull) {
-			images = nd.getImages();
-			uri = nd.getUri();
-			uri_name = nd.getUriName();
-			desc = nd.getDesc();
-			owl = Util.html(XMLUtil.format(nd.getOwl(), 4));
-			label = nd.getLabel();
-			child_nodes = nd.getRetrievalDataSource().getChildNodes();
-			attrs = nd.getRetrievalDataSource().getAttributes();
-			user_filed = nd.getUserfields();
+	images = nd.getImages();
+	uri = nd.getUri();
+	uri_name = nd.getUriName();
+	desc = nd.getDesc();
+	owl = Configuration.html(XMLUtil.format(nd.getOwl(), 4));
+	label = nd.getLabel();
+	child_nodes = nd.getRetrievalDataSource().getChildNodes();
+	attrs = nd.getRetrievalDataSource().getAttributes();
+	user_filed = nd.getUserfields();
 		} else {
-			contact = nd.getContact();
+	contact = nd.getContact();
 		}
 		
 		
@@ -79,7 +79,9 @@
 	for (Entry<String, String> entry : user_filed.entrySet()) {
 %>
 <tr><td>KEY: <%=entry.getKey()%></td><td>VALUE: <%=entry.getValue()%></td></tr>
-<%	}  %>
+<%
+	}
+%>
 <tr><td colspan='2'>====== Images ======</td></tr>
 <%
 	for (String image_url : images) {
@@ -89,7 +91,9 @@
 	}
 %>
 <tr><td colspan='2'>====== Attributes ======</td></tr>
-<% for (Attribute attr : attrs) { %>
+<%
+	for (NodeAttribute attr : attrs) {
+%>
 <tr><td>attr_name</td><td><%=attr.getName() %></td></tr>
 <tr><td>attr_name_en</td><td><%=attr.getEnglishName() %></td></tr>
 <tr><td>attr_desc</td><td><%=attr.getDesc() %></td></tr>

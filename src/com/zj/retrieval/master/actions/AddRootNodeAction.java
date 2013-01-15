@@ -19,7 +19,7 @@ import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
 import com.zj.retrieval.master.UserField;
-import com.zj.retrieval.master.Util;
+import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
@@ -51,7 +51,7 @@ public class AddRootNodeAction {
 		
 		try {
 			
-			UserDao userDao = Util.getUserDao();
+			UserDao userDao = Configuration.getUserDao();
 			if (!userDao.verifyUser(post_user_name, post_user_password)) {
 				this.isError = true;
 				this.message = "用户名或密码错误.";
@@ -60,21 +60,21 @@ public class AddRootNodeAction {
 			
 			Node root = new Node();
 			root.setDesc(desc);
-			logger.debug("desc: " + desc);
 			root.setEnglishName(node_name_en);
-			logger.debug("englishName: " + node_name_en);
 			root.setName(node_name);
-			logger.debug("name: " + node_name);
 			root.setNodeType(NodeType.NODETYPE_CLASS);
-			logger.debug("nodeType: NodeType.NODETYPE_CLASS");
 			root.setUri(uri);
-			logger.debug("uri: " + uri);
 			root.setUriName(root.getUri() + "#" + uri_name);
-			logger.debug("UriName: " + root.getUri() + "#" + uri_name);
 			root.setDetailType(DetailType.FULL);
+			root.setParentId(Node.VIRTUAL_NODE_ID);
+			logger.debug("desc: " + desc);
+			logger.debug("englishName: " + node_name_en);
+			logger.debug("name: " + node_name);
+			logger.debug("nodeType: NodeType.NODETYPE_CLASS");
+			logger.debug("uri: " + uri);
+			logger.debug("UriName: " + root.getUri() + "#" + uri_name);
 			logger.debug("DetailType: DetailType.FULL");
-			root.setParentId(Node.VIRTUAL_NODE_NAME);
-			logger.debug("ParentId: " + Node.VIRTUAL_NODE_NAME);
+			logger.debug("ParentId: " + Node.VIRTUAL_NODE_ID);
 			
 			// 解析images
 			List<String> fullPaths = new ArrayList<String>();
@@ -100,8 +100,8 @@ public class AddRootNodeAction {
 				root.setUserfields(UserField.parse(user_field_jsonarray));
 			}
 			
-			NodeDao nodeDao = Util.getNodeDao();
-			nodeDao.addRootNode(root);
+			NodeDao nodeDao = Configuration.getNodeDao();
+			nodeDao.insert(root);
 			
 			this.message = "Success, o(∩_∩)o...";
 			return ActionSupport.SUCCESS;

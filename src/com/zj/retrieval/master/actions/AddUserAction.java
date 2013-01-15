@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.User;
-import com.zj.retrieval.master.Util;
+import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class AddUserAction {
@@ -15,7 +15,7 @@ public class AddUserAction {
 	
 	public String execute() {
 		try {
-			UserDao userDao = Util.getUserDao();
+			UserDao userDao = Configuration.getUserDao();
 			if (userDao.getUserByName(name).size() > 0) {
 				this.isError = true;
 				this.message = String.format("用户名：%1$s 已经存在！", name);

@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.Node;
-import com.zj.retrieval.master.Util;
+import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
 
@@ -23,7 +23,7 @@ public class DeleteNodeAction {
 
 	public String execute() {
 		try {
-			UserDao userDao = Util.getUserDao();
+			UserDao userDao = Configuration.getUserDao();
 			if (!userDao.verifySu(post_user_name, post_user_password)) {
 				this.isError = true;
 				this.message = "用户名或密码错误.";
@@ -34,9 +34,9 @@ public class DeleteNodeAction {
 			nd.setId(node_id);
 			logger.info("要删除的节点id为：" + nd.getId());
 			
-			NodeDao ndService =  Util.getNodeDao();
+			NodeDao ndService =  Configuration.getNodeDao();
 			
-			if (ndService.deleteNode(nd)) {
+			if (ndService.delete(nd)) {
 				this.isError = false;
 				this.message = "Success, o(∩_∩)o...";
 				return ActionSupport.SUCCESS;

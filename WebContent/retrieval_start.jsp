@@ -4,7 +4,7 @@
 <%@page import="java.util.List"%>
 <%@page import="com.zj.retrieval.master.RetrievalResult"%>
 <%@page import="com.zj.retrieval.master.dao.NodeDao"%>
-<%@page import="com.zj.retrieval.master.Util"%>
+<%@page import="com.zj.retrieval.master.Configuration"%>
 <%@page import="com.zj.retrieval.master.dao.NodeDao"%>
 
 <%@page language="java" 
@@ -17,8 +17,8 @@
 <link href="common.css" type="text/css" rel="stylesheet" />
 <title>检索</title>
 <%
-	NodeDao nodeDao = Util.getNodeDao();
-	Node root = nodeDao.getNodeById(Node.VIRTUAL_NODE_NAME);
+	NodeDao nodeDao = Configuration.getNodeDao();
+	Node root = nodeDao.queryById(Node.VIRTUAL_NODE_ID);
 	List<String> ids = root.getRetrievalDataSource().getChildNodes();
 %>
 <script type="text/javascript" src='jquery-1.7.1.js'></script>
@@ -27,7 +27,9 @@
 
 	<table>
 		<tr><td>ID</td><td>中文名称</td><td>英文名称</td><td></td></tr>
-		<% for (String id : ids) { Node nd = nodeDao.getNodeById(id); %>
+		<%
+			for (String id : ids) { Node nd = nodeDao.queryById(id);
+		%>
 		<tr>
 			<td><%=nd.getId()%></td>
 			<td><%=nd.getName()%></td>

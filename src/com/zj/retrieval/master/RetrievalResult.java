@@ -5,7 +5,7 @@ import java.util.List;
 
 public class RetrievalResult {
 	private boolean hasResult;
-	private Attribute next;
+	private NodeAttribute next;
 	private List<String> result;
 	private String lastState;
 	
@@ -22,10 +22,10 @@ public class RetrievalResult {
 	public void hasResult(boolean hasResult) {
 		this.hasResult = hasResult;
 	}
-	public Attribute getNext() {
+	public NodeAttribute getNext() {
 		return next;
 	}
-	public void setNext(Attribute next) {
+	public void setNext(NodeAttribute next) {
 		this.next = next;
 		hasResult = false;
 	}

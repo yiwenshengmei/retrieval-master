@@ -1,9 +1,9 @@
 <%@page import="java.util.List"%>
-<%@page import="com.zj.retrieval.master.Attribute"%>
+<%@page import="com.zj.retrieval.master.NodeAttribute"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="com.zj.retrieval.master.Node"%>
-<%@page import="com.zj.retrieval.master.Util"%>
+<%@page import="com.zj.retrieval.master.Configuration"%>
 <%@page import="com.zj.retrieval.master.dao.NodeDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -14,11 +14,11 @@
 <title>编辑节点</title>
 <%
 	String nodeid = request.getParameter("node_id");
-	NodeDao nodedao = Util.getNodeDao();
-	Node node = nodedao.getNodeById(nodeid);
+	NodeDao nodedao = Configuration.getNodeDao();
+	Node node = nodedao.queryById(nodeid);
 	StringBuilder imgStrBuilder = new StringBuilder();
 	for (String imageUrl : node.getImages()) {
-		imgStrBuilder.append(Util.getImageNameExcludePath(imageUrl) + ";");
+		imgStrBuilder.append(Configuration.getImageNameExcludePath(imageUrl) + ";");
 	}
 	String imageStr = imgStrBuilder.substring(0, imgStrBuilder.length() - 1);
 %>

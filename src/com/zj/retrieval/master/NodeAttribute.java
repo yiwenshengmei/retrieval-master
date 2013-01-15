@@ -3,29 +3,32 @@ package com.zj.retrieval.master;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Attribute {
+import org.apache.commons.lang.StringUtils;
+
+public class NodeAttribute {
 
 	public static final int YES    = 2;
 	public static final int NO     = 1;
 	public static final int UNKNOW = 3;
 	
-	private String desc = "";
-	private String name = "";
-	private String enName = "";
-	private String image = "";
+	private String desc = StringUtils.EMPTY;
+	private String name = StringUtils.EMPTY;
+	private String enName = StringUtils.EMPTY;
+	private String image = StringUtils.EMPTY;
+	private String nodeId = StringUtils.EMPTY;
 	private Map<String, String> userfields = new HashMap<String, String>();
 	
-	public Attribute() {}
+	public NodeAttribute() {}
 
-	public Attribute(String name) {
+	public NodeAttribute(String name) {
 		this(name, "no english name", "no description.");
 	}
 	
-	public Attribute(String name, String enName, String desc) {
+	public NodeAttribute(String name, String enName, String desc) {
 		this(name, enName, desc, null);
 	}
 	
-	public Attribute(String name, String enName, String desc, String image) {
+	public NodeAttribute(String name, String enName, String desc, String image) {
 		this.desc = desc;
 		this.name = name;
 		this.enName = enName;
@@ -83,5 +86,13 @@ public class Attribute {
 
 	public void setUserFields(Map<String, String> userfields) {
 		this.userfields = userfields;
+	}
+
+	public String getNodeId() {
+		return nodeId;
+	}
+
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
 	}
 }

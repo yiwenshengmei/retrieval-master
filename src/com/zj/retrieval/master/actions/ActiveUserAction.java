@@ -1,7 +1,7 @@
 package com.zj.retrieval.master.actions;
 
 import com.opensymphony.xwork2.ActionSupport;
-import com.zj.retrieval.master.Util;
+import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class ActiveUserAction {
@@ -14,7 +14,7 @@ public class ActiveUserAction {
 	
 	public String execute() {
 		try {
-			UserDao userDao = Util.getUserDao();
+			UserDao userDao = Configuration.getUserDao();
 			if (!userDao.verifySu(post_user_name, post_user_password)) {
 				this.isError = true;
 				this.message = "用户名或密码错误.";
