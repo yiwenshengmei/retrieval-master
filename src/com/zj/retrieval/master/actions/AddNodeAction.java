@@ -18,7 +18,7 @@ import com.zj.retrieval.master.AttributeSelector;
 import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
-import com.zj.retrieval.master.UserField;
+import com.zj.retrieval.master.CustomerField;
 import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
@@ -47,39 +47,39 @@ public class AddNodeAction {
 	
 	public String execute() {
 		try {
-			UserDao userDao = Configuration.getUserDao();
+			UserDao userDao = UserDao.getInstance();
 			if (!userDao.verifyUser(post_user_name, post_user_password)) {
 				this.isError = true;
 				this.message = "用户名或密码错误.";
 				return ActionSupport.ERROR;
 			}
 			
-			Node newNode = new Node();
-			newNode.setDesc(desc);
-			newNode.setEnglishName(node_name_en);
-			newNode.setName(node_name);
-			newNode.setNodeType(NodeType.NODETYPE_CLASS); // 先暂时写死
-			newNode.setParentId(parent_id);
-			newNode.setUri(uri);
-			newNode.setUriName(newNode.getUri() + "#" + newNode.getEnglishName());
-			newNode.setDetailType(DetailType.FULL);
+			Node node = new Node();
+			node.setDesc(desc);
+			node.setEnglishName(node_name_en);
+			node.setName(node_name);
+			node.setNodeType(NodeType.NODETYPE_CLASS); // 先暂时写死
+			node.setParentId(parent_id);
+			node.setUri(uri);
+			node.setUriName(node.getUri() + "#" + node.getEnglishName());
+			node.setDetailTypeId("11");
 			
 			// 解析images
 			List<String> fullPaths = new ArrayList<String>();
-			for (String image_id : images.split(";")) {
-				fullPaths.add("images/" + image_id);
-			}
-			newNode.setImages(fullPaths);
+//			for (String image_id : images.split(";")) {
+//				fullPaths.add("images/" + image_id);
+//			}
+//			node.setImages(fullPaths);
 			
 			// 解析自定义字段
 			if (user_field != null && !user_field.isEmpty()) {
 				JSONArray userFieldJSONArray = new JSONArray(user_field);
-				newNode.setUserfields(UserField.parse(userFieldJSONArray));
+				node.setUserfields(CustomerField.parse(userFieldJSONArray));
 			}
 			
 			NodeDao nodeDao =  Configuration.getNodeDao();
 			
-			Node parentNode = nodeDao.queryById(newNode.getParentId());
+			Node parentNode = nodeDao.queryById(node.getParentId());
 			logger.info("找到父节点：" + parentNode);
 			AttributeSelector attrSelector = nodeDao.getAttributeSelector(parentNode);
 			String[] selectedAttributes = parent_attr.isEmpty() ?
@@ -98,11 +98,11 @@ public class AddNodeAction {
 						                          jAttr.getString("new_attr_desc"),
 						                          jAttr.getString("new_attr_image"));
 				JSONArray jAttrUserfields = jAttr.getJSONArray("new_attr_user_field");
-				newAttr.setUserFields(UserField.parse(jAttrUserfields));
+				newAttr.setUserFields(CustomerField.parse(jAttrUserfields));
 				logger.info("新添加的属性：" + newAttr);
 				attrSelector.addNewAttribute(newAttr, true);
 			}
-			nodeDao.addNode(newNode, parentNode, attrSelector);
+			nodeDao.addNode(node, parentNode, attrSelector);
 			
 			this.message = "Success, o(∩_∩)o...";
 			return ActionSupport.SUCCESS;

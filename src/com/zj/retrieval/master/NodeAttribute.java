@@ -1,6 +1,7 @@
 package com.zj.retrieval.master;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -14,12 +15,11 @@ public class NodeAttribute {
 	private String desc = StringUtils.EMPTY;
 	private String name = StringUtils.EMPTY;
 	private String enName = StringUtils.EMPTY;
-	private String image = StringUtils.EMPTY;
-	private String nodeId = StringUtils.EMPTY;
-	private Map<String, String> userfields = new HashMap<String, String>();
+	private List<NodeImage> images;
+	private String headerId = StringUtils.EMPTY;
+	private int index = -1;
+	private Map<String, String> customerFields = new HashMap<String, String>();
 	
-	public NodeAttribute() {}
-
 	public NodeAttribute(String name) {
 		this(name, "no english name", "no description.");
 	}
@@ -28,11 +28,11 @@ public class NodeAttribute {
 		this(name, enName, desc, null);
 	}
 	
-	public NodeAttribute(String name, String enName, String desc, String image) {
+	public NodeAttribute(String name, String enName, String desc, List<NodeImage> images) {
 		this.desc = desc;
 		this.name = name;
 		this.enName = enName;
-		this.image = image;
+		this.images = images;
 	}
 
 	public String getDesc() {
@@ -59,40 +59,39 @@ public class NodeAttribute {
 		this.enName = enName;
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("Name: " + name + "\n");
-		sb.append("EnglishName: " + enName + "\n");
-		sb.append("Descr: " + desc + "\n");
-		sb.append("Image: " + image);
-		for(String key : userfields.keySet()) {
-			sb.append(key).append(": ").append(userfields.get(key)).append("\n");
-		}
-		return sb.toString();
+	public String getHeaderId() {
+		return headerId;
 	}
 
-	public String getImage() {
-		return image;
+	public void setHeaderId(String headerId) {
+		this.headerId = headerId;
 	}
 
-	public void setImage(String image) {
-		this.image = image;
+	public int getIndex() {
+		return index;
 	}
 
-	public Map<String, String> getUserFields() {
-		return userfields;
+	public void setIndex(int index) {
+		this.index = index;
 	}
 
-	public void setUserFields(Map<String, String> userfields) {
-		this.userfields = userfields;
+	public List<NodeImage> getImages() {
+		return images;
 	}
 
-	public String getNodeId() {
-		return nodeId;
+	public void setImages(List<NodeImage> images) {
+		this.images = images;
 	}
 
-	public void setNodeId(String nodeId) {
-		this.nodeId = nodeId;
+	public Map<String, String> getCustomerFields() {
+		return customerFields;
+	}
+
+	public void setCustomerFields(Map<String, String> customerFields) {
+		this.customerFields = customerFields;
+	}
+
+	public String getEnName() {
+		return enName;
 	}
 }

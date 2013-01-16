@@ -11,8 +11,12 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UserField {
-	private static Logger logger = LoggerFactory.getLogger(UserField.class);
+public class CustomerField {
+	private static Logger logger = LoggerFactory.getLogger(CustomerField.class);
+	private String key;
+	private String value;
+	private String id;
+	private String headerId;
 	
 	public static JSONArray parse(Map<String, String> fields) {
 		JSONArray result = new JSONArray();
@@ -39,5 +43,37 @@ public class UserField {
 			logger.error("在将json字符串解析成自定义字段时发生错误。", e);
 			return null;
 		}
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getHeaderId() {
+		return headerId;
+	}
+
+	public void setHeaderId(String headerId) {
+		this.headerId = headerId;
 	}
 }

@@ -12,6 +12,8 @@ public class RetrievalDataSource {
 	// key代表特征矩阵中的行号，value代表子结点在数据库中的id
 	private List<String> childNodes;
 	private Matrix matrix;
+	private String id;
+	private String headerId;
 	
 	public RetrievalDataSource() {
 		attributes = new ArrayList<NodeAttribute>();
@@ -36,5 +38,21 @@ public class RetrievalDataSource {
 	}
 	public void setMatrix(Matrix matrix) {
 		this.matrix = matrix;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getHeaderId() {
+		return headerId;
+	}
+
+	public void setHeaderId(String headerId) {
+		this.headerId = headerId;
 	}
 }

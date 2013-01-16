@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
+import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.NodeAttribute;
 
 public class NodeAttributeDao {
@@ -17,11 +18,15 @@ public class NodeAttributeDao {
 	
 	public void insert(NodeAttribute attr) throws Exception {
 		StringBuilder sql = new StringBuilder()
-		.append("insert into t_node_attribute(`attr_id`, `attr_name`, `attr_name_en`, `attr_node_id`, `attr_desc`) ")
-		.append("values(:id, :name, :englishName, :nodeId, :desc)");
+		.append("INSERT INTO T_ATTRIBUTE(`ATTR_ID`, `ATTR_NAME`, `ATTR_NAME_EN`, `ATTR_HEADER_ID`, `ATTR_DESC`, `ATTR_INDEX`) ")
+		.append("VALUES(:id, :name, :englishName, :headerId, :desc, :index)");
 		
 		SqlParameterSource param = new BeanPropertySqlParameterSource(attr);
 		int result = template.update(sql.toString(), param);
-		if (result != 1) throw new Exception("插入T_NODE_ATTRIBUTE时返回结果不为1");
+		if (result != 1) throw new Exception("插入T_ATTRIBUTE时返回结果不为1");
+	}
+	
+	public static NodeAttributeDao getInstance() {
+		return (NodeAttributeDao) Configuration.getBean("nodeAttributeDao");
 	}
 }

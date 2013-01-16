@@ -118,23 +118,25 @@ public class NodeDao {
 	}
 	
 	public Node queryById(String id) throws Exception {
-		try {
-			String sql = "select `id`, `uri_name` as uriName, `name`, `images` as imagesStr, " +
-					"`name_en` as englishName, `parent_id` as parentId, " +
-					"`owl`, `uri`, `detail_type` as detailType, `contact` from `fish` where `id`=?";
-			ParameterizedRowMapper<Node> rowMapper = 
-				ParameterizedBeanPropertyRowMapper.newInstance(Node.class);
-			Node result = template.queryForObject(sql, rowMapper, id);
-			if (result.getDetailType() == DetailType.FULL) {
-				Node.parseNodeFromOWL(result);
-			}
-			return result;
-		} catch (EmptyResultDataAccessException ex) {
-			throw new Exception(String.format("ID为%1$s的节点不存在！", id));
-		} catch (Exception e) {
-			logger.error(String.format("查询节点时出错[id=%1$s]", id), e);
-			throw new Exception("查询节点时出错@NodeServiceImpl.findNodeById()", e);
-		}
+//		try {
+//			String sql = "select `id`, `uri_name` as uriName, `name`, `images` as imagesStr, " +
+//					"`name_en` as englishName, `parent_id` as parentId, " +
+//					"`owl`, `uri`, `detail_type` as detailType, `contact` from `fish` where `id`=?";
+//			ParameterizedRowMapper<Node> rowMapper = 
+//				ParameterizedBeanPropertyRowMapper.newInstance(Node.class);
+//			Node result = template.queryForObject(sql, rowMapper, id);
+//			if (result.getDetailType() == DetailType.FULL) {
+//				Node.parseNodeFromOWL(result);
+//			}
+//			return result;
+//		} catch (EmptyResultDataAccessException ex) {
+//			throw new Exception(String.format("ID为%1$s的节点不存在！", id));
+//		} catch (Exception e) {
+//			logger.error(String.format("查询节点时出错[id=%1$s]", id), e);
+//			throw new Exception("查询节点时出错@NodeServiceImpl.findNodeById()", e);
+//		}
+		
+		throw new Exception("NotSupplortYet");
 	}
 
 	public Node getNodeByName(String name) {
@@ -241,8 +243,9 @@ public class NodeDao {
 		logger.debug("id=" + node.getId());
 		
 		StringBuilder sql = new StringBuilder()
-		.append("insert into `fish`(`id`, `uri_name`, `name`, `name_en`, `images`, `parent_id`, `owl`, `uri`) ")
-		.append(" values(:id, :uriName, :name, :englishName, :imagesStr, :parentId, :uri)");
+		.append("INSERT INTO `NODE`(`ND_ID`, `ND_URI_NAME`, `ND_NAME`, `ND_PARENT_ID`")
+		.append(", `ND_URI`, `ND_URI_NAME`, `ND_DETAIL_ID`, `ND_CONTACT`) ")
+		.append("VALUES(:id, :uriName, :name, :parentId, :uri, :uriName, :detailTypeId, :contact)");
 		SqlParameterSource param = new BeanPropertySqlParameterSource(node);
 		
 		int result = template.update(sql.toString(), param);
@@ -252,23 +255,23 @@ public class NodeDao {
 	public void insert(Node node) throws Exception {
 		logger.debug("插入根节点");
 			
-			logger.debug("Save to T_NODE...");
-			doInsert(node);
-			
-			logger.debug("Save to T_NODE_IMAGE...");
-			NodeImageDao imgdao = Configuration.getNodeImageDao();
-			for (NodeImage img : node.getImages()) {
-				imgdao.insert(img);
-			}
-			
-			logger.debug("Save to T_NODE_ATTRIBUTE...");
-			NodeAttributeDao attrdao = Configuration.getNodeAttributeDao();
-			for (NodeAttribute attr : node.getRetrievalDataSource().getAttributes()) {
-				attrdao.insert(attr);
-			}
-			
-			logger.debug("Save to T_MATRIX...");
-			
+		logger.debug("Save to T_NODE...");
+		doInsert(node);
+		
+		logger.debug("Save to T_IMAGE...");
+		NodeImageDao imgdao = Configuration.getNodeImageDao();
+		for (NodeImage img : node.getImages()) {
+			imgdao.insert(img);
+		}
+		
+		logger.debug("Save to T_ATTRIBUTE...");
+		NodeAttributeDao attrdao = NodeAttributeDao.getInstance();
+		for (NodeAttribute attr : node.getRetrievalDataSource().getAttributes()) {
+			attrdao.insert(attr);
+		}
+		
+		logger.debug("Save to T_RETRIEVAL_DATA_SOURCE...");
+		RetrievalDataSourceDao.getInstance().insert(node.getRetrievalDataSource());
 			
 //			// 2.更新VirtualNode[id=Node.VIRTUAL_NODE_ID]的childNodes属性
 //			logger.debug("更新虚节点");
@@ -303,69 +306,71 @@ public class NodeDao {
 
 	// 增加只包含检索信息的节点
 	public void addNodeBrief(Node newNode, Node parentNode, AttributeSelector as) {
-		try {
-			// 更新parent的matrix属性
-			logger.info("更新父节点的特征矩阵");
-			Matrix matrix = parentNode.getRetrievalDataSource().getMatrix();
-			//   先修改行：将newNode和parentNode中已有特性的进行匹配
-			//   如果matrix为空[列数或行数等于零]，从特征矩阵的语义上来说无论添加多少行
-			//   都等于没有添加，因为没有已知的特性与其匹配
-			int[] newRow = new int[matrix.getColSize()];
-			for(int i = 0; i < newRow.length; i++)
-				newRow[i] = as.getAttributeMapping().get(i) ? NodeAttribute.YES : NodeAttribute.NO;
-			matrix.addRow(newRow, 0, newRow.length);
-
-			//   再修改列：向parentNode添加创建newNode时一起添加的新特性
-			//   在添加新特性的同时将新特性加入parentNode的attribute列表
-			List<NodeAttribute> parentAttributes = parentNode.getRetrievalDataSource().getAttributes();
-			for(NodeAttribute attr : as.getNewAttributeMapping().keySet()) {
-				// matrix可能为空，向空矩阵添加1列需要的长度始终是1
-				int[] newCol = matrix.getRowSize() == 0 ? new int[1] : new int[matrix.getRowSize()];
-				for(int j = 0; j < newCol.length; j++) {
-					newCol[j] = (j != newCol.length - 1 ? 0 : 
-						(as.getNewAttributeMapping().get(attr) ? NodeAttribute.YES : NodeAttribute.NO));
-				}
-				matrix.addCol(newCol, 0, newCol.length);
-				// 同时更新parentNode的attribte列表
-				parentAttributes.add(attr);
-			}
-			
-			// 创建并设置newNode的owl字符串
-//			log.info("创建并设置新节点的owl字符串");
-//			newNode.setOwl(Node.getOwlFromNode(newNode, sqlclient));
-			
-			logger.info("将新节点写入数据库");
-			// 注意，brief节点的ID值是由客户端提供的！！！
-			// 为新节点detailType设置值: brief
-			newNode.setDetailType(DetailType.BRIEF);
-			String sqlInsertNewNode = "insert into fish(`id`, `name`, `name_en`, `parent_id`, `contact`, `detail_type`) values(" +
-					                                    ":id, :name, :englishName, :parentId, :contact, :detailType)";
-			SqlParameterSource paramInsertNewNode = new BeanPropertySqlParameterSource(newNode) ;
-			if (template.update(sqlInsertNewNode, paramInsertNewNode) != 1) {
-				throw new Exception("插入节点时失败@NodeService.addNode()"); // Rollback
-			}
-	
-			// 将newNode的id值加入parentNode的childNodes列表中
-			logger.info("更新父节点的子结点列表");
-			parentNode.getRetrievalDataSource().getChildNodes().add(newNode.getId());
-			// 更新parentNode的owl字符串
-			logger.info("更新父节点的owl字符串");
-			parentNode.setOwl(BizNode.getOWL(parentNode));
-					
-			// 将parentNode重新写回数据库
-			// 由于只修改了parentNode的owl信息，所以这里只更新owl字段
-			logger.info("将父节点写回数据库");
-			String sqlUpdateParentNode = "update `fish` set `owl`=:owl where id=:id";
-			SqlParameterSource paramUpdateParentNode = new BeanPropertySqlParameterSource(parentNode);
-			if (template.update(sqlUpdateParentNode, paramUpdateParentNode) != 1) {
-				throw new Exception("更新父类时失败@NodeService.addNode()"); // Rollback
-			}
-			
-		} catch (Exception ex) {
-			logger.error("NodeService.addNode()方法发生错误", ex);
-			throw new RuntimeException("NodeService.addNode()方法发生错误", ex);
-		}
+//		try {
+//			// 更新parent的matrix属性
+//			logger.info("更新父节点的特征矩阵");
+//			Matrix matrix = parentNode.getRetrievalDataSource().getMatrix();
+//			//   先修改行：将newNode和parentNode中已有特性的进行匹配
+//			//   如果matrix为空[列数或行数等于零]，从特征矩阵的语义上来说无论添加多少行
+//			//   都等于没有添加，因为没有已知的特性与其匹配
+//			int[] newRow = new int[matrix.getColSize()];
+//			for(int i = 0; i < newRow.length; i++)
+//				newRow[i] = as.getAttributeMapping().get(i) ? NodeAttribute.YES : NodeAttribute.NO;
+//			matrix.addRow(newRow, 0, newRow.length);
+//
+//			//   再修改列：向parentNode添加创建newNode时一起添加的新特性
+//			//   在添加新特性的同时将新特性加入parentNode的attribute列表
+//			List<NodeAttribute> parentAttributes = parentNode.getRetrievalDataSource().getAttributes();
+//			for(NodeAttribute attr : as.getNewAttributeMapping().keySet()) {
+//				// matrix可能为空，向空矩阵添加1列需要的长度始终是1
+//				int[] newCol = matrix.getRowSize() == 0 ? new int[1] : new int[matrix.getRowSize()];
+//				for(int j = 0; j < newCol.length; j++) {
+//					newCol[j] = (j != newCol.length - 1 ? 0 : 
+//						(as.getNewAttributeMapping().get(attr) ? NodeAttribute.YES : NodeAttribute.NO));
+//				}
+//				matrix.addCol(newCol, 0, newCol.length);
+//				// 同时更新parentNode的attribte列表
+//				parentAttributes.add(attr);
+//			}
+//			
+//			// 创建并设置newNode的owl字符串
+////			log.info("创建并设置新节点的owl字符串");
+////			newNode.setOwl(Node.getOwlFromNode(newNode, sqlclient));
+//			
+//			logger.info("将新节点写入数据库");
+//			// 注意，brief节点的ID值是由客户端提供的！！！
+//			// 为新节点detailType设置值: brief
+//			newNode.setDetailType(DetailType.BRIEF);
+//			String sqlInsertNewNode = "insert into fish(`id`, `name`, `name_en`, `parent_id`, `contact`, `detail_type`) values(" +
+//					                                    ":id, :name, :englishName, :parentId, :contact, :detailType)";
+//			SqlParameterSource paramInsertNewNode = new BeanPropertySqlParameterSource(newNode) ;
+//			if (template.update(sqlInsertNewNode, paramInsertNewNode) != 1) {
+//				throw new Exception("插入节点时失败@NodeService.addNode()"); // Rollback
+//			}
+//	
+//			// 将newNode的id值加入parentNode的childNodes列表中
+//			logger.info("更新父节点的子结点列表");
+//			parentNode.getRetrievalDataSource().getChildNodes().add(newNode.getId());
+//			// 更新parentNode的owl字符串
+//			logger.info("更新父节点的owl字符串");
+//			parentNode.setOwl(BizNode.getOWL(parentNode));
+//					
+//			// 将parentNode重新写回数据库
+//			// 由于只修改了parentNode的owl信息，所以这里只更新owl字段
+//			logger.info("将父节点写回数据库");
+//			String sqlUpdateParentNode = "update `fish` set `owl`=:owl where id=:id";
+//			SqlParameterSource paramUpdateParentNode = new BeanPropertySqlParameterSource(parentNode);
+//			if (template.update(sqlUpdateParentNode, paramUpdateParentNode) != 1) {
+//				throw new Exception("更新父类时失败@NodeService.addNode()"); // Rollback
+//			}
+//			
+//		} catch (Exception ex) {
+//			logger.error("NodeService.addNode()方法发生错误", ex);
+//			throw new RuntimeException("NodeService.addNode()方法发生错误", ex);
+//		}
 	}
 
-
+	public static NodeDao getInstance() {
+		return (NodeDao) Configuration.getBean("nodeDao");
+	}
 }

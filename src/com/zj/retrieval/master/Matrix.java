@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 public class Matrix {
 	private int[][] array;
+	private String nodeId;
+	private String id;
 
 	public Matrix(int[][] array) {
 		this.array = array;
@@ -36,7 +38,7 @@ public class Matrix {
 			return;
 		
 		if (newRow.length < getColSize())
-			throw new RuntimeException("鏂拌鍏冪礌涓暟灏忎簬鐭╅樀涓鐨勫垪鏁癅Matrix.addRow()");
+			throw new RuntimeException("新行元素个数小于矩阵中行的列数@Matrix.addRow()");
 		
 		int rowSize = getRowSize();
 		int colSize = getColSize();
@@ -46,12 +48,12 @@ public class Matrix {
 		
 		for (int row = 0; row < rowSize; row++) {
 			for (int col = 0; col < newColSize; col++) {
-				// 濡傛灉鏂拌鐨勫厓绱犲皯浜庡師琛岀殑鍏冪礌锛屽垯鍦ㄦ柊琛屼腑琛ラ浂
+				// 如果新行的元素少于原行的元素，则在新行中补零
 				if (col < colSize) {
-					// 璇存槑鍦ㄦ寚閽堟寚鍦ㄥ師濮嬫暟鎹綅缃笂
+					// 说明在指针指在原始数据位置上
 					newMatrix[row][col] = array[row][col];
 				} else {
-					// 璇存槑鎸囬拡鎸囧湪鍘熷厛娌℃湁鏁版嵁鐨勪綅缃笂锛岃繖浜涗綅缃簲璇ヨˉ闆?
+					// 说明指针指在原先没有数据的位置上，这些位置应该补雿
 					newMatrix[row][col] = 0;
 				}
 			}
@@ -66,7 +68,7 @@ public class Matrix {
 			throw new RuntimeException("The length of new col wrong.");
 		}
 		
-		// 濡傛灉褰撳墠鐭╅樀鏄竴涓┖鐨勭煩闃碉紝鍒欑壒娈婂鐞?
+		// 如果当前矩阵是一个空的矩阵，则特殊处琿
 		if (getRowSize() == 0) {
 			int[][] _data = new int[len][1];
 			for(int i = 0; i < len; i++) {
@@ -133,6 +135,22 @@ public class Matrix {
 				m.addRow(array[i], 0, getColSize());
 		}
 		array = m.array;
+	}
+
+	public String getNodeId() {
+		return nodeId;
+	}
+
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 }

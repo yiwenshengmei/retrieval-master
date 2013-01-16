@@ -14,7 +14,7 @@ public class ActiveUserAction {
 	
 	public String execute() {
 		try {
-			UserDao userDao = Configuration.getUserDao();
+			UserDao userDao = UserDao.getInstance();
 			if (!userDao.verifySu(post_user_name, post_user_password)) {
 				this.isError = true;
 				this.message = "用户名或密码错误.";

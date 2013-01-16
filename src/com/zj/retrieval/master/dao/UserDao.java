@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedBeanPropertyRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
+import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.User;
 
 public class UserDao {
@@ -69,5 +70,9 @@ public class UserDao {
 	public void activeUser(String id) {
 		String sql = "update `user` set `isActive`=1 where `id`=?";
 		sqlClient.update(sql, id);
+	}
+	
+	public static UserDao getInstance() {
+		return (UserDao) Configuration.getBean("userDao");
 	}
 }

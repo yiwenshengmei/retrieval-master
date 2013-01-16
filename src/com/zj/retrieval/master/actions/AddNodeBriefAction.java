@@ -15,7 +15,7 @@ import com.zj.retrieval.master.AttributeSelector;
 import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
-import com.zj.retrieval.master.UserField;
+import com.zj.retrieval.master.CustomerField;
 import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
@@ -79,7 +79,7 @@ public class AddNodeBriefAction {
 						                          jAttr.getString("new_attr_desc"),
 						                          jAttr.getString("new_attr_image"));
 				JSONArray jAttrUserfields = jAttr.getJSONArray("new_attr_user_field");
-				newAttr.setUserFields(UserField.parse(jAttrUserfields));
+				newAttr.setUserFields(CustomerField.parse(jAttrUserfields));
 				logger.info("新添加的属性：" + newAttr);
 				attrSelector.addNewAttribute(newAttr, true);
 			}

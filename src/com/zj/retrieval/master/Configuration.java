@@ -4,50 +4,49 @@ import javax.servlet.ServletContext;
 
 import org.apache.struts2.ServletActionContext;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.zj.retrieval.master.dao.MatrixDao;
 import com.zj.retrieval.master.dao.NodeAttributeDao;
 import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.NodeImageDao;
 import com.zj.retrieval.master.dao.UserDao;
 
 public class Configuration {
-	public static ApplicationContext applicationContext = null;
+	public static ApplicationContext springCtx = null;
 	public static String IMAGE_PATH_PREFIX = "images/";
 	
 	public static ApplicationContext getApplicationContext() {
-		if (applicationContext == null) {
-			ServletContext servletCtx = ServletActionContext.getServletContext();
-			WebApplicationContext springCtx = WebApplicationContextUtils.getWebApplicationContext(servletCtx);
+		if (springCtx == null) {
+//			ServletContext servletCtx = ServletActionContext.getServletContext();
+//			WebApplicationContext springCtx = WebApplicationContextUtils.getWebApplicationContext(servletCtx);
+			ClassPathXmlApplicationContext springCtx = new ClassPathXmlApplicationContext("beans.xml");
 			return springCtx;
 		} else {
-			return applicationContext;
+			return springCtx;
 		}
+	}
+	
+	public static Object getBean(String name) {
+		return getApplicationContext().getBean(name);
 	}
 	
 	public static String getImageNameExcludePath(String url) {
 		return url.substring(IMAGE_PATH_PREFIX.length(), url.length());
 	}
 	
-	public static UserDao getUserDao() {
-		ApplicationContext ctx = getApplicationContext();
-		return (UserDao) ctx.getBean("userDao");
-	}
-	
 	public static NodeImageDao getNodeImageDao() {
-		ApplicationContext ctx = getApplicationContext();
-		return (NodeImageDao) ctx.getBean("nodeImageDao");
+		return (NodeImageDao) getApplicationContext().getBean("nodeImageDao");
 	}
 	
 	public static NodeDao getNodeDao() {
-		ApplicationContext ctx = getApplicationContext();
-		return (NodeDao) ctx.getBean("nodeDao");
+		return (NodeDao) getApplicationContext().getBean("nodeDao");
 	}
 	
-	public static NodeAttributeDao getNodeAttributeDao() {
-		ApplicationContext ctx = getApplicationContext();
-		return (NodeAttributeDao) ctx.getBean("nodeAttributeDao");
+	public static MatrixDao getMatrixDao() {
+		return (MatrixDao) getApplicationContext().getBean("matrixDao");
 	}
 	
 	public static String html(String content) {
