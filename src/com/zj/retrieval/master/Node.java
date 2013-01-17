@@ -2,6 +2,7 @@ package com.zj.retrieval.master;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -31,6 +32,8 @@ public class Node {
 	
 	public Node() {
 		retrievalDataSource = new RetrievalDataSource();
+		this.id = UUID.randomUUID().toString();
+		retrievalDataSource.setHeaderId(this.id);
 	}
 	public String getUri() {
 		return uri;
@@ -251,5 +254,24 @@ public class Node {
 	public void setCustomerFields(List<CustomerField> customerFields) {
 		this.customerFields = customerFields;
 	}
-
+	public void addNodeAttribute(NodeAttribute attr) {
+		attr.setHeaderId(this.retrievalDataSource.getId());
+		this.retrievalDataSource.getAttributes().add(attr);
+	}
+	
+	public Node addImage(NodeImage img) {
+		if (this.images == null) 
+			this.images = new ArrayList<NodeImage>();
+		img.setHeaderId(this.id);
+		images.add(img);
+		return this;
+	}
+	
+	public Node addCustomerField(CustomerField f) {
+		if (this.customerFields == null) 
+			this.customerFields = new ArrayList<CustomerField>();
+		f.setHeaderId(this.id);
+		this.customerFields.add(f);
+		return this;
+	}
 }

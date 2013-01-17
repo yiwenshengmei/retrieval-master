@@ -2,6 +2,7 @@ package com.zj.retrieval.master.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.zj.retrieval.master.NodeAttribute;
 import com.zj.retrieval.master.Matrix;
@@ -19,6 +20,7 @@ public class RetrievalDataSource {
 		attributes = new ArrayList<NodeAttribute>();
 		childNodes = new ArrayList<String>();
 		matrix = new Matrix();
+		this.id = UUID.randomUUID().toString();
 	}
 	
 	public List<NodeAttribute> getAttributes() {

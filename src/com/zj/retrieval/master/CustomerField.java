@@ -2,6 +2,7 @@ package com.zj.retrieval.master;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +30,12 @@ public class CustomerField {
 			result.put(jField);
 		}
 		return result;
+	}
+	
+	public CustomerField(String key, String value) {
+		this.key = key;
+		this.value = value;
+		this.id = UUID.randomUUID().toString();
 	}
 	
 	public static Map<String, String> parse(JSONArray jUserfields) {

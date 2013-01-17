@@ -32,7 +32,7 @@ public class NodeImageDao {
 		return template.query(sql, new NodeImageRowMapper(), new Object[] { nodeId });
 	}
 	
-	public void setDateSource(DataSource dataSource) {
+	public void setDataSource(DataSource dataSource) {
 		this.template = new SimpleJdbcTemplate(dataSource);
 	}
 }

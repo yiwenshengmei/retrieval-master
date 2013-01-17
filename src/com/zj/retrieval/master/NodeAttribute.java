@@ -1,8 +1,10 @@
 package com.zj.retrieval.master;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -17,22 +19,23 @@ public class NodeAttribute {
 	private String enName = StringUtils.EMPTY;
 	private List<NodeImage> images;
 	private String headerId = StringUtils.EMPTY;
+	private String id;
 	private int index = -1;
 	private Map<String, String> customerFields = new HashMap<String, String>();
 	
-	public NodeAttribute(String name) {
-		this(name, "no english name", "no description.");
-	}
-	
 	public NodeAttribute(String name, String enName, String desc) {
-		this(name, enName, desc, null);
-	}
-	
-	public NodeAttribute(String name, String enName, String desc, List<NodeImage> images) {
+		this.id = UUID.randomUUID().toString();
 		this.desc = desc;
 		this.name = name;
 		this.enName = enName;
-		this.images = images;
+	}
+	
+	public NodeAttribute addImage(NodeImage img) {
+		if (images == null) 
+			images = new ArrayList<NodeImage>();
+		img.setHeaderId(this.id);
+		images.add(img);
+		return this;
 	}
 
 	public String getDesc() {

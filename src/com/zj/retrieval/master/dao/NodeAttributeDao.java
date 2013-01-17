@@ -12,7 +12,7 @@ import com.zj.retrieval.master.NodeAttribute;
 public class NodeAttributeDao {
 	private SimpleJdbcTemplate template;
 	
-	public void setDateSource(DataSource dataSource) {
+	public void setDataSource(DataSource dataSource) {
 		this.template = new SimpleJdbcTemplate(dataSource);
 	}
 	

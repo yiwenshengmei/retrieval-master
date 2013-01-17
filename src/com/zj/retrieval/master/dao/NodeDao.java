@@ -243,9 +243,9 @@ public class NodeDao {
 		logger.debug("id=" + node.getId());
 		
 		StringBuilder sql = new StringBuilder()
-		.append("INSERT INTO `NODE`(`ND_ID`, `ND_URI_NAME`, `ND_NAME`, `ND_PARENT_ID`")
-		.append(", `ND_URI`, `ND_URI_NAME`, `ND_DETAIL_ID`, `ND_CONTACT`) ")
-		.append("VALUES(:id, :uriName, :name, :parentId, :uri, :uriName, :detailTypeId, :contact)");
+		.append("INSERT INTO `T_NODE`(`ND_ID`, `ND_URI_NAME`, `ND_NAME`, `ND_PARENT_ID`")
+		.append(", `ND_URI`, `ND_DETAIL_TYPE_ID`, `ND_CONTACT`, `ND_NAME_EN`) ")
+		.append("VALUES(:id, :uriName, :name, :parentId, :uri, :detailTypeId, :contact, :englishName)");
 		SqlParameterSource param = new BeanPropertySqlParameterSource(node);
 		
 		int result = template.update(sql.toString(), param);
