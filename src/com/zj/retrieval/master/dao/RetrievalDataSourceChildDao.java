@@ -15,12 +15,12 @@ public class RetrievalDataSourceChildDao {
 	private SimpleJdbcTemplate template;
 	
 	public static RetrievalDataSourceChildDao getInstance() {
-		return (RetrievalDataSourceChildDao) Configuration.getBean("retrievalDataSourceDao");
+		return (RetrievalDataSourceChildDao) Configuration.getBean("retrievalDataSourceChildDao");
 	}
 	
 	public void insert(List<String> childs, String headerId) {
 		StringBuilder sql = new StringBuilder()
-		.append("INSERT INTO T_RETRIEVAL_DATA_SOURCE_CHILD(`RDSC_ID`, `RDSC_HEADER_ID`, `RDSC_INDEX`, `RDSC_TO_NODE_ID`)")
+		.append("INSERT INTO T_RETRIEVAL_DATA_SOURCE_CHILD(`ID`, `RDSC_HEADER_ID`, `RDSC_INDEX`, `RDSC_TO_NODE_ID`)")
 		.append(" VALUES(:id, :headerId, :index, :toNodeId)");
 
 		for (int index = 0; index < childs.size(); index++) {

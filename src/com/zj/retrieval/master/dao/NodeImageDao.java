@@ -18,17 +18,17 @@ public class NodeImageDao {
 	private SimpleJdbcTemplate template;
 	private final Logger logger = LoggerFactory.getLogger(NodeImageDao.class);
 	
-	public void insert(NodeImage img) throws Exception {
+	public void insert(NodeImage img) {
 		StringBuilder sql = new StringBuilder()
-		.append("insert into `t_image`(`img_id`, `img_path`, `img_node_id`) values(:id, :path, :nodeId)");
+		.append("INSERT INTO `T_IMAGE`(`ID`, `IMG_PATH`, `IMG_HEADER_ID`) VALUES(:id, :path, :headerId)");
 		
 		SqlParameterSource param = new BeanPropertySqlParameterSource(img);
 		int result = template.update(sql.toString(), param);
-		if (result != 1) throw new Exception("插入image时返回结果不为1");
+		if (result != 1) throw new RuntimeException("插入image时返回结果不为1");
 	}
 	
 	public List<NodeImage> queryByNodeId(String nodeId) throws Exception {
-		String sql = "select * from t_image img where img.node_id = ?";
+		String sql = "SELECT * FROM T_IMAGE IMG WHERE IMG.ID = ?";
 		return template.query(sql, new NodeImageRowMapper(), new Object[] { nodeId });
 	}
 	

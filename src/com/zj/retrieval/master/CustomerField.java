@@ -13,6 +13,53 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CustomerField {
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((headerId == null) ? 0 : headerId.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((key == null) ? 0 : key.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CustomerField other = (CustomerField) obj;
+		if (headerId == null) {
+			if (other.headerId != null)
+				return false;
+		}
+		else if (!headerId.equals(other.headerId))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		}
+		else if (!id.equals(other.id))
+			return false;
+		if (key == null) {
+			if (other.key != null)
+				return false;
+		}
+		else if (!key.equals(other.key))
+			return false;
+		if (value == null) {
+			if (other.value != null)
+				return false;
+		}
+		else if (!value.equals(other.value))
+			return false;
+		return true;
+	}
+
 	private static Logger logger = LoggerFactory.getLogger(CustomerField.class);
 	private String key;
 	private String value;

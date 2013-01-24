@@ -1,10 +1,14 @@
 package com.zj.retrieval.master;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.SessionFactory;
+import org.hibernate.classic.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.zj.retrieval.master.dao.RetrievalDataSource;
@@ -12,7 +16,7 @@ import com.zj.retrieval.master.dao.RetrievalDataSource;
 public class Node {
 	private static Logger logger = LoggerFactory.getLogger(Node.class);
 		
-	public final static String VIRTUAL_NODE_ID = "virtual_node";
+	public final static String VIRTUAL_NODE_ID = "VIRTUAL_NODE";
 	
 	private String uri = StringUtils.EMPTY;
 	private String id = StringUtils.EMPTY;
@@ -27,12 +31,11 @@ public class Node {
 	private int nodeType = NodeType.NODETYPE_CLASS;
 	private String detailTypeId = StringUtils.EMPTY;
 	private String contact = StringUtils.EMPTY;
-	private List<NodeImage> images = new ArrayList<NodeImage>();
-	private List<CustomerField> customerFields = new ArrayList<CustomerField>();
+	private Set<NodeImage> images = new HashSet<NodeImage>();
+	private Set<CustomerField> customerFields = new HashSet<CustomerField>();
 	
 	public Node() {
 		retrievalDataSource = new RetrievalDataSource();
-		this.id = UUID.randomUUID().toString();
 		retrievalDataSource.setHeaderId(this.id);
 	}
 	public String getUri() {
@@ -101,10 +104,10 @@ public class Node {
 	public void setNodeType(int nodeType) {
 		this.nodeType = nodeType;
 	}
-	public List<NodeImage> getImages() {
+	public Set<NodeImage> getImages() {
 		return images;
 	}
-	public void setImages(List<NodeImage> image) {
+	public void setImages(Set<NodeImage> image) {
 		this.images = image;
 	}
 //	public static Node parseVirtualNodeFromOWL(String owl) throws Exception {
@@ -248,30 +251,30 @@ public class Node {
 	public void setContact(String contact) {
 		this.contact = contact;
 	}
-	public List<CustomerField> getCustomerFields() {
+	public Set<CustomerField> getCustomerFields() {
 		return customerFields;
 	}
-	public void setCustomerFields(List<CustomerField> customerFields) {
+	public void setCustomerFields(Set<CustomerField> customerFields) {
 		this.customerFields = customerFields;
 	}
-	public void addNodeAttribute(NodeAttribute attr) {
-		attr.setHeaderId(this.retrievalDataSource.getId());
+	public void addNodeAttribute(NodeAttribute attr, Session sess) {
+		sess.save(attr);
 		this.retrievalDataSource.getAttributes().add(attr);
 	}
 	
-	public Node addImage(NodeImage img) {
+	public Node addImage(NodeImage img, Session sess) {
+		sess.save(img);
 		if (this.images == null) 
-			this.images = new ArrayList<NodeImage>();
-		img.setHeaderId(this.id);
+			this.images = new HashSet<NodeImage>();
 		images.add(img);
 		return this;
 	}
 	
-	public Node addCustomerField(CustomerField f) {
+	public Node addCustomerField(CustomerField fd, Session sess) {
+		sess.save(fd);
 		if (this.customerFields == null) 
-			this.customerFields = new ArrayList<CustomerField>();
-		f.setHeaderId(this.id);
-		this.customerFields.add(f);
+			this.customerFields = new HashSet<CustomerField>();
+		this.customerFields.add(fd);
 		return this;
 	}
 }

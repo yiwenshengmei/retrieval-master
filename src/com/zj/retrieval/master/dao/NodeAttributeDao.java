@@ -16,14 +16,14 @@ public class NodeAttributeDao {
 		this.template = new SimpleJdbcTemplate(dataSource);
 	}
 	
-	public void insert(NodeAttribute attr) throws Exception {
+	public void insert(NodeAttribute attr) {
 		StringBuilder sql = new StringBuilder()
-		.append("INSERT INTO T_ATTRIBUTE(`ATTR_ID`, `ATTR_NAME`, `ATTR_NAME_EN`, `ATTR_HEADER_ID`, `ATTR_DESC`, `ATTR_INDEX`) ")
+		.append("INSERT INTO T_ATTRIBUTE(`ID`, `ATTR_NAME`, `ATTR_NAME_EN`, `ATTR_HEADER_ID`, `ATTR_DESC`, `ATTR_INDEX`) ")
 		.append("VALUES(:id, :name, :englishName, :headerId, :desc, :index)");
 		
 		SqlParameterSource param = new BeanPropertySqlParameterSource(attr);
 		int result = template.update(sql.toString(), param);
-		if (result != 1) throw new Exception("插入T_ATTRIBUTE时返回结果不为1");
+		if (result != 1) throw new RuntimeException("插入T_ATTRIBUTE时返回结果不为1");
 	}
 	
 	public static NodeAttributeDao getInstance() {

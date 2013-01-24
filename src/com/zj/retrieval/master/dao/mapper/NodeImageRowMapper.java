@@ -12,9 +12,9 @@ public class NodeImageRowMapper implements ParameterizedRowMapper<NodeImage> {
 	@Override
 	public NodeImage mapRow(ResultSet rs, int arg1) throws SQLException {
 		NodeImage image  = new NodeImage();
-		image.setId(rs.getString("id"));
-		image.setNodeId(rs.getString("nodeId"));
-		image.setPath(rs.getString("path"));
+		image.setId(rs.getString("ID"));
+		image.setHeaderId(rs.getString("HEADER_ID"));
+		image.setPath(rs.getString("PATH"));
 		return image;
 	}
 

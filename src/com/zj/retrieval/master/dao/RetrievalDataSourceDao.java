@@ -16,9 +16,9 @@ public class RetrievalDataSourceDao {
 		this.template = new SimpleJdbcTemplate(dataSource);
 	}
 	
-	public void insert(RetrievalDataSource rds) throws Exception {
+	public void insert(RetrievalDataSource rds) {
 		
-		String sql = "INSERT INTO T_RETRIEVAL_DATA_SOURCE(`RDS_ID`, `RDS_HEADER_ID`) VALUES(:id, :headerId)";
+		String sql = "INSERT INTO T_RETRIEVAL_DATA_SOURCE(`ID`, `RDS_HEADER_ID`) VALUES(:id, :headerId)";
 		SqlParameterSource param = new MapSqlParameterSource()
 			.addValue("id", rds.getId())
 			.addValue("headerId", rds.getHeaderId());

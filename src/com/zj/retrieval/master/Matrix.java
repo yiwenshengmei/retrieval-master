@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class Matrix {
 	private int[][] array;
-	private String nodeId;
+	private String headerId;
 	private String id;
 
 	public Matrix(int[][] array) {
@@ -137,20 +137,20 @@ public class Matrix {
 		array = m.array;
 	}
 
-	public String getNodeId() {
-		return nodeId;
-	}
-
-	public void setNodeId(String nodeId) {
-		this.nodeId = nodeId;
-	}
-
 	public String getId() {
 		return id;
 	}
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getHeaderId() {
+		return headerId;
+	}
+
+	public void setHeaderId(String headerId) {
+		this.headerId = headerId;
 	}
 
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.zj.retrieval.master.Node" table="T_NODE">
+		<id name="id" type="java.lang.String">
+			<column name="ID" />
+			<generator class="uuid" />
+		</id>
+		<property name="name" column="ND_NAME" type="java.lang.String" />
+		<property name="englishName" column="ND_NAME_EN" type="java.lang.String" />
+		<property name="desc" column="ND_DESC" type="java.lang.String" />
+		<property name="label" column="ND_LABEL" type="java.lang.String" />
+		<property name="parentId" column="ND_PARENT_ID" type="java.lang.String" />
+		<property name="uri" column="ND_URI" type="java.lang.String" />
+		<property name="uriName" column="ND_URI_NAME" type="java.lang.String" />
+		<set name="images">
+			<key column="IMG_HEADER_ID" />
+			<one-to-many class="com.zj.retrieval.master.NodeImage" />
+		</set>
+		<many-to-one name="retrievalDataSource" column="RDS_HEADER_ID"/>
+	</class>
+</hibernate-mapping>

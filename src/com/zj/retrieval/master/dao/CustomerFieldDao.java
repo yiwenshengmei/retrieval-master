@@ -14,7 +14,7 @@ public class CustomerFieldDao extends AbstractCRUDHandler {
 	
 	public void insert(CustomerField field) {
 		StringBuilder sql = new StringBuilder()
-		.append("INSERT INTO T_CUSTOMER_FIELD(`FD_ID`, `FD_KEY`, `FD_VALUE`, `FD_HEADER_ID`)")
+		.append("INSERT INTO T_CUSTOMER_FIELD(`ID`, `FD_KEY`, `FD_VALUE`, `FD_HEADER_ID`)")
 		.append(" VALUES(:id, :key, :value, :headerId)");
 		
 		SqlParameterSource param = new BeanPropertySqlParameterSource(field);

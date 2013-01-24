@@ -17,10 +17,11 @@ public class RetrievalDataSource {
 	private String headerId;
 	
 	public RetrievalDataSource() {
+		this.id = UUID.randomUUID().toString();
 		attributes = new ArrayList<NodeAttribute>();
 		childNodes = new ArrayList<String>();
 		matrix = new Matrix();
-		this.id = UUID.randomUUID().toString();
+		matrix.setHeaderId(this.id);
 	}
 	
 	public List<NodeAttribute> getAttributes() {

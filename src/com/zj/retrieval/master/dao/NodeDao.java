@@ -19,8 +19,14 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedBeanPropertyRowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.zj.retrieval.master.Configuration;
+import com.zj.retrieval.master.CustomerField;
 import com.zj.retrieval.master.NodeAttribute;
 import com.zj.retrieval.master.AttributeSelector;
 import com.zj.retrieval.master.BizNode;
@@ -33,7 +39,12 @@ import com.zj.retrieval.master.dao.mapper.NodeRowMapper;
 public class NodeDao {
 	
 	private SimpleJdbcTemplate template;
+	private TransactionTemplate tt;
 	private static Logger logger = LoggerFactory.getLogger(NodeDao.class);
+	
+	public void setTxManager(PlatformTransactionManager txManager) {
+		this.tt = new TransactionTemplate(txManager);
+	}
 	
 	public List<Node> getAllNodeAsBrief() {
 		String sql = "select `id`, `images` as imagesStr, `name`, `parent_id` as parentId, `detail_type` as detailType from `fish`";
@@ -117,28 +128,6 @@ public class NodeDao {
 		
 	}
 	
-	public Node queryById(String id) throws Exception {
-//		try {
-//			String sql = "select `id`, `uri_name` as uriName, `name`, `images` as imagesStr, " +
-//					"`name_en` as englishName, `parent_id` as parentId, " +
-//					"`owl`, `uri`, `detail_type` as detailType, `contact` from `fish` where `id`=?";
-//			ParameterizedRowMapper<Node> rowMapper = 
-//				ParameterizedBeanPropertyRowMapper.newInstance(Node.class);
-//			Node result = template.queryForObject(sql, rowMapper, id);
-//			if (result.getDetailType() == DetailType.FULL) {
-//				Node.parseNodeFromOWL(result);
-//			}
-//			return result;
-//		} catch (EmptyResultDataAccessException ex) {
-//			throw new Exception(String.format("ID为%1$s的节点不存在！", id));
-//		} catch (Exception e) {
-//			logger.error(String.format("查询节点时出错[id=%1$s]", id), e);
-//			throw new Exception("查询节点时出错@NodeServiceImpl.findNodeById()", e);
-//		}
-		
-		throw new Exception("NotSupplortYet");
-	}
-
 	public Node getNodeByName(String name) {
 		// TODO Auto-generated method stub
 		return null;
@@ -237,41 +226,46 @@ public class NodeDao {
 		}
 	}
 	
-	private void doInsert(Node node) throws Exception {
+	private void doInsert(Node node) {
 		if (StringUtils.isBlank(node.getId()))
 			node.setId(UUID.randomUUID().toString());
 		logger.debug("id=" + node.getId());
 		
 		StringBuilder sql = new StringBuilder()
-		.append("INSERT INTO `T_NODE`(`ND_ID`, `ND_URI_NAME`, `ND_NAME`, `ND_PARENT_ID`")
+		.append("INSERT INTO `T_NODE`(`ID`, `ND_URI_NAME`, `ND_NAME`, `ND_PARENT_ID`")
 		.append(", `ND_URI`, `ND_DETAIL_TYPE_ID`, `ND_CONTACT`, `ND_NAME_EN`) ")
 		.append("VALUES(:id, :uriName, :name, :parentId, :uri, :detailTypeId, :contact, :englishName)");
 		SqlParameterSource param = new BeanPropertySqlParameterSource(node);
 		
 		int result = template.update(sql.toString(), param);
-		if (result != 1) throw new Exception("插入根节点的结果不为1");
+		if (result != 1) throw new RuntimeException("插入根节点的结果不为1");
 	}
 	
-	public void insert(Node node) throws Exception {
-		logger.debug("插入根节点");
-			
-		logger.debug("Save to T_NODE...");
-		doInsert(node);
+	public void insert(final Node node) throws Exception {
+		tt.execute(new TransactionCallback() {
+			@Override
+			public Object doInTransaction(TransactionStatus arg0) {
+				// Save to T_NODE.
+				doInsert(node);
+				
+				// Save to T_IMAGE.
+				NodeImageDao imgdao = Configuration.getNodeImageDao();
+				for (NodeImage img : node.getImages()) {
+					imgdao.insert(img);
+				}
+				
+				// Save to T_CUSTOMER_FIELD.
+				for (CustomerField fd : node.getCustomerFields()) {
+					CustomerFieldDao.getInstance().insert(fd);
+				}
+				
+				// Save to T_RETRIEVAL_DATA_SOURCE.
+				RetrievalDataSourceDao.getInstance().insert(node.getRetrievalDataSource());
+				
+				return null;
+			}
+		});
 		
-		logger.debug("Save to T_IMAGE...");
-		NodeImageDao imgdao = Configuration.getNodeImageDao();
-		for (NodeImage img : node.getImages()) {
-			imgdao.insert(img);
-		}
-		
-		logger.debug("Save to T_ATTRIBUTE...");
-		NodeAttributeDao attrdao = NodeAttributeDao.getInstance();
-		for (NodeAttribute attr : node.getRetrievalDataSource().getAttributes()) {
-			attrdao.insert(attr);
-		}
-		
-		logger.debug("Save to T_RETRIEVAL_DATA_SOURCE...");
-		RetrievalDataSourceDao.getInstance().insert(node.getRetrievalDataSource());
 			
 //			// 2.更新VirtualNode[id=Node.VIRTUAL_NODE_ID]的childNodes属性
 //			logger.debug("更新虚节点");

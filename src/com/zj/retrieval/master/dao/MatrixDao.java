@@ -16,21 +16,21 @@ import com.zj.retrieval.master.Matrix;
 public class MatrixDao {
 	private SimpleJdbcTemplate template;
 	
-	public void insert(Matrix m) throws Exception {
-		String sql = "INSERT INTO T_MATRIX(`MTX_ID`, `MTX_NODE_ID`) VALUES(:id, :nodeId)";
+	public void insert(Matrix m) {
+		String sql = "INSERT INTO T_MATRIX(`ID`, `MTX_HEADER_ID`) VALUES(:id, :headerId)";
 		if (StringUtils.isBlank(m.getId())) 
 			m.setId(UUID.randomUUID().toString());
 		
 		SqlParameterSource param = new BeanPropertySqlParameterSource(m);
 		if (template.update(sql, param) != 1)
-			throw new Exception("The value of insert T_MATRIX is not 1");
+			throw new RuntimeException("The value of insert T_MATRIX is not 1");
 		
 		insertMatrixRow(m);
 	}
 	
-	private void insertMatrixRow(Matrix m) throws Exception {
+	private void insertMatrixRow(Matrix m) {
 		StringBuilder sql = new StringBuilder()
-		.append("INSERT INTO T_MATRIX_ROW(`MTXR_ID`, `MTXR_MATRIX_ID`, `MTXR_ROW_INDEX`, `MTXR_COL_INDEX`, `MTXR_VALUE`)")
+		.append("INSERT INTO T_MATRIX_ROW(`ID`, `MTXR_MATRIX_ID`, `MTXR_ROW_INDEX`, `MTXR_COL_INDEX`, `MTXR_VALUE`)")
 		.append(" VALUES(:id, :matrixId, :row, :col, :value)");
 		
 		for (int row = 0; row < m.getRowSize(); row++) {
@@ -42,7 +42,7 @@ public class MatrixDao {
 					.addValue("col", col)
 					.addValue("value", m.getValue(row, col));
 				if (template.update(sql.toString(), param) != 1) 
-					throw new Exception("The value of insert T_MATRIX_ROW is not 1");
+					throw new RuntimeException("The value of insert T_MATRIX_ROW is not 1");
 			}
 		}
 	}

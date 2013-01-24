@@ -1,22 +1,23 @@
 package com.zj.retrieval.master.test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.classic.Session;
 import org.junit.Test;
 
 import com.zj.retrieval.master.CustomerField;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeAttribute;
 import com.zj.retrieval.master.NodeImage;
-import com.zj.retrieval.master.dao.NodeDao;
 
 public class TestNodeCRUD {
 	
 	@Test
 	public void testAddRootNode() throws Exception {
+		SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+		Session sess = sessionFactory.openSession();
+		sess.beginTransaction();
+		
 		Node node = new Node();
 		node.setName("鸟");
 		node.setEnglishName("Bird");
@@ -27,13 +28,20 @@ public class TestNodeCRUD {
 		node.setUriName("birduriname");
 		node.setLabel("b");
 		
-		node.addImage(new NodeImage("E:\\1.jpg")).addImage(new NodeImage("E:\\2.jpg"));
+		node.addImage(new NodeImage("E:\\1.jpg"), sess)
+		    .addImage(new NodeImage("E:\\2.jpg"), sess);
 		
-		node.addCustomerField(new CustomerField("k1", "v1")).addCustomerField(new CustomerField("k2", "v2"));
+		node.addCustomerField(new CustomerField("k1", "v1"), sess)
+			.addCustomerField(new CustomerField("k2", "v2"), sess);
 		
-		node.addNodeAttribute(new NodeAttribute("可以飞", "Can Fly", "使用翅膀飞行").addImage(new NodeImage("E:\\fly.jpg")));
-		node.addNodeAttribute(new NodeAttribute("可以跳", "Can Jump", "用脚跳").addImage(new NodeImage("E:\\jump.jpg")));
+		node.addNodeAttribute(
+				new NodeAttribute("可以飞", "Can Fly", "使用翅膀飞行").withImage(new NodeImage("E:\\fly.jpg"), sess), sess);
+		node.addNodeAttribute(
+				new NodeAttribute("可以跳", "Can Jump", "用脚跳").withImage(new NodeImage("E:\\jump.jpg"), sess), sess);
 		
-		NodeDao.getInstance().insert(node);
+		sess.save(node);
+		
+		sess.getTransaction().commit();
+		
 	}
 }

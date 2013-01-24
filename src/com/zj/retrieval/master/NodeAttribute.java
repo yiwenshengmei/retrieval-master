@@ -1,12 +1,13 @@
 package com.zj.retrieval.master;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.classic.Session;
 
 public class NodeAttribute {
 
@@ -16,9 +17,53 @@ public class NodeAttribute {
 	
 	private String desc = StringUtils.EMPTY;
 	private String name = StringUtils.EMPTY;
-	private String enName = StringUtils.EMPTY;
-	private List<NodeImage> images;
+	private String englishName = StringUtils.EMPTY;
+	private Set<NodeImage> images;
 	private String headerId = StringUtils.EMPTY;
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((englishName == null) ? 0 : englishName.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + index;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		NodeAttribute other = (NodeAttribute) obj;
+		if (englishName == null) {
+			if (other.englishName != null)
+				return false;
+		}
+		else if (!englishName.equals(other.englishName))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		}
+		else if (!id.equals(other.id))
+			return false;
+		if (index != other.index)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		}
+		else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
+
 	private String id;
 	private int index = -1;
 	private Map<String, String> customerFields = new HashMap<String, String>();
@@ -27,15 +72,19 @@ public class NodeAttribute {
 		this.id = UUID.randomUUID().toString();
 		this.desc = desc;
 		this.name = name;
-		this.enName = enName;
+		this.englishName = enName;
 	}
 	
-	public NodeAttribute addImage(NodeImage img) {
+	public NodeAttribute addImage(NodeImage img, Session sess) {
+		sess.save(img);
 		if (images == null) 
-			images = new ArrayList<NodeImage>();
-		img.setHeaderId(this.id);
+			images = new HashSet<NodeImage>();
 		images.add(img);
 		return this;
+	}
+	
+	public NodeAttribute withImage(NodeImage img, Session sess) {
+		return addImage(img, sess);
 	}
 
 	public String getDesc() {
@@ -55,11 +104,11 @@ public class NodeAttribute {
 	}
 
 	public String getEnglishName() {
-		return enName;
+		return englishName;
 	}
 
-	public void setEnName(String enName) {
-		this.enName = enName;
+	public void setEnglishName(String englishName) {
+		this.englishName = englishName;
 	}
 
 	public String getHeaderId() {
@@ -78,11 +127,11 @@ public class NodeAttribute {
 		this.index = index;
 	}
 
-	public List<NodeImage> getImages() {
+	public Set<NodeImage> getImages() {
 		return images;
 	}
 
-	public void setImages(List<NodeImage> images) {
+	public void setImages(Set<NodeImage> images) {
 		this.images = images;
 	}
 
@@ -95,6 +144,14 @@ public class NodeAttribute {
 	}
 
 	public String getEnName() {
-		return enName;
+		return englishName;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 }
