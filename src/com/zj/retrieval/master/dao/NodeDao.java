@@ -26,14 +26,15 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.zj.retrieval.master.Configuration;
-import com.zj.retrieval.master.CustomerField;
 import com.zj.retrieval.master.NodeAttribute;
+import com.zj.retrieval.master.NodeFeature;
 import com.zj.retrieval.master.AttributeSelector;
 import com.zj.retrieval.master.BizNode;
 import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Matrix;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeImage;
+import com.zj.retrieval.master.RetrievalDataSource;
 import com.zj.retrieval.master.dao.mapper.NodeRowMapper;
 
 public class NodeDao {
@@ -135,7 +136,7 @@ public class NodeDao {
 
 	public AttributeSelector getAttributeSelector(Node nd) {
 		List<Integer> resultData = new ArrayList<Integer>();
-		List<NodeAttribute> attrs = nd.getRetrievalDataSource().getAttributes();
+		List<NodeFeature> attrs = nd.getRetrievalDataSource().getAttributes();
 		for (int i = 0; i < attrs.size(); i++) {
 			resultData.add(i);
 		}
@@ -152,18 +153,18 @@ public class NodeDao {
 			//   都等于没有添加，因为没有已知的特性与其匹配
 			int[] newRow = new int[matrix.getColSize()];
 			for(int i = 0; i < newRow.length; i++)
-				newRow[i] = as.getAttributeMapping().get(i) ? NodeAttribute.YES : NodeAttribute.NO;
+				newRow[i] = as.getAttributeMapping().get(i) ? NodeFeature.YES : NodeFeature.NO;
 			matrix.addRow(newRow, 0, newRow.length);
 
 			//   再修改列：向parentNode添加创建newNode时一起添加的新特性
 			//   在添加新特性的同时将新特性加入parentNode的attribute列表
-			List<NodeAttribute> parentAttributes = parentNode.getRetrievalDataSource().getAttributes();
-			for(NodeAttribute attr : as.getNewAttributeMapping().keySet()) {
+			List<NodeFeature> parentAttributes = parentNode.getRetrievalDataSource().getAttributes();
+			for(NodeFeature attr : as.getNewAttributeMapping().keySet()) {
 				// matrix可能为空，向空矩阵添加1列需要的长度始终是1
 				int[] newCol = matrix.getRowSize() == 0 ? new int[1] : new int[matrix.getRowSize()];
 				for(int j = 0; j < newCol.length; j++) {
 					newCol[j] = (j != newCol.length - 1 ? 0 : 
-						(as.getNewAttributeMapping().get(attr) ? NodeAttribute.YES : NodeAttribute.NO));
+						(as.getNewAttributeMapping().get(attr) ? NodeFeature.YES : NodeFeature.NO));
 				}
 				matrix.addCol(newCol, 0, newCol.length);
 				// 同时更新parentNode的attribte列表
@@ -255,7 +256,7 @@ public class NodeDao {
 				}
 				
 				// Save to T_CUSTOMER_FIELD.
-				for (CustomerField fd : node.getCustomerFields()) {
+				for (NodeAttribute fd : node.getCustomerFields()) {
 					CustomerFieldDao.getInstance().insert(fd);
 				}
 				

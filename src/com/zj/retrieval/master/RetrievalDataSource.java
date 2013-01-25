@@ -1,15 +1,14 @@
-package com.zj.retrieval.master.dao;
+package com.zj.retrieval.master;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
+import java.util.Set;
 
-import com.zj.retrieval.master.NodeAttribute;
-import com.zj.retrieval.master.Matrix;
 
 public class RetrievalDataSource {
 	// key代表特征举证中的列号，value代表该列号对应的特征对象
-	private List<NodeAttribute> attributes;
+	private Set<NodeFeature> attributes;
 	// key代表特征矩阵中的行号，value代表子结点在数据库中的id
 	private List<String> childNodes;
 	private Matrix matrix;
@@ -17,17 +16,16 @@ public class RetrievalDataSource {
 	private String headerId;
 	
 	public RetrievalDataSource() {
-		this.id = UUID.randomUUID().toString();
-		attributes = new ArrayList<NodeAttribute>();
+		attributes = new HashSet<NodeFeature>();
 		childNodes = new ArrayList<String>();
 		matrix = new Matrix();
 		matrix.setHeaderId(this.id);
 	}
 	
-	public List<NodeAttribute> getAttributes() {
+	public Set<NodeFeature> getAttributes() {
 		return attributes;
 	}
-	public void setAttributes(List<NodeAttribute> attributes) {
+	public void setAttributes(Set<NodeFeature> attributes) {
 		this.attributes = attributes;
 	}
 	public List<String> getChildNodes() {

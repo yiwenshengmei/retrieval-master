@@ -66,7 +66,7 @@ public class BizNode {
 		}
 		
 		// Create <attributes>
-		List<NodeAttribute> attrs = node.getRetrievalDataSource().getAttributes();
+		List<NodeFeature> attrs = node.getRetrievalDataSource().getAttributes();
 		XMLBuilder elemAttributes = elemClass.e("attributes");
 		for(int index = 0; index < attrs.size(); index ++) {
 			XMLBuilder elemAttribute = elemAttributes.e("attribute");

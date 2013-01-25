@@ -7,7 +7,8 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import com.zj.retrieval.master.Configuration;
-import com.zj.retrieval.master.NodeAttribute;
+import com.zj.retrieval.master.NodeFeature;
+import com.zj.retrieval.master.RetrievalDataSource;
 
 public class RetrievalDataSourceDao {
 	private SimpleJdbcTemplate template;
@@ -25,7 +26,7 @@ public class RetrievalDataSourceDao {
 		template.update(sql, param);
 		
 		NodeAttributeDao attrdao = NodeAttributeDao.getInstance();
-		for (NodeAttribute attr : rds.getAttributes()) {
+		for (NodeFeature attr : rds.getAttributes()) {
 			attrdao.insert(attr);
 		}
 		

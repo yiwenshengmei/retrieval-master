@@ -2,21 +2,18 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-	<class name="com.zj.retrieval.master.Node" table="T_NODE">
+	<class name="com.zj.retrieval.master.NodeFeature" table="T_NODE_FEATURE">
 		<id name="id" type="java.lang.String">
 			<column name="ID" />
 			<generator class="uuid" />
 		</id>
 		<property name="name" column="NAME" type="java.lang.String" />
-		<property name="englishName" column="NAME_EN" type="java.lang.String" />
 		<property name="desc" column="DESC" type="java.lang.String" />
-		<property name="label" column="LABEL" type="java.lang.String" />
-		<property name="parentId" column="PARENT_ID" type="java.lang.String" />
-		<property name="uri" column="URI" type="java.lang.String" />
-		<property name="uriName" column="URI_NAME" type="java.lang.String" />
+		<property name="englishName" column="NAME_EN" type="java.lang.String" />
+		<property name="retrievalDataSource" column="RDS_ID" type="java.lang.String" />
 		<set name="images">
-			<key column="NODE_ID" />
-			<one-to-many class="NodeImage" />
+			<key column="FEATURE_ID" />
+			<one-to-many class="com.zj.retrieval.master.FeatureImage" />
 		</set>
 	</class>
 </hibernate-mapping>

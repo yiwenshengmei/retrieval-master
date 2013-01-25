@@ -12,13 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionSupport;
-import com.zj.retrieval.master.NodeAttribute;
+import com.zj.retrieval.master.NodeFeature;
 import com.zj.retrieval.master.AttributeSelectedWrongException;
 import com.zj.retrieval.master.AttributeSelector;
 import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
-import com.zj.retrieval.master.CustomerField;
+import com.zj.retrieval.master.NodeAttribute;
 import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
@@ -76,7 +76,7 @@ public class UpdateNodeAction {
 			// 解析自定义字段
 			if (user_field != null && !user_field.isEmpty()) {
 				JSONArray userFieldJSONArray = new JSONArray(user_field);
-				nd.setUserfields(CustomerField.parse(userFieldJSONArray));
+				nd.setUserfields(NodeAttribute.parse(userFieldJSONArray));
 			}
 			
 			

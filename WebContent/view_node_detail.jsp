@@ -3,7 +3,7 @@
 <%@page import="java.util.Map.Entry"%>
 <%@page import="com.zj.retrieval.master.actions.XMLUtil"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="com.zj.retrieval.master.NodeAttribute"%>
+<%@page import="com.zj.retrieval.master.NodeFeature"%>
 <%@page import="java.util.List"%>
 <%@page import="com.zj.retrieval.master.DetailType"%>
 <%@page import="com.zj.retrieval.master.Node"%>
@@ -32,7 +32,7 @@
 	String uri_name = "";
 	List<String> images = new ArrayList<String>();
 	List<String> child_nodes = new ArrayList<String>();
-	List<NodeAttribute> attrs = new ArrayList<NodeAttribute>();
+	List<NodeFeature> attrs = new ArrayList<NodeFeature>();
 	String node_id = request.getParameter("node_id");
 	Map<String, String> user_filed = new HashMap<String, String>();
 	
@@ -92,7 +92,7 @@
 %>
 <tr><td colspan='2'>====== Attributes ======</td></tr>
 <%
-	for (NodeAttribute attr : attrs) {
+	for (NodeFeature attr : attrs) {
 %>
 <tr><td>attr_name</td><td><%=attr.getName() %></td></tr>
 <tr><td>attr_name_en</td><td><%=attr.getEnglishName() %></td></tr>

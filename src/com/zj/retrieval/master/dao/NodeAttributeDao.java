@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import com.zj.retrieval.master.Configuration;
-import com.zj.retrieval.master.NodeAttribute;
+import com.zj.retrieval.master.NodeFeature;
 
 public class NodeAttributeDao {
 	private SimpleJdbcTemplate template;
@@ -16,7 +16,7 @@ public class NodeAttributeDao {
 		this.template = new SimpleJdbcTemplate(dataSource);
 	}
 	
-	public void insert(NodeAttribute attr) {
+	public void insert(NodeFeature attr) {
 		StringBuilder sql = new StringBuilder()
 		.append("INSERT INTO T_ATTRIBUTE(`ID`, `ATTR_NAME`, `ATTR_NAME_EN`, `ATTR_HEADER_ID`, `ATTR_DESC`, `ATTR_INDEX`) ")
 		.append("VALUES(:id, :name, :englishName, :headerId, :desc, :index)");

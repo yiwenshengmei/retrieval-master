@@ -1,34 +1,101 @@
 package com.zj.retrieval.master;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.classic.Session;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NodeAttribute {
+	private static Logger logger = LoggerFactory.getLogger(NodeAttribute.class);
+	private String key;
+	private String value;
+	private String id;
+	private String nodeId;
+	private Node node;
+	
+	public static JSONArray parse(Map<String, String> fields) {
+		JSONArray result = new JSONArray();
+		for (String key : fields.keySet()) {
+			JSONObject jField = new JSONObject();
+			try {
+				jField.put("key", key);
+				jField.put("value", fields.get(key));
+			} catch (JSONException e) { logger.error("在将自定义字段转换成json格式时发生错误。", e); }
+			result.put(jField);
+		}
+		return result;
+	}
+	
+	public NodeAttribute(String key, String value) {
+		this.key = key;
+		this.value = value;
+		this.id = UUID.randomUUID().toString();
+	}
+	
+	public static Map<String, String> parse(JSONArray jUserfields) {
+		try {
+			Map<String, String> result = new HashMap<String, String>();
+			for (int i = 0; i < jUserfields.length(); i++) {
+				JSONObject jField = jUserfields.getJSONObject(i);
+				result.put(jField.getString("key"), jField.getString("value"));
+			}
+			return result;
+		} catch (JSONException e) { 
+			logger.error("在将json字符串解析成自定义字段时发生错误。", e);
+			return null;
+		}
+	}
 
-	public static final int YES    = 2;
-	public static final int NO     = 1;
-	public static final int UNKNOW = 3;
-	
-	private String desc = StringUtils.EMPTY;
-	private String name = StringUtils.EMPTY;
-	private String englishName = StringUtils.EMPTY;
-	private Set<NodeImage> images;
-	private String headerId = StringUtils.EMPTY;
-	
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getNodeId() {
+		return nodeId;
+	}
+
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
+	}
+
+	public Node getNode() {
+		return node;
+	}
+
+	public void setNode(Node node) {
+		this.node = node;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((englishName == null) ? 0 : englishName.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + index;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
 
@@ -41,117 +108,13 @@ public class NodeAttribute {
 		if (getClass() != obj.getClass())
 			return false;
 		NodeAttribute other = (NodeAttribute) obj;
-		if (englishName == null) {
-			if (other.englishName != null)
-				return false;
-		}
-		else if (!englishName.equals(other.englishName))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
 		}
 		else if (!id.equals(other.id))
 			return false;
-		if (index != other.index)
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		}
-		else if (!name.equals(other.name))
-			return false;
 		return true;
 	}
-
-	private String id;
-	private int index = -1;
-	private Map<String, String> customerFields = new HashMap<String, String>();
 	
-	public NodeAttribute(String name, String enName, String desc) {
-		this.id = UUID.randomUUID().toString();
-		this.desc = desc;
-		this.name = name;
-		this.englishName = enName;
-	}
-	
-	public NodeAttribute addImage(NodeImage img, Session sess) {
-		sess.save(img);
-		if (images == null) 
-			images = new HashSet<NodeImage>();
-		images.add(img);
-		return this;
-	}
-	
-	public NodeAttribute withImage(NodeImage img, Session sess) {
-		return addImage(img, sess);
-	}
-
-	public String getDesc() {
-		return desc;
-	}
-
-	public void setDesc(String desc) {
-		this.desc = desc;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getEnglishName() {
-		return englishName;
-	}
-
-	public void setEnglishName(String englishName) {
-		this.englishName = englishName;
-	}
-
-	public String getHeaderId() {
-		return headerId;
-	}
-
-	public void setHeaderId(String headerId) {
-		this.headerId = headerId;
-	}
-
-	public int getIndex() {
-		return index;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
-	}
-
-	public Set<NodeImage> getImages() {
-		return images;
-	}
-
-	public void setImages(Set<NodeImage> images) {
-		this.images = images;
-	}
-
-	public Map<String, String> getCustomerFields() {
-		return customerFields;
-	}
-
-	public void setCustomerFields(Map<String, String> customerFields) {
-		this.customerFields = customerFields;
-	}
-
-	public String getEnName() {
-		return englishName;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 }

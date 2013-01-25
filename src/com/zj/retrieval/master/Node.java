@@ -1,17 +1,10 @@
 package com.zj.retrieval.master;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.UUID;
-
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.SessionFactory;
-import org.hibernate.classic.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.zj.retrieval.master.dao.RetrievalDataSource;
 
 public class Node {
 	private static Logger logger = LoggerFactory.getLogger(Node.class);
@@ -32,11 +25,10 @@ public class Node {
 	private String detailTypeId = StringUtils.EMPTY;
 	private String contact = StringUtils.EMPTY;
 	private Set<NodeImage> images = new HashSet<NodeImage>();
-	private Set<CustomerField> customerFields = new HashSet<CustomerField>();
+	private Set<NodeAttribute> customerFields = new HashSet<NodeAttribute>();
 	
 	public Node() {
 		retrievalDataSource = new RetrievalDataSource();
-		retrievalDataSource.setHeaderId(this.id);
 	}
 	public String getUri() {
 		return uri;
@@ -251,29 +243,26 @@ public class Node {
 	public void setContact(String contact) {
 		this.contact = contact;
 	}
-	public Set<CustomerField> getCustomerFields() {
+	public Set<NodeAttribute> getCustomerFields() {
 		return customerFields;
 	}
-	public void setCustomerFields(Set<CustomerField> customerFields) {
+	public void setCustomerFields(Set<NodeAttribute> customerFields) {
 		this.customerFields = customerFields;
 	}
-	public void addNodeAttribute(NodeAttribute attr, Session sess) {
-		sess.save(attr);
+	public void addNodeAttribute(NodeFeature attr) {
 		this.retrievalDataSource.getAttributes().add(attr);
 	}
 	
-	public Node addImage(NodeImage img, Session sess) {
-		sess.save(img);
+	public Node addImage(NodeImage img) {
 		if (this.images == null) 
 			this.images = new HashSet<NodeImage>();
 		images.add(img);
 		return this;
 	}
 	
-	public Node addCustomerField(CustomerField fd, Session sess) {
-		sess.save(fd);
+	public Node addCustomerField(NodeAttribute fd) {
 		if (this.customerFields == null) 
-			this.customerFields = new HashSet<CustomerField>();
+			this.customerFields = new HashSet<NodeAttribute>();
 		this.customerFields.add(fd);
 		return this;
 	}

@@ -1,5 +1,5 @@
 <%@page import="java.util.List"%>
-<%@page import="com.zj.retrieval.master.NodeAttribute"%>
+<%@page import="com.zj.retrieval.master.NodeFeature"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="com.zj.retrieval.master.Node"%>

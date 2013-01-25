@@ -18,7 +18,7 @@ import com.opensymphony.xwork2.ActionSupport;
 import com.zj.retrieval.master.DetailType;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeType;
-import com.zj.retrieval.master.CustomerField;
+import com.zj.retrieval.master.NodeAttribute;
 import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.dao.NodeDao;
 import com.zj.retrieval.master.dao.UserDao;
@@ -97,7 +97,7 @@ public class AddRootNodeAction {
 			// 解析自定义字段
 			if (user_field != null && !user_field.isEmpty()) {
 				JSONArray user_field_jsonarray = new JSONArray(user_field);
-				root.setUserfields(CustomerField.parse(user_field_jsonarray));
+				root.setUserfields(NodeAttribute.parse(user_field_jsonarray));
 			}
 			
 			NodeDao nodeDao = Configuration.getNodeDao();

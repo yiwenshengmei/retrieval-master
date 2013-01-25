@@ -12,7 +12,7 @@
 <%@page import="org.apache.http.client.HttpClient"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="com.zj.retrieval.master.NodeAttribute"%>
+<%@page import="com.zj.retrieval.master.NodeFeature"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>

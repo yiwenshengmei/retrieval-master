@@ -2,18 +2,13 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-	<class name="com.zj.retrieval.master.NodeAttribute" table="T_Attribute">
+	<class name="com.zj.retrieval.master.NodeAttribute" table="T_NODE_ATTRIBUTE">
 		<id name="id" type="java.lang.String">
 			<column name="ID" />
 			<generator class="uuid" />
 		</id>
-		<property name="name" column="ATTR_NAME" type="java.lang.String" />
-		<property name="desc" column="ATTR_DESC" type="java.lang.String" />
-		<property name="englishName" column="ATTR_NAME_EN" type="java.lang.String" />
-		<property name="headerId" column="ATTR_HEADER_ID" type="java.lang.String" />
-		<set name="images">
-			<key column="IMG_HEADER_ID" />
-			<one-to-many class="com.zj.retrieval.master.NodeImage" />
-		</set>
+		<property name="key" column="KEY" type="java.lang.String" />
+		<property name="value" column="VALUE" type="java.lang.String" />
+		<many-to-one name="node" column="NODE_ID" />
 	</class>
 </hibernate-mapping>

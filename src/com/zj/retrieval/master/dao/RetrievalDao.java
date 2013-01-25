@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.zj.retrieval.master.NodeAttribute;
+import com.zj.retrieval.master.NodeFeature;
 import com.zj.retrieval.master.Matrix;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.RetrievalResult;
@@ -39,7 +39,7 @@ public class RetrievalDao {
 		for (int i = 1; i < selectState.length(); i++) {
 			int perAnswer = Integer.valueOf(selectState.substring(i, i + 1));
 			// 如果回答unknown，轮空本次，这可能将导致最终答案出现多个
-			if (perAnswer == NodeAttribute.UNKNOW)
+			if (perAnswer == NodeFeature.UNKNOW)
 				continue;
 			Matrix matrix = retrievalNode.getRetrievalDataSource().getMatrix();
 			Iterator<Integer> iter = mappingRows.iterator();
