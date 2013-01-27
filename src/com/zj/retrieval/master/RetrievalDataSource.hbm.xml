@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 	<class name="com.zj.retrieval.master.RetrievalDataSource" table="T_RETRIEVAL_DATA_SOURCE">
 		<id name="id" type="java.lang.String">
-			<column name="ID" />
+			<column name="`ID`" />
 			<generator class="foreign">
 				<param name="property">node</param>
 			</generator>
 		</id>
-		<many-to-one name="node" column="NODE_ID" />
+		<many-to-one name="node" column="`NODE_ID`" unique="true" />
 		<set name="features">
-			<key column="RDS_ID" />
+			<key column="`RDS_ID`" />
 			<one-to-many class="com.zj.retrieval.master.NodeFeature" />
 		</set>
-		<one-to-one name="node" constrained="true" />
 	</class>
 </hibernate-mapping>

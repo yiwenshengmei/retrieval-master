@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 	<class name="com.zj.retrieval.master.NodeFeature" table="T_NODE_FEATURE">
 		<id name="id" type="java.lang.String">
-			<column name="ID" />
+			<column name="`ID`" />
 			<generator class="uuid" />
 		</id>
-		<property name="name" column="NAME" type="java.lang.String" />
-		<property name="desc" column="DESC" type="java.lang.String" />
-		<property name="englishName" column="NAME_EN" type="java.lang.String" />
-		<property name="retrievalDataSource" column="RDS_ID" type="java.lang.String" />
+		<property name="name" column="`NAME`" type="java.lang.String" />
+		<property name="desc" column="`DESC`" type="java.lang.String" />
+		<property name="englishName" column="`NAME_EN`" type="java.lang.String" />
+		<many-to-one name="retrievalDataSource" column="`RDS_ID`" />
 		<set name="images">
-			<key column="FEATURE_ID" />
+			<key column="`FEATURE_ID`" />
 			<one-to-many class="com.zj.retrieval.master.FeatureImage" />
 		</set>
 	</class>

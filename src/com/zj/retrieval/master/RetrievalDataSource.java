@@ -14,6 +14,8 @@ public class RetrievalDataSource {
 	private Matrix matrix;
 	private String id;
 	private String headerId;
+	private Node node;
+	private Set<NodeFeature> features;
 	
 	public RetrievalDataSource() {
 		attributes = new HashSet<NodeFeature>();
@@ -55,5 +57,21 @@ public class RetrievalDataSource {
 
 	public void setHeaderId(String headerId) {
 		this.headerId = headerId;
+	}
+
+	public Node getNode() {
+		return node;
+	}
+
+	public void setNode(Node node) {
+		this.node = node;
+	}
+
+	public Set<NodeFeature> getFeatures() {
+		return features;
+	}
+
+	public void setFeatures(Set<NodeFeature> features) {
+		this.features = features;
 	}
 }

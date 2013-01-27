@@ -4,14 +4,17 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.Session;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zj.retrieval.master.FeatureImage;
 import com.zj.retrieval.master.NodeAttribute;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeFeature;
@@ -25,22 +28,30 @@ public class TestNodeCRUD {
 	@Test
 	public void testAddRootNode() throws Exception {
 		SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
-		Session sess = sessionFactory.openSession();
-		sess.beginTransaction();
+		Session sess = null;
+		Transaction tx = null;
+		try {
+		sess = sessionFactory.openSession();
+		tx = sess.beginTransaction();
 		
 		Node node = new Node();
 		node.setName("鸟");
-//		node.setEnglishName("Bird");
-//		node.setDesc("一种鸟");
-//		node.setContact("yiwenshengmei@163.com");
-//		node.setParentId(Node.VIRTUAL_NODE_ID);
-//		node.setUri("http://www.bird.com");
-//		node.setUriName("birduriname");
-//		node.setLabel("b");
 		
 		node.setImages(new HashSet<NodeImage>(Arrays.asList(new NodeImage[] {
 			new NodeImage("E:\\1.jpg"),
 			new NodeImage("E:\\2.jpg")
+		})));
+		
+		node.setAttributes(new HashSet<NodeAttribute>(Arrays.asList(new NodeAttribute[] {
+			new NodeAttribute("k1", "v1"),	
+			new NodeAttribute("k2", "v2")	
+		})));
+		
+		if (node.getRetrievalDataSource() == null) 
+			node.setRetrievalDataSource(new RetrievalDataSource());
+		node.getRetrievalDataSource().setFeatures(new HashSet<NodeFeature>(Arrays.asList(new NodeFeature[] {
+			new NodeFeature("可以飞", "Can Fly", StringUtils.EMPTY),
+			new NodeFeature("可以跳", "Can Jump", StringUtils.EMPTY)
 		})));
 		
 //		node.addCustomerField(new CustomerField("k1", "v1")).addCustomerField(new CustomerField("k2", "v2"));
@@ -69,8 +80,29 @@ public class TestNodeCRUD {
 		for (NodeImage img : node.getImages()) {
 			sess.save(img);
 		}
+		for (NodeAttribute attr : node.getAttributes()) {
+			sess.save(attr);
+		}
+		sess.save(node.getRetrievalDataSource());
+		for (NodeFeature feature : node.getRetrievalDataSource().getFeatures()) {
+			sess.save(feature);
+			for (FeatureImage img : feature.getImages()) {
+				sess.save(img);
+			}
+		}
 		
-		sess.getTransaction().commit();
+		tx.commit();
+		
+		}
+		catch (Exception ex) {
+			if (tx != null)
+				tx.rollback();
+			throw ex;
+		}
+		finally {
+			if (sess != null)
+				sess.close();
+		}
 		
 	}
 

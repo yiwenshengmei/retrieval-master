@@ -15,7 +15,6 @@ public class NodeAttribute {
 	private String key;
 	private String value;
 	private String id;
-	private String nodeId;
 	private Node node;
 	
 	public static JSONArray parse(Map<String, String> fields) {
@@ -30,6 +29,8 @@ public class NodeAttribute {
 		}
 		return result;
 	}
+	
+	public NodeAttribute() { }
 	
 	public NodeAttribute(String key, String value) {
 		this.key = key;
@@ -75,14 +76,6 @@ public class NodeAttribute {
 		this.id = id;
 	}
 
-	public String getNodeId() {
-		return nodeId;
-	}
-
-	public void setNodeId(String nodeId) {
-		this.nodeId = nodeId;
-	}
-
 	public Node getNode() {
 		return node;
 	}
@@ -96,6 +89,8 @@ public class NodeAttribute {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((key == null) ? 0 : key.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
 
@@ -114,7 +109,18 @@ public class NodeAttribute {
 		}
 		else if (!id.equals(other.id))
 			return false;
+		if (key == null) {
+			if (other.key != null)
+				return false;
+		}
+		else if (!key.equals(other.key))
+			return false;
+		if (value == null) {
+			if (other.value != null)
+				return false;
+		}
+		else if (!value.equals(other.value))
+			return false;
 		return true;
 	}
-	
 }

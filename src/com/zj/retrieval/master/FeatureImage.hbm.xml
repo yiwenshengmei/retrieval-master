@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 	<class name="com.zj.retrieval.master.FeatureImage" table="T_FEATURE_IMAGE">
 		<id name="id" type="java.lang.String">
-			<column name="ID" />
+			<column name="`ID`" />
 			<generator class="uuid" />
 		</id>
-		<property name="path" column="PATH" type="java.lang.String" />
-		<many-to-one name="feature" column="FEATURE_ID" />
+		<property name="path" column="`PATH`" type="java.lang.String" />
+		<many-to-one name="feature" column="`FEATURE_ID`" />
 	</class>
 </hibernate-mapping>
