@@ -1,6 +1,7 @@
 package com.zj.retrieval.master;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -24,11 +25,11 @@ public class Node {
 	private int nodeType = NodeType.NODETYPE_CLASS;
 	private String detailTypeId = StringUtils.EMPTY;
 	private String contact = StringUtils.EMPTY;
-	private Set<NodeImage> images = new HashSet<NodeImage>();
-	private Set<NodeAttribute> attributes = new HashSet<NodeAttribute>();
+	private List<NodeImage> images;
+	private List<NodeAttribute> attributes;
 
 	public Node() {
-		retrievalDataSource = new RetrievalDataSource();
+		retrievalDataSource = new RetrievalDataSource(this);
 	}
 
 	public String getUri() {
@@ -119,11 +120,11 @@ public class Node {
 		this.nodeType = nodeType;
 	}
 
-	public Set<NodeImage> getImages() {
+	public List<NodeImage> getImages() {
 		return images;
 	}
 
-	public void setImages(Set<NodeImage> image) {
+	public void setImages(List<NodeImage> image) {
 		this.images = image;
 	}
 
@@ -276,18 +277,12 @@ public class Node {
 		this.retrievalDataSource.getAttributes().add(attr);
 	}
 
-	public Node addImage(NodeImage img) {
-		if (this.images == null)
-			this.images = new HashSet<NodeImage>();
-		images.add(img);
-		return this;
-	}
 
-	public Set<NodeAttribute> getAttributes() {
+	public List<NodeAttribute> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(Set<NodeAttribute> attributes) {
+	public void setAttributes(List<NodeAttribute> attributes) {
 		this.attributes = attributes;
 	}
 }

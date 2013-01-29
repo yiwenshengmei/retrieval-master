@@ -15,9 +15,12 @@ public class RetrievalDataSource {
 	private String id;
 	private String headerId;
 	private Node node;
-	private Set<NodeFeature> features;
+	private List<NodeFeature> features;
 	
-	public RetrievalDataSource() {
+	public RetrievalDataSource() { }
+	
+	public RetrievalDataSource(Node node) {
+		this.node = node;
 		attributes = new HashSet<NodeFeature>();
 		childNodes = new ArrayList<String>();
 		matrix = new Matrix();
@@ -67,11 +70,11 @@ public class RetrievalDataSource {
 		this.node = node;
 	}
 
-	public Set<NodeFeature> getFeatures() {
+	public List<NodeFeature> getFeatures() {
 		return features;
 	}
 
-	public void setFeatures(Set<NodeFeature> features) {
+	public void setFeatures(List<NodeFeature> features) {
 		this.features = features;
 	}
 }
