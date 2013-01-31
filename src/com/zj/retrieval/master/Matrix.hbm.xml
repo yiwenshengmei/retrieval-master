@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.zj.retrieval.master.Matrix" table="T_MATRIX">
+		<id name="id" type="java.lang.String">
+			<column name="`ID`" />
+			<generator class="uuid" />
+		</id>
+		<many-to-one name="retrievalDataSource" column="`RDS_ID`" unique="true" />
+		<bag name="rows" cascade="save-update">
+			<key column="`MATRIX_ID`" />
+			<one-to-many class="com.zj.retrieval.master.MatrixRow" />
+		</bag>
+	</class>
+</hibernate-mapping>

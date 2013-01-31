@@ -13,7 +13,12 @@ public class DALService {
 	private final static Logger logger = LoggerFactory.getLogger(DALService.class);
 	
 	static {
-		sessionFactory = new Configuration().configure().buildSessionFactory();
+		try {
+			sessionFactory = new Configuration().configure().buildSessionFactory();
+		}
+		catch (Throwable ex) {
+			logger.error("Hibernate初始化时发生错误", ex);
+		}
 	}
 	
 	private DALService() { }
@@ -31,6 +36,7 @@ public class DALService {
 			tx = null;
 		}
 		catch (Throwable ex) {
+			logger.error("操作数据库时发生错误", ex);
 			if (null != tx) {
 				try {
 					tx.rollback();

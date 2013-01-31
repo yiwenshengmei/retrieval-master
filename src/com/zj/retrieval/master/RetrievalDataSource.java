@@ -1,44 +1,44 @@
 package com.zj.retrieval.master;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class RetrievalDataSource {
-	// key代表特征举证中的列号，value代表该列号对应的特征对象
-	private Set<NodeFeature> attributes;
-	// key代表特征矩阵中的行号，value代表子结点在数据库中的id
-	private List<String> childNodes;
+	private List<NodeFeature> attributes;
+	private List<Node> childNodes;
 	private Matrix matrix;
 	private String id;
-	private String headerId;
 	private Node node;
 	private List<NodeFeature> features;
 	
-	public RetrievalDataSource() { }
+	public RetrievalDataSource() { 
+		attributes = new ArrayList<NodeFeature>();
+		childNodes = new ArrayList<Node>();
+		features = new ArrayList<NodeFeature>();
+	}
 	
 	public RetrievalDataSource(Node node) {
+		this();
 		this.node = node;
-		attributes = new HashSet<NodeFeature>();
-		childNodes = new ArrayList<String>();
-		matrix = new Matrix();
-		matrix.setHeaderId(this.id);
 	}
 	
-	public Set<NodeFeature> getAttributes() {
+	public List<NodeFeature> getAttributes() {
 		return attributes;
 	}
-	public void setAttributes(Set<NodeFeature> attributes) {
+	
+	public void setAttributes(List<NodeFeature> attributes) {
 		this.attributes = attributes;
 	}
-	public List<String> getChildNodes() {
+	
+	public List<Node> getChildNodes() {
 		return childNodes;
 	}
-	public void setChildNodes(List<String> childNodes) {
+	
+	public void setChildNodes(List<Node> childNodes) {
 		this.childNodes = childNodes;
 	}
+	
 	public Matrix getMatrix() {
 		return matrix;
 	}
@@ -52,14 +52,6 @@ public class RetrievalDataSource {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getHeaderId() {
-		return headerId;
-	}
-
-	public void setHeaderId(String headerId) {
-		this.headerId = headerId;
 	}
 
 	public Node getNode() {

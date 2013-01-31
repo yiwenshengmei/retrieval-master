@@ -1,140 +1,75 @@
 package com.zj.retrieval.master;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.ArrayUtils;
 
 public class Matrix {
-	private int[][] array;
-	private String headerId;
 	private String id;
+	private List<MatrixRow> rows;
+	private RetrievalDataSource retrievalDataSource;
 
-	public Matrix(int[][] array) {
-		this.array = array;
-	}
+	public Matrix() { }
 	
-	public Matrix() {
-		array = new int[0][0];
-	}
-	
-	public static Matrix create(int rowSize, int colSize) {
-		int[][] array = new int[rowSize][colSize];
-		return new Matrix(array);
-	}
-	
-	public boolean isEmpty() {
-		return array.length == 0;
-	}
-
-	public int[][] getArray() {
-		return array;
-	}
-
-	public void setArray(int[][] data) {
-		this.array = data;
-	}
-
-	public void addRow(int[] newRow, int start, int len) {
+	public void addRow(MatrixRow row, int index) {
+		int newRowColSize = row.getItems().size();
+		int oldRowColSize = getColSize();
 		
-		if (newRow.length == 0)
+		if (newRowColSize == 0) 
 			return;
+		if (newRowColSize < oldRowColSize) 
+			throw new IllegalArgumentException("新MatrixRow的列数不能小于Matrix的列数");
 		
-		if (newRow.length < getColSize())
-			throw new RuntimeException("新行元素个数小于矩阵中行的列数@Matrix.addRow()");
+		rows.add(row);
 		
-		int rowSize = getRowSize();
-		int colSize = getColSize();
-		int newColSize = newRow.length;
-		
-		int[][] newMatrix = new int[rowSize + 1][newColSize];
-		
-		for (int row = 0; row < rowSize; row++) {
-			for (int col = 0; col < newColSize; col++) {
-				// 如果新行的元素少于原行的元素，则在新行中补零
-				if (col < colSize) {
-					// 说明在指针指在原始数据位置上
-					newMatrix[row][col] = array[row][col];
-				} else {
-					// 说明指针指在原先没有数据的位置上，这些位置应该补雿
-					newMatrix[row][col] = 0;
-				}
-			}
+		int diff = newRowColSize - oldRowColSize;
+		// 如果新增的行的列数比现有的列数多，则需要把现有的列数扩充（填充0）
+		if (diff > 0) {
+			List<MatrixItem> newCols = new ArrayList<MatrixItem>();
+			for (int i = 0; i < diff; i++)
+				newCols.add(new MatrixItem(0));
+			for (MatrixRow oldRow : rows) 
+				oldRow.getItems().addAll(newCols);
 		}
-
-		System.arraycopy(newRow, 0, newMatrix[rowSize], 0, newColSize);
-		array = newMatrix;
 	}
-
-	public void addCol(int[] newCol, int start, int len) {
-		if (newCol.length != getRowSize() & getRowSize() != 0) {
-			throw new RuntimeException("The length of new col wrong.");
-		}
-		
-		// 如果当前矩阵是一个空的矩阵，则特殊处琿
-		if (getRowSize() == 0) {
-			int[][] _data = new int[len][1];
-			for(int i = 0; i < len; i++) {
-				_data[i][0] = newCol[i];
-			}
-			this.array = _data;
-			return;
-		}
-		
-		int[][] _data = new int[getRowSize()][getColSize() + 1];
-		for (int i = 0; i < getRowSize(); i++) {
-			int[] row = getRow(i);
-			System.arraycopy(row, 0, _data[i], 0, row.length);
-			_data[i][row.length] = newCol[i];
-		}
-		this.array = _data;
+	
+	public void setItem(int row, int col, MatrixItem item) {
+		this.rows.get(row).getItems().set(col, item);
 	}
-
-	public void setValue(int row, int col, int value) {
-		this.array[row][col] = value;
+	
+	public List<Integer> getCol(int col) {
+		List<Integer> ret = new ArrayList<Integer>();
+		for (MatrixRow row : rows) 
+			ret.add(row.getItems().get(col).getValue());
+		return ret;
 	}
-
-	public int[] getRow(int index) {
-		return this.array[index];
-	}
-
-	public int[] getCol(int index) {
-		int[] result = new int[getRowSize()];
-		for (int row = 0; row < getRowSize(); row++) {
-			result[row] = array[row][index];
-		}
-		return result;
-	}
-
-	public int getValue(int row, int col) {
-		return array[row][col];
+	
+	public MatrixItem getItem(int row, int col) {
+		return this.rows.get(row).getItems().get(col);
 	}
 
 	public int getRowSize() {
-		return array.length;
+		return this.rows.size();
 	}
 
 	public int getColSize() {
-		return array.length == 0 ? 0 : array[0].length;
+		return rows.size() == 0 ? 0 : rows.get(0).getItems().size();
 	}
 	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Matrix: \n");
-		for (int[] row : array) {
-			sb.append(Arrays.toString(row));
+		for (MatrixRow row : rows) {
+			sb.append(ArrayUtils.toString(row.getItems()));
 			sb.append("\n");
 		}
 		return sb.toString();
 	}
 	
 	public void removeRow(int row) {
-		Matrix m = new Matrix();
-		for (int i = 0; i < getRowSize(); i++) {
-			if (i == row)
-				continue;
-			else 
-				m.addRow(array[i], 0, getColSize());
-		}
-		array = m.array;
+		this.rows.remove(row);
 	}
 
 	public String getId() {
@@ -145,12 +80,19 @@ public class Matrix {
 		this.id = id;
 	}
 
-	public String getHeaderId() {
-		return headerId;
+	public List<MatrixRow> getRows() {
+		return rows;
 	}
 
-	public void setHeaderId(String headerId) {
-		this.headerId = headerId;
+	public void setRows(List<MatrixRow> rows) {
+		this.rows = rows;
 	}
 
+	public RetrievalDataSource getRetrievalDataSource() {
+		return retrievalDataSource;
+	}
+
+	public void setRetrievalDataSource(RetrievalDataSource retrievalDataSource) {
+		this.retrievalDataSource = retrievalDataSource;
+	}
 }

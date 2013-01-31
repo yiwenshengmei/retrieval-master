@@ -20,5 +20,8 @@
 		<mapping resource="com/zj/retrieval/master/NodeFeature.hbm.xml" />
 		<mapping resource="com/zj/retrieval/master/RetrievalDataSource.hbm.xml" />
 		<mapping resource="com/zj/retrieval/master/FeatureImage.hbm.xml" />
+		<mapping resource="com/zj/retrieval/master/Matrix.hbm.xml" />
+		<mapping resource="com/zj/retrieval/master/MatrixRow.hbm.xml" />
+		<mapping resource="com/zj/retrieval/master/MatrixItem.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>
