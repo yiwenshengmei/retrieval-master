@@ -8,13 +8,9 @@
 			<generator class="uuid" />
 		</id>
 		<many-to-one name="node" column="`NODE_ID`" unique="true" />
-		<bag name="features" cascade="save-update">
+		<bag name="features" cascade="save-update" inverse="true">
 			<key column="`RDS_ID`" />
 			<one-to-many class="com.zj.retrieval.master.NodeFeature" />
-		</bag>
-		<bag name="childNodes">
-			<key column="`PARENT_ID`" not-null="false"/>
-			<one-to-many class="com.zj.retrieval.master.Node" />
 		</bag>
 		<one-to-one name="matrix" property-ref="retrievalDataSource" cascade="save-update" />
 	</class>

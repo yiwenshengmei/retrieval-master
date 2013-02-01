@@ -11,7 +11,7 @@
 		<property name="desc" column="`DESC`" type="java.lang.String" />
 		<property name="englishName" column="`NAME_EN`" type="java.lang.String" />
 		<many-to-one name="retrievalDataSource" column="`RDS_ID`" />
-		<bag name="images" cascade="save-update">
+		<bag name="images" cascade="save-update" inverse="true">
 			<key column="`FEATURE_ID`" />
 			<one-to-many class="com.zj.retrieval.master.FeatureImage" />
 		</bag>

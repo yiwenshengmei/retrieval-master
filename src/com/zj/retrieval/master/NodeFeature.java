@@ -26,6 +26,11 @@ public class NodeFeature {
 		this.englishName = enName;
 	}
 	
+	public NodeFeature withRetrievalDataSource(RetrievalDataSource rds) {
+		this.retrievalDataSource = rds;
+		return this;
+	}
+	
 	public NodeFeature withImages(List<FeatureImage> images) {
 		this.images = images;
 		return this;

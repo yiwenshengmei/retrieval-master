@@ -8,7 +8,7 @@
 			<generator class="uuid" />
 		</id>
 		<many-to-one name="retrievalDataSource" column="`RDS_ID`" unique="true" />
-		<bag name="rows" cascade="save-update">
+		<bag name="rows" cascade="save-update" inverse="true">
 			<key column="`MATRIX_ID`" />
 			<one-to-many class="com.zj.retrieval.master.MatrixRow" />
 		</bag>

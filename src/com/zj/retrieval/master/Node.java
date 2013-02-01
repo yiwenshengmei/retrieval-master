@@ -12,21 +12,21 @@ public class Node {
 
 	public final static String VIRTUAL_NODE_ID = "VIRTUAL_NODE";
 
-	private String uri = StringUtils.EMPTY;
-	private String id = StringUtils.EMPTY;
-	private String name = StringUtils.EMPTY;
-	private String uriName = StringUtils.EMPTY;
-	private String englishName = StringUtils.EMPTY;
-	private String desc = StringUtils.EMPTY;
-	private String parentId = StringUtils.EMPTY;
-	private String owl = StringUtils.EMPTY;
+	private String uri;
+	private String id;
+	private String name;
+	private String uriName;
+	private String englishName;
+	private String desc;
+	private String parentId;
+	private String owl;
 	private RetrievalDataSource retrievalDataSource;
-	private String label = StringUtils.EMPTY;
-	private int nodeType = NodeType.NODETYPE_CLASS;
-	private String detailTypeId = StringUtils.EMPTY;
-	private String contact = StringUtils.EMPTY;
+	private String label;
+	private String detailTypeId;
+	private String contact;
 	private List<NodeImage> images;
 	private List<NodeAttribute> attributes;
+	private List<Node> childNodes;
 
 	public Node() {
 		retrievalDataSource = new RetrievalDataSource(this);
@@ -110,14 +110,6 @@ public class Node {
 
 	public void setLabel(String label) {
 		this.label = label;
-	}
-
-	public int getNodeType() {
-		return nodeType;
-	}
-
-	public void setNodeType(int nodeType) {
-		this.nodeType = nodeType;
 	}
 
 	public List<NodeImage> getImages() {
@@ -284,5 +276,13 @@ public class Node {
 
 	public void setAttributes(List<NodeAttribute> attributes) {
 		this.attributes = attributes;
+	}
+
+	public List<Node> getChildNodes() {
+		return childNodes;
+	}
+
+	public void setChildNodes(List<Node> childNodes) {
+		this.childNodes = childNodes;
 	}
 }

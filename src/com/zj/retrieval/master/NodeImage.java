@@ -4,7 +4,6 @@ package com.zj.retrieval.master;
 public class NodeImage {
 	private String id;
 	private String path;
-	private String nodeId;
 	private Node node;
 	
 	public Node getNode() {
@@ -16,7 +15,12 @@ public class NodeImage {
 	}
 
 	public NodeImage(String path) {
+		this(path, null);
+	}
+	
+	public NodeImage(String path, Node node) {
 		this.path = path;
+		this.node = node;
 	}
 	
 	public NodeImage() {}
@@ -35,13 +39,5 @@ public class NodeImage {
 	
 	public void setPath(String path) {
 		this.path = path;
-	}
-
-	public String getNodeId() {
-		return nodeId;
-	}
-
-	public void setNodeId(String nodeId) {
-		this.nodeId = nodeId;
 	}
 }

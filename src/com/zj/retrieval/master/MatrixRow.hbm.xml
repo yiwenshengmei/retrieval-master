@@ -8,7 +8,7 @@
 			<generator class="uuid" />
 		</id>
 		<many-to-one name="matrix" column="`MATRIX_ID`" unique="true" />
-		<list name="items" cascade="save-update">
+		<list name="items" cascade="save-update" inverse="true">
 			<key column="`ROW_ID`" />
 			<list-index column="`ROW_INDEX`" />
 			<one-to-many class="com.zj.retrieval.master.MatrixItem" />

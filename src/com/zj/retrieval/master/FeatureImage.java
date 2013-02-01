@@ -7,8 +7,9 @@ public class FeatureImage {
 	private String nodeId;
 	private NodeFeature feature;
 	
-	public FeatureImage(String path) {
+	public FeatureImage(String path, NodeFeature feature) {
 		this.path = path;
+		this.feature = feature;
 	}
 	
 	public FeatureImage() {}

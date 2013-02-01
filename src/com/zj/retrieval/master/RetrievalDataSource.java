@@ -6,7 +6,6 @@ import java.util.List;
 
 public class RetrievalDataSource {
 	private List<NodeFeature> attributes;
-	private List<Node> childNodes;
 	private Matrix matrix;
 	private String id;
 	private Node node;
@@ -14,7 +13,6 @@ public class RetrievalDataSource {
 	
 	public RetrievalDataSource() { 
 		attributes = new ArrayList<NodeFeature>();
-		childNodes = new ArrayList<Node>();
 		features = new ArrayList<NodeFeature>();
 	}
 	
@@ -31,17 +29,10 @@ public class RetrievalDataSource {
 		this.attributes = attributes;
 	}
 	
-	public List<Node> getChildNodes() {
-		return childNodes;
-	}
-	
-	public void setChildNodes(List<Node> childNodes) {
-		this.childNodes = childNodes;
-	}
-	
 	public Matrix getMatrix() {
 		return matrix;
 	}
+	
 	public void setMatrix(Matrix matrix) {
 		this.matrix = matrix;
 	}

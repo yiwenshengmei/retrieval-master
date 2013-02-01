@@ -14,14 +14,20 @@
 		<property name="parentId" column="`PARENT_ID`" type="java.lang.String" />
 		<property name="uri" column="`URI`" type="java.lang.String" />
 		<property name="uriName" column="`URI_NAME`" type="java.lang.String" />
-		<bag name="images" cascade="save-update">
+		<bag name="images" cascade="save-update" inverse="true">
 			<key column="`NODE_ID`" />
 			<one-to-many class="com.zj.retrieval.master.NodeImage" />
 		</bag>
-		<bag name="attributes" cascade="save-update">
+		<bag name="attributes" cascade="save-update" inverse="true">
 			<key column="`NODE_ID`" />
 			<one-to-many class="com.zj.retrieval.master.NodeAttribute" />
 		</bag>
-		<one-to-one name="retrievalDataSource" property-ref="node" cascade="save-update" />
+		<list name="childNodes" inverse="true">
+			<key column="`PARENT_ID`" not-null="false" />
+			<list-index column="`CHILD_INDEX`" />
+			<one-to-many class="com.zj.retrieval.master.Node" />
+		</list>
+		<one-to-one name="retrievalDataSource" property-ref="node"
+			cascade="save-update" />
 	</class>
 </hibernate-mapping>
