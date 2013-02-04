@@ -30,7 +30,7 @@ public class DALService {
 		try {
 			sess = sessionFactory.openSession();
 			tx = sess.beginTransaction();
-			ret = action.doAction(sess);
+			ret = action.doAction(sess, tx);
 			if (null != tx)
 				tx.commit();
 			tx = null;

@@ -1,5 +1,6 @@
 package com.zj.retrieval.master;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MatrixRow {
@@ -7,8 +8,16 @@ public class MatrixRow {
 	private Matrix matrix;
 	private String id;
 	
-	private MatrixRow() { }
-
+	public MatrixRow() { }
+	
+	public MatrixRow(List<Integer> values, Matrix matrix) {
+		items = new ArrayList<MatrixItem>();
+		for (Integer v : values) {
+			items.add(new MatrixItem(v, this));
+		}
+		this.matrix = matrix;
+	}
+	
 	public List<MatrixItem> getItems() {
 		return items;
 	}
@@ -16,7 +25,7 @@ public class MatrixRow {
 	public void setItems(List<MatrixItem> items) {
 		this.items = items;
 	}
-
+	
 	public Matrix getMatrix() {
 		return matrix;
 	}

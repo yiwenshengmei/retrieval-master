@@ -11,9 +11,9 @@
 		<property name="englishName" column="`NAME_EN`" type="java.lang.String" />
 		<property name="desc" column="`DESC`" type="java.lang.String" />
 		<property name="label" column="`LABEL`" type="java.lang.String" />
-		<property name="parentId" column="`PARENT_ID`" type="java.lang.String" />
 		<property name="uri" column="`URI`" type="java.lang.String" />
 		<property name="uriName" column="`URI_NAME`" type="java.lang.String" />
+		<many-to-one name="parentNode" column="`PARENT_ID`" />
 		<bag name="images" cascade="save-update" inverse="true">
 			<key column="`NODE_ID`" />
 			<one-to-many class="com.zj.retrieval.master.NodeImage" />
@@ -22,7 +22,7 @@
 			<key column="`NODE_ID`" />
 			<one-to-many class="com.zj.retrieval.master.NodeAttribute" />
 		</bag>
-		<list name="childNodes" inverse="true">
+		<list name="childNodes" cascade="save-update">
 			<key column="`PARENT_ID`" not-null="false" />
 			<list-index column="`CHILD_INDEX`" />
 			<one-to-many class="com.zj.retrieval.master.Node" />

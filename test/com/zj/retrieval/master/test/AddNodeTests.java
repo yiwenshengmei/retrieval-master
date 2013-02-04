@@ -5,27 +5,38 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.hibernate.Transaction;
 import com.zj.retrieval.master.DALService;
 import com.zj.retrieval.master.FeatureImage;
 import com.zj.retrieval.master.IDALAction;
+import com.zj.retrieval.master.Matrix;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeAttribute;
 import com.zj.retrieval.master.NodeFeature;
 import com.zj.retrieval.master.NodeImage;
 import com.zj.retrieval.master.RetrievalDataSource;
 
-public class NodeCRUDTests {
+public class AddNodeTests {
 	
-	private final static Logger logger = LoggerFactory.getLogger(NodeCRUDTests.class);
+	private final static Logger logger = LoggerFactory.getLogger(AddNodeTests.class);
 	
-	public void addRootNode(Session sess) {
+	public static Node addRootNode() throws Exception {
+		Node ret = (Node) DALService.doAction(new IDALAction() {
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				addRootNodeWithSession(sess);
+				return null;
+			}
+		});
+		
+		return ret;
+	}
+	
+	public static Node addRootNodeWithSession(Session sess) {
 		Node node = new Node();
 		node.setName("鸟");
 		
@@ -39,8 +50,10 @@ public class NodeCRUDTests {
 			new NodeAttribute("k2", "v2", node)	
 		));
 		
-		NodeFeature feature1 = new NodeFeature("可以飞", "Can Fly", StringUtils.EMPTY).withRetrievalDataSource(node.getRetrievalDataSource());
-		NodeFeature feature2 = new NodeFeature("可以跳", "Can Jump", StringUtils.EMPTY).withRetrievalDataSource(node.getRetrievalDataSource());
+		NodeFeature feature1 = new NodeFeature("可以飞", "Can Fly", StringUtils.EMPTY)
+			.withRetrievalDataSource(node.getRetrievalDataSource());
+		NodeFeature feature2 = new NodeFeature("可以跳", "Can Jump", StringUtils.EMPTY)
+			.withRetrievalDataSource(node.getRetrievalDataSource());
 		feature1.setImages(Arrays.asList(
 				new FeatureImage("E:\\可以飞featureImage1.jpg", feature1), 
 				new FeatureImage("C:\\可以飞featureImage2.jpg", feature1)));
@@ -49,30 +62,40 @@ public class NodeCRUDTests {
 				new FeatureImage("C:\\可以跳featureImage2.jpg", feature2)));
 		node.getRetrievalDataSource().setFeatures(Arrays.asList(feature1, feature2));
 		
+		Matrix mtx = new Matrix(Arrays.asList(
+			Arrays.asList(1, 2, 0),
+			Arrays.asList(3, 3, 2)
+		));
+		mtx.setRetrievalDataSource(node.getRetrievalDataSource());
+		node.getRetrievalDataSource().setMatrix(mtx);
+		
+		Node node2 = new Node();
+		node2.setName("小鸟");
+		node2.setParentNode(node);
+		node.setChildNodes(Arrays.asList(node2));
+		
 		sess.save(node);
+		
+		return node;
+	}
+	
+	public void checkAddRootNode() throws Exception {
+		DALService.doAction(new IDALAction() {
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				checkNode(sess);
+				return null;
+			}
+		});
 	}
 	
 	@Test
 	public void testAddRootNode() throws Exception {
-		DALService.doAction(new IDALAction() {
-			@Override
-			public Object doAction(Session sess) throws Exception {
-				addRootNode(sess);
-				return null;
-			}
-		});
-		
-		DALService.doAction(new IDALAction() {
-			
-			@Override
-			public Object doAction(Session sess) throws Exception {
-				getNode(sess);
-				return null;
-			}
-		});
+		addRootNode();
+		checkAddRootNode();
 	}
 	
-	private void getNode(Session sess) {
+	private void checkNode(Session sess) {
 		List nodes = sess.createQuery("from Node nd where nd.name = '鸟'").list();
 		Assert.assertEquals("查询数量不为1", 1, nodes.size());
 		Node node = (Node) nodes.get(0);
@@ -101,7 +124,8 @@ public class NodeCRUDTests {
 			Assert.assertTrue("feature.retrievalDataSource != rds !", ft.getRetrievalDataSource() == rds);
 			Assert.assertEquals("feature.images的数量不对", 2, ft.getImages().size());
 			for (FeatureImage img : ft.getImages()) {
-				Assert.assertTrue("特征图片路径不正确", img.getPath().equals("E:\\可以飞featureImage1.jpg")
+				Assert.assertTrue("特征图片路径不正确", 
+						   img.getPath().equals("E:\\可以飞featureImage1.jpg")
 						|| img.getPath().equals("C:\\可以飞featureImage2.jpg")
 						|| img.getPath().equals("E:\\可以跳featureImage1.jpg")
 						|| img.getPath().equals("C:\\可以跳featureImage2.jpg"));
@@ -109,6 +133,16 @@ public class NodeCRUDTests {
 				Assert.assertTrue("featureImage.feature != feature !", img.getFeature() == ft);
 			}
 		}
+		
+		Assert.assertEquals("子节点数量不正确", 1, node.getChildNodes().size());
+		Node child1 = node.getChildNodes().get(0);
+		Assert.assertNotNull("子节点为null！", child1);
+		Assert.assertEquals("小鸟", child1.getName());
+		
+		Matrix mtx = rds.getMatrix();
+		Assert.assertNotNull("Matrix为空！", mtx);
+		logger.debug(mtx.toString());
+		Assert.assertEquals("Matrix的值不正确", "\n[1, 2, 0]\n[3, 3, 2]", mtx.toString());
 	}
 
 	@Test
@@ -116,8 +150,8 @@ public class NodeCRUDTests {
 		DALService.doAction(new IDALAction() {
 			
 			@Override
-			public Object doAction(Session sess) throws Exception {
-				getNode(sess);
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				checkNode(sess);
 				return null;
 			}
 		});

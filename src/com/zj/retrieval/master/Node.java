@@ -18,7 +18,6 @@ public class Node {
 	private String uriName;
 	private String englishName;
 	private String desc;
-	private String parentId;
 	private String owl;
 	private RetrievalDataSource retrievalDataSource;
 	private String label;
@@ -27,6 +26,7 @@ public class Node {
 	private List<NodeImage> images;
 	private List<NodeAttribute> attributes;
 	private List<Node> childNodes;
+	private Node parentNode;
 
 	public Node() {
 		retrievalDataSource = new RetrievalDataSource(this);
@@ -78,14 +78,6 @@ public class Node {
 
 	public void setDesc(String desc) {
 		this.desc = desc;
-	}
-
-	public String getParentId() {
-		return parentId;
-	}
-
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
 	}
 
 	public String getOwl() {
@@ -284,5 +276,13 @@ public class Node {
 
 	public void setChildNodes(List<Node> childNodes) {
 		this.childNodes = childNodes;
+	}
+
+	public Node getParentNode() {
+		return parentNode;
+	}
+
+	public void setParentNode(Node parentNode) {
+		this.parentNode = parentNode;
 	}
 }

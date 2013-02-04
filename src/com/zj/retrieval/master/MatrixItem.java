@@ -7,9 +7,14 @@ public class MatrixItem {
 	
 	public MatrixItem() { }
 	
-	public MatrixItem(Integer item) {
+	public MatrixItem(Integer value, MatrixRow row) {
 		this();
-		this.value = item;
+		this.value = value;
+		this.row = row;
+	}
+	
+	public MatrixItem(Integer value) {
+		this(value, null);
 	}
 
 	public MatrixRow getRow() {
