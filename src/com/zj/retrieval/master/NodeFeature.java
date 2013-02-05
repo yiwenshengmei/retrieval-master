@@ -13,7 +13,6 @@ public class NodeFeature {
 	private String name = StringUtils.EMPTY;
 	private String englishName = StringUtils.EMPTY;
 	private List<FeatureImage> images;
-	private List<NodeAttribute> attributes;
 	private RetrievalDataSource retrievalDataSource;
 	private String id;
 	private int index = -1;
@@ -86,14 +85,6 @@ public class NodeFeature {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public List<NodeAttribute> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(List<NodeAttribute> attributes) {
-		this.attributes = attributes;
 	}
 
 	public RetrievalDataSource getRetrievalDataSource() {

@@ -5,28 +5,18 @@ import java.util.List;
 
 
 public class RetrievalDataSource {
-	private List<NodeFeature> attributes;
 	private Matrix matrix;
 	private String id;
 	private Node node;
 	private List<NodeFeature> features;
 	
 	public RetrievalDataSource() { 
-		attributes = new ArrayList<NodeFeature>();
 		features = new ArrayList<NodeFeature>();
 	}
 	
 	public RetrievalDataSource(Node node) {
 		this();
 		this.node = node;
-	}
-	
-	public List<NodeFeature> getAttributes() {
-		return attributes;
-	}
-	
-	public void setAttributes(List<NodeFeature> attributes) {
-		this.attributes = attributes;
 	}
 	
 	public Matrix getMatrix() {

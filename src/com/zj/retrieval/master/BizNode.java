@@ -19,7 +19,7 @@ public class BizNode {
 		return Configuration.getNodeDao().queryById(id);
 	}
 	
-	public static String getOWL(Node node) throws Exception {
+	public static String createOwl(Node node) throws Exception {
 
 		XMLBuilder xml = XMLBuilder.create("rdf:RDF");
 		
@@ -28,23 +28,16 @@ public class BizNode {
 		xml.a("xmlns:rdfs", "http://www.w3.org/2000/01/rdf-schema#");
 		xml.a("xmlns:xsd", "http://www.w3.org/2001/XMLSchema#");
 		
-		// 创建class类型节点的owl格式
-		if(node.getNodeType() == NodeType.NODETYPE_CLASS) {
-			createClassTypeXML(node, xml);
-		}
-		
-		// 创建individual类型节点的owl格式
-		if(node.getNodeType() == NodeType.NODETYPE_INDIVIDUAL) {
-			createIndividualTypeXML(node, xml);
-		}
-		
+		createClassTypeXML(node, xml);
+
 		return xml.asString();
 	}
 
 	private static void createClassTypeXML(Node node, XMLBuilder xml) throws Exception {
 
 		// Create <owl:Class>
-		String parentURI = node.getParentId() == Node.VIRTUAL_NODE_ID ? "" : getParent(node.getParentId()).getUri();
+		String parentURI = (node.getParentNode().getId() == Node.VIRTUAL_NODE_ID ? 
+				StringUtils.EMPTY :	node.getParentNode().getUri());
 		XMLBuilder elemClass = xml.e("owl:Class").a("rdf:ID", node.getUri() + "#" + node.getEnglishName());
 		elemClass.e("rdfs:subClassOf").a("rdf:resource", parentURI);
 		elemClass.e("rdfs:label").t(node.getLabel());
@@ -54,28 +47,34 @@ public class BizNode {
 		
 		// Create <images>
 		XMLBuilder eImages = elemClass.e("images");
-		for (String image_path : node.getImages()) {
-			eImages.e("item").t(image_path);
-		}
-		
-		// Create <userfields>
-		XMLBuilder elemUserfields = elemClass.e("userfields");
-		Map<String, String> userfields = node.getUserfields();
-		for (String key : userfields.keySet()) {
-			elemUserfields.e("field").a("key", key).t(userfields.get(key));
+		for (NodeImage nodeImage : node.getImages()) {
+			eImages.e("item").t(nodeImage.getPath());
 		}
 		
 		// Create <attributes>
-		List<NodeFeature> attrs = node.getRetrievalDataSource().getAttributes();
-		XMLBuilder elemAttributes = elemClass.e("attributes");
-		for(int index = 0; index < attrs.size(); index ++) {
-			XMLBuilder elemAttribute = elemAttributes.e("attribute");
-			elemAttribute.a("name", attrs.get(index).getName())
-				         .a("enName", attrs.get(index).getEnglishName())
+		XMLBuilder elemUserfields = elemClass.e("attributes");
+		for (NodeAttribute attr : node.getAttributes()) {
+			elemUserfields.e("attribute").a("key", attr.getKey()).t(attr.getValue());
+			
+		}
+
+		// Create <features>
+		List<NodeFeature> features = node.getRetrievalDataSource().getFeatures();
+		XMLBuilder elemAttributes = elemClass.e("features");
+		for(int index = 0; index < features.size(); index ++) {
+			
+			XMLBuilder elemAttribute = elemAttributes.e("feature");
+			elemAttribute.a("name", features.get(index).getName())
+				         .a("english_name", features.get(index).getEnglishName())
 				         .a("index", String.valueOf(index))
-					         .e("desc").t(attrs.get(index).getDesc()).up()
-					         .e("image").t(attrs.get(index).getImage());
-			Map<String, String> attrUserfields = attrs.get(index).getUserFields();
+					     	.e("desc").t(features.get(index).getDesc()).up();
+			
+			XMLBuilder featureImages = elemAttribute.e("images");
+			for (FeatureImage featureImage : features.get(index).getImages()) {
+				featureImages.e("image").a("path", featureImage.getPath());
+			}
+			
+			Map<String, String> attrUserfields = features.get(index).getUserFields();
 			XMLBuilder elemAttrUserfields = elemAttribute.element("userfields");
 			for (String key : attrUserfields.keySet()) {
 				elemAttrUserfields.e("field").a("key", key).t(attrUserfields.get(key));
