@@ -32,14 +32,12 @@ public class DeleteNodeFeaturesTests {
 				logger.debug("开始删除");
 				for (NodeFeature feature : features) {
 					for (FeatureImage img : feature.getImages()) {
-						img.setFeature(null);
-						sess.delete(img);
+						sess.delete(img); // 如果没有这句代码，则不会产生delete语句
 					}
-					feature.getImages().clear();
-					features.remove(feature);
-					feature.setRetrievalDataSource(null);
+					feature.getImages().clear(); // 这句可以省略
 					sess.delete(feature);
 				}
+				features.clear(); // 这句不能省略
 				return null;
 			}
 		});
