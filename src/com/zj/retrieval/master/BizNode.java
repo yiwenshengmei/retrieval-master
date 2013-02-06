@@ -1,23 +1,14 @@
 package com.zj.retrieval.master;
 
 import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import com.jamesmurty.utils.XMLBuilder;
 
 public class BizNode {
 	
 	private static final Logger logger = LoggerFactory.getLogger(BizNode.class);
-	
-	private static Node getParent(String id) throws Exception {
-		return Configuration.getNodeDao().queryById(id);
-	}
 	
 	public static String createOwl(Node node) throws Exception {
 
@@ -73,51 +64,44 @@ public class BizNode {
 			for (FeatureImage featureImage : features.get(index).getImages()) {
 				featureImages.e("image").a("path", featureImage.getPath());
 			}
-			
-			Map<String, String> attrUserfields = features.get(index).getUserFields();
-			XMLBuilder elemAttrUserfields = elemAttribute.element("userfields");
-			for (String key : attrUserfields.keySet()) {
-				elemAttrUserfields.e("field").a("key", key).t(attrUserfields.get(key));
-			}
 		}
 
 		// Create <matrix>
 		XMLBuilder elemMatrix = elemClass.e("matrix");
 		Matrix matrix = node.getRetrievalDataSource().getMatrix();
 		for(int rowindex = 0; rowindex < matrix.getRowSize(); rowindex++) {
-			int[] row = matrix.getRow(rowindex);
-			elemMatrix.e("row").a("index", String.valueOf(rowindex)).t(StringUtils.join(ArrayUtils.toObject(row)));
+			elemMatrix.e("row").a("index", String.valueOf(rowindex)).t(StringUtils.join(matrix.getRow(rowindex).getValueList(), " "));
 		}
 		
 		// Create <childNodes>
-		XMLBuilder elemChildNodes = elemClass.e("childNodes");
-		List<String> childNodes = node.getRetrievalDataSource().getChildNodes();
+		XMLBuilder elemChildNodes = elemClass.e("child_nodes");
+		List<Node> childNodes = node.getChildNodes();
 		for(int index = 0; index < childNodes.size(); index++) {
-			elemChildNodes.e("node").a("index", String.valueOf(index))
-				.t(childNodes.get(index));
+			elemChildNodes.e("node").a("index", String.valueOf(index)).t(childNodes.get(index).getName());
 		}
 	
 	}
 	
 	private static void createIndividualTypeXML(Node node, XMLBuilder xml) throws Exception {
 
-		String parentEnName = getParent(node.getParentId()).getEnglishName();
+		String parentEnName = node.getParentNode().getEnglishName();
 		XMLBuilder individual = xml.e(parentEnName);
 		individual.a("rdf:ID", node.getUri() + "#" + node.getEnglishName())
 			.e("label").t(node.getLabel()).up()
 			.e("name").t(node.getName()).up()
 			.e("desc").t(node.getDesc());
 
+		// Create <images>
 		XMLBuilder eImages = individual.e("images");
-		for (String image_path : node.getImages()) {
-			eImages.e("item").t(image_path);
+		for (NodeImage nodeImage : node.getImages()) {
+			eImages.e("item").t(nodeImage.getPath());
 		}
 		
-		// Create <userfields>
-		XMLBuilder elemUserfields = individual.e("userfields");
-		Map<String, String> userfields = node.getUserfields();
-		for (String key : userfields.keySet()) {
-			elemUserfields.e("field").a("key", key).t(userfields.get(key));
+		// Create <attributes>
+		XMLBuilder elemUserfields = individual.e("attributes");
+		for (NodeAttribute attr : node.getAttributes()) {
+			elemUserfields.e("attribute").a("key", attr.getKey()).t(attr.getValue());
+			
 		}
 	}
 }

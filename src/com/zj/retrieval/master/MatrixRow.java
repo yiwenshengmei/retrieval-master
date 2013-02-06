@@ -18,6 +18,14 @@ public class MatrixRow {
 		this.matrix = matrix;
 	}
 	
+	public List<Integer> getValueList() {
+		List<Integer> ret = new ArrayList<Integer>();
+		for (MatrixItem item : items) {
+			ret.add(item.getValue());
+		}
+		return ret;
+	}
+	
 	public List<MatrixItem> getItems() {
 		return items;
 	}

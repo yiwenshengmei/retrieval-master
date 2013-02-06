@@ -20,6 +20,10 @@ public class Matrix {
 		}
 	}
 	
+	public MatrixRow getRow(int rowIndex) {
+		return rows.get(rowIndex);
+	}
+	
 	public void addRow(MatrixRow row, int index) {
 		int newRowColSize = row.getItems().size();
 		int oldRowColSize = getColSize();
