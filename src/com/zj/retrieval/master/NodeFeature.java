@@ -9,6 +9,15 @@ public class NodeFeature {
 	public static final int NO     = 1;
 	public static final int UNKNOW = 3;
 	
+	public static String textValue(int value) {
+		switch(value) {
+			case YES : return "Yes";
+			case NO : return "No";
+			case UNKNOW : return "Unknow";
+			default : return "Unknow Feature Answer Value";
+		}
+	}
+	
 	private String desc = StringUtils.EMPTY;
 	private String name = StringUtils.EMPTY;
 	private String englishName = StringUtils.EMPTY;
@@ -18,6 +27,10 @@ public class NodeFeature {
 	private int index = -1;
 	
 	public NodeFeature() { }
+	
+	public NodeFeature(String name) {
+		this.name = name;
+	}
 	
 	public NodeFeature(String name, String enName, String desc) {
 		this.desc = desc;

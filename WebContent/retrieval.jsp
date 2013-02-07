@@ -44,11 +44,11 @@
 		if (result.hasResult()) {
 	resultNodeIDs = result.getResult();
 		} else {
-	attrName = result.getNext().getName();
-	attrNameEN = result.getNext().getEnglishName();
-	attrDesc = result.getNext().getDesc();
-	attrImages.add(result.getNext().getImage());
-	attrUserFields = result.getNext().getUserFields();
+	attrName = result.getNextFeature().getName();
+	attrNameEN = result.getNextFeature().getEnglishName();
+	attrDesc = result.getNextFeature().getDesc();
+	attrImages.add(result.getNextFeature().getImage());
+	attrUserFields = result.getNextFeature().getUserFields();
 		}
 	}
 %>

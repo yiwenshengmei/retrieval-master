@@ -65,7 +65,7 @@ public class RetrievalDao {
 			// ????还没有完成，返回下一????询问的特??
 			result.hasResult(false);
 			int nextAttributeId = selectState.length() - 1;
-			result.setNext(retrievalNode.getRetrievalDataSource().getAttributes().get(nextAttributeId));
+			result.setNextFeature(retrievalNode.getRetrievalDataSource().getAttributes().get(nextAttributeId));
 		}
 		result.setLastState(selectState);
 		return result;

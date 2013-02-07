@@ -32,6 +32,11 @@ public class Node {
 		images = new ArrayList<NodeImage>();
 		childNodes = new ArrayList<Node>();
 	}
+	
+	public Node(String name) {
+		this();
+		this.name = name;
+	}
 
 	public String getUri() {
 		return uri;

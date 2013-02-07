@@ -17,7 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.zj.retrieval.master.Node;
-import com.zj.retrieval.master.NodeRetrieval;
+import com.zj.retrieval.master.BizRetrieval;
 import com.zj.retrieval.master.RetrievalResult;
 import com.zj.retrieval.master.UserField;
 import com.zj.retrieval.master.Util;
@@ -42,7 +42,7 @@ public class RetrievalNodeAction extends HttpServlet{
 			String selectState = j.getString("select_state");
 			
 			NodeService ndService =  Util.getNodeService();
-			NodeRetrieval ndRetrieval = new NodeRetrieval();
+			BizRetrieval ndRetrieval = new BizRetrieval();
 			
 			Node retrievalNode = ndService.queryNodeById(startNodeId);
 			ndRetrieval.setRetrievalNode(retrievalNode);
@@ -75,11 +75,11 @@ public class RetrievalNodeAction extends HttpServlet{
 			} else {
 				// 如果没有结果，返回下一个特征的基本信息
 				JSONObject jNextAttr = new JSONObject();
-				jNextAttr.put("name", result.getNext().getName());
-				jNextAttr.put("enName", result.getNext().getEnglishName());
-				jNextAttr.put("desc", result.getNext().getDesc());
-				jNextAttr.put("image", String.format("%1$s/%2$s", config.getOriginalfileFolderName(), result.getNext().getImage()));
-				jNextAttr.put("user_fields", UserField.parse(result.getNext().getUserFields()));
+				jNextAttr.put("name", result.getNextFeature().getName());
+				jNextAttr.put("enName", result.getNextFeature().getEnglishName());
+				jNextAttr.put("desc", result.getNextFeature().getDesc());
+				jNextAttr.put("image", String.format("%1$s/%2$s", config.getOriginalfileFolderName(), result.getNextFeature().getImage()));
+				jNextAttr.put("user_fields", UserField.parse(result.getNextFeature().getUserFields()));
 				jResult.put("next", jNextAttr);
 			}
 			String resultString = jResult.toString();
