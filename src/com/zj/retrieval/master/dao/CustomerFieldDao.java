@@ -3,11 +3,11 @@ package com.zj.retrieval.master.dao;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
-import com.zj.retrieval.master.AbstractCRUDHandler;
+import com.zj.retrieval.master.AbstractAction;
 import com.zj.retrieval.master.Configuration;
 import com.zj.retrieval.master.NodeAttribute;
 
-public class CustomerFieldDao extends AbstractCRUDHandler {
+public class CustomerFieldDao extends AbstractAction {
 	public static CustomerFieldDao getInstance() {
 		return (CustomerFieldDao) Configuration.getBean("customerFieldDao");
 	}

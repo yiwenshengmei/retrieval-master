@@ -37,6 +37,10 @@ public class NodeAttribute {
 		this.node = node;
 	}
 	
+	public NodeAttribute(String key, String value) {
+		this(key, value, null);
+	}
+	
 	public static Map<String, String> parse(JSONArray jUserfields) {
 		try {
 			Map<String, String> result = new HashMap<String, String>();

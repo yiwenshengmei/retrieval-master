@@ -70,4 +70,8 @@ public class Configuration {
 	private static boolean endsWithSlash(String str) {
 		return str.endsWith("/") || str.endsWith("\\");
 	}
+	
+	public static String getImagePath() {
+		return "";
+	}
 }

@@ -1,5 +1,6 @@
 package com.zj.retrieval.master;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -24,6 +25,15 @@ public class BizNode {
 		String xmlStr = xml.asString();
 		logger.debug(xmlStr);
 		return xmlStr;
+	}
+	
+	public static AttributeSelector getAttributeSelector(Node nd) {
+		List<Integer> resultData = new ArrayList<Integer>();
+		List<NodeFeature> attrs = nd.getRetrievalDataSource().getFeatures();
+		for (int i = 0; i < attrs.size(); i++) {
+			resultData.add(i);
+		}
+		return new AttributeSelector(resultData);
 	}
 	
 	private static String nullEmpty(String value) {

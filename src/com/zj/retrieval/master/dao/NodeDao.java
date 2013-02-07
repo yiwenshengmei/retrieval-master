@@ -134,14 +134,7 @@ public class NodeDao {
 		return null;
 	}
 
-	public AttributeSelector getAttributeSelector(Node nd) {
-		List<Integer> resultData = new ArrayList<Integer>();
-		List<NodeFeature> attrs = nd.getRetrievalDataSource().getAttributes();
-		for (int i = 0; i < attrs.size(); i++) {
-			resultData.add(i);
-		}
-		return new AttributeSelector(resultData);
-	}
+
 
 	public void addNode(Node newNode, Node parentNode, AttributeSelector as) {
 		try {

@@ -1,6 +1,6 @@
 package com.zj.retrieval.master;
 
-public class BizUser extends AbstractCRUDHandler {
+public class BizUser extends AbstractAction {
 	
 	public boolean verifyUser(String name, String pwd) {
 		String sql = "SELECT COUNT(*) FROM `T_USER` WHERE `U_NAME`=? AND `U_PASSWORD`=? AND U_IS_ACTIVE=?";
