@@ -11,7 +11,9 @@ public class Matrix {
 	private List<MatrixRow> rows;
 	private RetrievalDataSource retrievalDataSource;
 
-	public Matrix() { }
+	public Matrix() {
+		rows = new ArrayList<MatrixRow>();
+	}
 	
 	public Matrix(List<List<Integer>> values) {
 		rows = new ArrayList<MatrixRow>();

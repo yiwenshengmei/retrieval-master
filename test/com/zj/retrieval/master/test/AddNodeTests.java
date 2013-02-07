@@ -5,11 +5,12 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.hibernate.Transaction;
+
 import com.zj.retrieval.master.DALService;
 import com.zj.retrieval.master.FeatureImage;
 import com.zj.retrieval.master.IDALAction;
@@ -24,20 +25,32 @@ public class AddNodeTests {
 	
 	private final static Logger logger = LoggerFactory.getLogger(AddNodeTests.class);
 	
-	public static Node addRootNode() throws Exception {
-		Node ret = (Node) DALService.doAction(new IDALAction() {
+	public static String addNode() throws Exception {
+		String id = (String) DALService.doAction(new IDALAction() {
+			
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
-				addRootNodeWithSession(sess);
-				return null;
+				return addNodeWithParent(sess, null).getId();
 			}
 		});
 		
-		return ret;
+		return id;
 	}
 	
-	public static Node addRootNodeWithSession(Session sess) {
+	public static String addNodeWithParentId(Session sess, final String parentId) throws Exception {
+		Node parentNode = (Node) sess.get(Node.class, parentId);
+		return addNodeWithParent(sess, parentNode).getId();
+	}
+	
+	/**
+	 * 注意，parent必须是已经托管的对象
+	 * @param sess
+	 * @param parent
+	 * @return
+	 */
+	public static Node addNodeWithParent(Session sess, Node parent) {
 		Node node = new Node();
+		node.setParentNode(parent);
 		node.setName("鸟");
 		
 		node.setImages(Arrays.asList(
@@ -69,11 +82,10 @@ public class AddNodeTests {
 		mtx.setRetrievalDataSource(node.getRetrievalDataSource());
 		node.getRetrievalDataSource().setMatrix(mtx);
 		
-		Node node2 = new Node();
-		node2.setName("小鸟");
-		node2.setParentNode(node);
-		node.setChildNodes(Arrays.asList(node2));
-		
+		if (parent != null) {
+			parent.getChildNodes().add(node);
+			node.setParentNode(parent);
+		}
 		sess.save(node);
 		
 		return node;
@@ -83,19 +95,27 @@ public class AddNodeTests {
 		DALService.doAction(new IDALAction() {
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
-				checkNode(sess);
+				checkNodeBase(sess);
 				return null;
 			}
 		});
 	}
 	
-	@Test
-	public void testAddRootNode() throws Exception {
-		addRootNode();
-		checkAddRootNode();
+	private void checkAddChildNode(final String childId) throws Exception {
+		DALService.doAction(new IDALAction() {
+			
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				Node child = (Node) sess.get(Node.class, childId);
+				Node parent = child.getParentNode();
+				Assert.assertNotNull("父节点为null！", parent);
+				Assert.assertEquals("父节点的child不为1", 1, parent.getChildNodes().size());
+				return null;
+			}
+		});
 	}
 	
-	private void checkNode(Session sess) {
+	private void checkNodeBase(Session sess) {
 		List nodes = sess.createQuery("from Node nd where nd.name = '鸟'").list();
 		Assert.assertEquals("查询数量不为1", 1, nodes.size());
 		Node node = (Node) nodes.get(0);
@@ -134,15 +154,30 @@ public class AddNodeTests {
 			}
 		}
 		
-		Assert.assertEquals("子节点数量不正确", 1, node.getChildNodes().size());
-		Node child1 = node.getChildNodes().get(0);
-		Assert.assertNotNull("子节点为null！", child1);
-		Assert.assertEquals("小鸟", child1.getName());
-		
 		Matrix mtx = rds.getMatrix();
 		Assert.assertNotNull("Matrix为空！", mtx);
 		logger.debug(mtx.toString());
 		Assert.assertEquals("Matrix的值不正确", "\n[1, 2, 0]\n[3, 3, 2]", mtx.toString());
+	}
+	
+	@Test
+	public void testAddRootNode() throws Exception {
+		addNode();
+		checkAddRootNode();
+	}
+	
+	@Test
+	public void testAddChildNode() throws Exception {
+		String childId = (String) DALService.doAction(new IDALAction() {
+			
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				Node parent = addNodeWithParent(sess, null);
+				return addNodeWithParent(sess, parent).getId();
+			}
+		});
+		
+		checkAddChildNode(childId);
 	}
 
 	@Test
@@ -151,7 +186,7 @@ public class AddNodeTests {
 			
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
-				checkNode(sess);
+				checkNodeBase(sess);
 				return null;
 			}
 		});

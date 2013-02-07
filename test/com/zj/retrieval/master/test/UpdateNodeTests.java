@@ -18,7 +18,7 @@ import com.zj.retrieval.master.NodeFeature;
 public class UpdateNodeTests {
 	@Test
 	public void testUpdateNode() throws Exception {
-		AddNodeTests.addRootNode();
+		AddNodeTests.addNode();
 		updateFeatureImagePath();
 		checkUpdate();
 	}

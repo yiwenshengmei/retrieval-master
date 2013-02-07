@@ -27,7 +27,7 @@ public class QueryNodeOWLAction {
 			
 			Node node = ndService.queryById(node_id);
 			
-			this.owl = Boolean.valueOf(format) ? XMLUtil.format(node.getOwl(), 4) : node.getOwl();
+			this.owl = Boolean.valueOf(format) ? XMLUtils.format(node.getOwl(), 4) : node.getOwl();
 			return ActionSupport.SUCCESS;
 			
 		} catch (Exception ex) {

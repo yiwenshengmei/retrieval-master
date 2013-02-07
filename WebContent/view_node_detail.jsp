@@ -1,7 +1,7 @@
 <%@page import="java.util.Map"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map.Entry"%>
-<%@page import="com.zj.retrieval.master.actions.XMLUtil"%>
+<%@page import="com.zj.retrieval.master.actions.XMLUtils"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.zj.retrieval.master.NodeFeature"%>
 <%@page import="java.util.List"%>
@@ -50,7 +50,7 @@
 	uri = nd.getUri();
 	uri_name = nd.getUriName();
 	desc = nd.getDesc();
-	owl = Configuration.html(XMLUtil.format(nd.getOwl(), 4));
+	owl = Configuration.html(XMLUtils.format(nd.getOwl(), 4));
 	label = nd.getLabel();
 	child_nodes = nd.getRetrievalDataSource().getChildNodes();
 	attrs = nd.getRetrievalDataSource().getAttributes();

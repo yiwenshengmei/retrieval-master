@@ -1,5 +1,6 @@
 package com.zj.retrieval.master;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +29,8 @@ public class Node {
 
 	public Node() {
 		retrievalDataSource = new RetrievalDataSource(this);
+		images = new ArrayList<NodeImage>();
+		childNodes = new ArrayList<Node>();
 	}
 
 	public String getUri() {

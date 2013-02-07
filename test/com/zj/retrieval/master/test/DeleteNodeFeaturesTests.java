@@ -56,7 +56,7 @@ public class DeleteNodeFeaturesTests {
 	
 	@Test
 	public void testDeleteNodeFeature() throws Exception {
-		AddNodeTests.addRootNode();
+		AddNodeTests.addNode();
 		deleteNodeFeature();
 		checkDeleteNodeFeature();
 	}
