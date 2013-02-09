@@ -54,17 +54,7 @@ public class AddNodeAction extends AbstractNodeCRUDAction {
 	}
 
 	@Override
-	protected String getSuccessfulMesssage() {
-		return "O(กษ_กษ)Oนþนþ~";
-	}
-
-	@Override
-	protected String getActionResult() {
-		return ActionSupport.SUCCESS;
-	}
-
-	@Override
-	protected void beforeSave(Node node, Session sess) {
+	protected void beforeSaveNode(Node node, Session sess) {
 		
 		Node parentNode = (Node) sess.get(Node.class, parent_id);
 		parentNode.getChildNodes().add(node);
@@ -109,5 +99,28 @@ public class AddNodeAction extends AbstractNodeCRUDAction {
 
 	public void setNewFeatureImagesFileName(List<String> newFeatureImagesFileName) {
 		this.newFeatureImagesFileName = newFeatureImagesFileName;
+	}
+
+	@Override
+	protected String getActionName() {
+		return "AddNodeAction";
+	}
+
+	@Override
+	protected void preExecute() throws Exception {
+	}
+
+	@Override
+	protected void postExecute() throws Exception {
+	}
+
+	@Override
+	protected String getSuccessfulMesssage() {
+		return null;
+	}
+
+	@Override
+	protected String getActionResult() {
+		return null;
 	}
 }

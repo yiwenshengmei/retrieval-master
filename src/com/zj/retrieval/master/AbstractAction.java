@@ -13,7 +13,10 @@ public abstract class AbstractAction {
 	
 	public String execute() {
 		try {
+			logger.info("Action: " + getActionName());
+			preExecute();
 			doExecute();
+			postExecute();
 			this.message = getSuccessfulMesssage();
 			return getActionResult();
 		}
@@ -22,6 +25,16 @@ public abstract class AbstractAction {
 			this.errorMessage = ex.getMessage();
 			return ActionSupport.ERROR;
 		}
+	}
+	
+	protected abstract String getActionName();
+	
+	protected void preExecute() throws Exception {
+		
+	}
+	
+	protected void postExecute() throws Exception {
+		
 	}
 	
 	protected abstract void doExecute() throws Exception;
