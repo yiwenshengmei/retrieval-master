@@ -1,5 +1,6 @@
 package com.zj.retrieval.master;
 
+import java.io.File;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
@@ -22,6 +23,9 @@ public class NodeFeature {
 	private String name = StringUtils.EMPTY;
 	private String englishName = StringUtils.EMPTY;
 	private List<FeatureImage> images;
+	private File[] imageFiles;
+	private String[] imageFilesContentType;
+	private String[] imageFilesFileName;
 	private RetrievalDataSource retrievalDataSource;
 	private String id;
 	private int index = -1;
@@ -106,5 +110,29 @@ public class NodeFeature {
 
 	public void setRetrievalDataSource(RetrievalDataSource retrievalDataSource) {
 		this.retrievalDataSource = retrievalDataSource;
+	}
+
+	public String[] getImageFilesContentType() {
+		return imageFilesContentType;
+	}
+
+	public void setImageFilesContentType(String[] imageFilesContentType) {
+		this.imageFilesContentType = imageFilesContentType;
+	}
+
+	public String[] getImageFilesFileName() {
+		return imageFilesFileName;
+	}
+
+	public void setImageFilesFileName(String[] imageFilesFileName) {
+		this.imageFilesFileName = imageFilesFileName;
+	}
+
+	public void setImageFiles(File[] imageFiles) {
+		this.imageFiles = imageFiles;
+	}
+
+	public File[] getImageFiles() {
+		return imageFiles;
 	}
 }

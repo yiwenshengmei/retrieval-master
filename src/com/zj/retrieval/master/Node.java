@@ -1,5 +1,6 @@
 package com.zj.retrieval.master;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,9 @@ public class Node {
 	private String label;
 	private String authorContact;
 	private List<NodeImage> images;
+	private File[] imageFiles;
+	private String[] imageFilesFileName;
+	private String[] imageFilesContentType;
 	private List<NodeAttribute> attributes;
 	private List<Node> childNodes;
 	private Node parentNode;
@@ -140,5 +144,29 @@ public class Node {
 
 	public void setAuthorContact(String authorContact) {
 		this.authorContact = authorContact;
+	}
+
+	public File[] getImageFiles() {
+		return imageFiles;
+	}
+
+	public void setImageFiles(File[] imageFiles) {
+		this.imageFiles = imageFiles;
+	}
+
+	public String[] getImageFilesFileName() {
+		return imageFilesFileName;
+	}
+
+	public void setImageFilesFileName(String[] imageFilesFileName) {
+		this.imageFilesFileName = imageFilesFileName;
+	}
+
+	public String[] getImageFilesContentType() {
+		return imageFilesContentType;
+	}
+
+	public void setImageFilesContentType(String[] imageFilesContentType) {
+		this.imageFilesContentType = imageFilesContentType;
 	}
 }
