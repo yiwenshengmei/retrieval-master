@@ -3,36 +3,35 @@
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
-	<package name="nodeService" namespace="/node" extends="struts-default">
-		<action name="add" class="com.zj.retrieval.master.actions.AddNodeAction" method="execute">
+	
+	<constant name="struts.enable.SlashesInActionNames" value="true" />
+	
+	<package name="node" extends="json-default">
+		
+		<interceptors>
+			
+			<interceptor name="permission" class="com.zj.retrieval.master.interceptors.PermissionInterceptor"/>
+			
+			<interceptor-stack name="permissionStack">
+<!-- 				<interceptor-ref name="permission"/> -->
+				<interceptor-ref name="defaultStack"/>
+			</interceptor-stack>
+		</interceptors>
+		
+		<default-interceptor-ref name="permissionStack"/>
+		
+		<action name="node/*" class="com.zj.retrieval.master.actions.NodeAction" method="{1}">
 			<result name="success">/common-message.jsp</result>
 			<result name="error">/common-message.jsp</result>
-		</action>
-		<action name="delete" class="com.zj.retrieval.master.actions.DeleteNodeAction" method="execute">
-			<result name="success">/common-json.jsp</result>
-			<result name="error">/common-json.jsp</result>
-		</action>
-		<action name="edit" class="com.zj.retrieval.master.actions.UpdateNodeAction" method="execute">
-			<result name="success">/common-message.jsp</result>
-			<result name="error">/common-message.jsp</result>
+			<result name="login">/login.jsp</result>
 		</action>
 	</package>
 	
-	<package name="rootNodeService" namespace="/root-node" extends="struts-default">
-		<action name="add" class="com.zj.retrieval.master.actions.AddRootNodeAction" method="execute">
+	<package name="user" extends="json-default">
+		<action name="user/*" class="com.zj.retrieval.master.actions.UserAction" method="{1}">
 			<result name="success">/common-message.jsp</result>
 			<result name="error">/common-message.jsp</result>
-		</action>
-		<action name="edit" class="com.zj.retrieval.master.actions.UpdateRootNodeAction" method="execute">
-			<result name="success">/common-message.jsp</result>
-			<result name="error">/common-message.jsp</result>
-		</action>
-	</package>
-	
-	<package name="briefnode" namespace="/briefnode" extends="struts-default">
-		<action name="add" class="com.zj.retrieval.master.actions.AddNodeBriefAction" method="execute">
-			<result name="success">/common-message.jsp</result>
-			<result name="error">/common-message.jsp</result>
+			<result name="jsonRet" type="json"/>
 		</action>
 	</package>
 	
@@ -42,16 +41,4 @@
 			<result name="error">/common-message.jsp</result>
 		</action>
 	</package>
-	
-	<package name="user" namespace="/user" extends="struts-default">
-		<action name="add" class="com.zj.retrieval.master.actions.AddUserAction">
-			<result name="success">/common-message.jsp</result>
-			<result name="error">/common-message.jsp</result>
-		</action>
-		<action name="active" class="com.zj.retrieval.master.actions.ActiveUserAction">
-			<result name="success">/common-message.jsp</result>
-			<result name="error">/common-message.jsp</result>
-		</action>
-	</package>
-	
 </struts>
