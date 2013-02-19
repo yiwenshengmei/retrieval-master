@@ -1,11 +1,21 @@
 package com.zj.retrieval.master;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class FeatureImage {
 	private String id;
 	private String path;
-	private String nodeId;
 	private NodeFeature feature;
+	
+	public static List<FeatureImage> batchCreate(List<String> paths, NodeFeature feature) {
+		List<FeatureImage> ret = new ArrayList<FeatureImage>();
+		for (String path : paths) {
+			ret.add(new FeatureImage(path, feature));
+		}
+		return ret;
+	}
 	
 	public FeatureImage(String path, NodeFeature feature) {
 		this.path = path;
@@ -28,14 +38,6 @@ public class FeatureImage {
 	
 	public void setPath(String path) {
 		this.path = path;
-	}
-
-	public String getNodeId() {
-		return nodeId;
-	}
-
-	public void setNodeId(String nodeId) {
-		this.nodeId = nodeId;
 	}
 
 	public NodeFeature getFeature() {

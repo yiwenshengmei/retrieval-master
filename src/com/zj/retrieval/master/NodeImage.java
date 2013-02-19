@@ -1,10 +1,21 @@
 package com.zj.retrieval.master;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class NodeImage {
 	private String id;
 	private String path;
 	private Node node;
+	
+	public static List<NodeImage> batchCreate(List<String> paths, Node node) {
+		List<NodeImage> ret = new ArrayList<NodeImage>();
+		for (String path : paths) {
+			ret.add(new NodeImage(path, node));
+		}
+		return ret;
+	}
 	
 	public Node getNode() {
 		return node;

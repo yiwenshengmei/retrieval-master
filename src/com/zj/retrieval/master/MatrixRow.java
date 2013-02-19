@@ -8,10 +8,12 @@ public class MatrixRow {
 	private Matrix matrix;
 	private String id;
 	
-	public MatrixRow() { }
+	public MatrixRow() { 
+		items = new ArrayList<MatrixItem>();
+	}
 	
 	public MatrixRow(List<Integer> values, Matrix matrix) {
-		items = new ArrayList<MatrixItem>();
+		this();
 		for (Integer v : values) {
 			items.add(new MatrixItem(v, this));
 		}

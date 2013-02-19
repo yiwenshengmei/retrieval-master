@@ -34,10 +34,10 @@
 			var new_field = $(
 				"<div id='user_field_" + user_field_index + "'>" +
 					"<span>" +
-						"key: <input id='user_field_key_" + user_field_index + "' type='text'/>" +
+						"key: <input id='user_field_key_" + user_field_index + "' type='text' name='attributes[" + user_field_index + "].key'/>" +
 					"</span>" + 
 					"<span>" +
-						"value: <input id='user_field_value_" + user_field_index + "' type='text'>" +
+						"value: <input id='user_field_value_" + user_field_index + "' type='text' name='attributes[" + user_field_index + "].value'>" +
 					"</span>" +
 					"<span>" +
 						"<a class='user_field_delete' href='#' onclick='delete_user_field(" + user_field_index + ");'>DELETE</a>" +
@@ -53,7 +53,7 @@
 			var location = $('#add_image_location');
 			var new_file_field = $(
 				"<div id='image_field_" + image_index + "'>" +
-					"<input type='file' name='images' accept='image/jpeg'/>" +
+					"<input type='file' name='imageFiles' accept='image/jpeg'/>" +
 					"<span>" +
 						"<a href='#' onclick='delete_image_field(" + image_index + ");'>DELETE</a>" +
 					"</span>" +
@@ -81,6 +81,7 @@
 				return false;
 			}
 			
+			/*
 			var user_fields_json = '[ ';
 			
 			for (var i = 0; i < user_field_index; i++) {
@@ -100,6 +101,7 @@
 			}
 			user_fields_json += ' ]';
 			$('#user_field').val(user_fields_json);
+			*/
 			// 提交表单
 			$('#add_node_form').submit();
 // 			alert($('#user_field').val()); // for test
@@ -112,13 +114,13 @@
 	</script>
 </head>
 <body>
-	<form id="add_node_form" action="root-node/add" method="post" enctype="multipart/form-data" >
+	<form id="add_node_form" action="node/addRootNode.action" method="post" enctype="multipart/form-data" >
 		<table id="base_info">
-			<tr><td>Name: </td><td><input name="node_name" type="text"/></td></tr>
-			<tr><td>English Name: </td><td><input name="node_name_en" type="text"/></td></tr>
+			<tr><td>Name: </td><td><input name="name" type="text"/></td></tr>
+			<tr><td>English Name: </td><td><input name="englishName" type="text"/></td></tr>
 			<tr><td>Description: </td><td><input name="desc" type="text"/></td></tr>
 			<tr><td>URI:</td><td><input name="uri" type="text"/></td></tr>
-			<tr><td>URI Name: </td><td><input name="uri_name" type="text"/></td></tr>
+			<tr><td>URI Name: </td><td><input name="uriName" type="text"/></td></tr>
 		</table>
 		
 		<a id="add_image" href="#">Add Image</a>
@@ -151,9 +153,6 @@
 			-->
 		</div>
 		
-		<input id='user_field' type="hidden" name="user_field"/>
-		PostUserName: <input type='text' name='post_user_name'/>
-		PostUserPassword: <input type='text' name='post_user_password'/>
 		<div><a id="submit_form" href="#">SUBMIT</a></div>
 	</form>
 </body>

@@ -12,6 +12,7 @@ public class RetrievalDataSource {
 	
 	public RetrievalDataSource() { 
 		features = new ArrayList<NodeFeature>();
+		matrix = new Matrix();
 	}
 	
 	public RetrievalDataSource(Node node) {
