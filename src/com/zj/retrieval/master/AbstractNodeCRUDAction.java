@@ -63,20 +63,20 @@ public abstract class AbstractNodeCRUDAction extends AbstractAction {
 					}
 				}
 				
-				beforeSave(node, sess);
+				beforeSaveNode(node, sess);
 				sess.save(node);
-				afterSave(node, sess);
+				afterSaveNode(node, sess);
 				
 				return null;
 			}
 		});
 	}
 	
-	protected void beforeSave(Node node, Session sess) {
+	protected void beforeSaveNode(Node node, Session sess) {
 		
 	}
 	
-	protected void afterSave(Node node, Session sess) {
+	protected void afterSaveNode(Node node, Session sess) {
 		
 	}
 	

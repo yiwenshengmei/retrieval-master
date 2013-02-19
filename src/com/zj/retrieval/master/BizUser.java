@@ -1,13 +1,8 @@
 package com.zj.retrieval.master;
 
-public class BizUser extends AbstractAction {
+public class BizUser {
 	
-	public boolean verifyUser(String name, String pwd) {
-		String sql = "SELECT COUNT(*) FROM `T_USER` WHERE `U_NAME`=? AND `U_PASSWORD`=? AND U_IS_ACTIVE=?";
-		return template.queryForInt(sql, name, pwd, 1) > 0;
-	}
-
-	public static BizUser getInstance() {
-		return (BizUser) Configuration.getBean("bizUser");
+	public static User login(String loginName, String loginPassword) {
+		return null;
 	}
 }

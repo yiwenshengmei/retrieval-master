@@ -13,7 +13,7 @@ public class AddRootNodeAction extends AbstractNodeCRUDAction {
 	private static Logger logger = LoggerFactory.getLogger(AddRootNodeAction.class);
 	
 	@Override
-	protected void beforeSave(Node node, Session sess) {
+	protected void beforeSaveNode(Node node, Session sess) {
 		Node virtualNode = (Node) sess.get(Node.class, Node.VIRTUAL_NODE_ID);
 		virtualNode.getChildNodes().add(node);
 		node.setParentNode(virtualNode);
@@ -27,5 +27,10 @@ public class AddRootNodeAction extends AbstractNodeCRUDAction {
 	@Override
 	protected String getActionResult() {
 		return ActionSupport.SUCCESS;
+	}
+
+	@Override
+	protected String getActionName() {
+		return AddRootNodeAction.class.getName();
 	}
 }
