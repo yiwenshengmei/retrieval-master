@@ -1,8 +1,12 @@
 package com.zj.retrieval.master.test;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -190,5 +194,13 @@ public class AddNodeTests {
 				return null;
 			}
 		});
+	}
+	
+	@Test
+	public void testFilePath() {
+		File file = new File("E:\\Projects\\java_retrieval\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\retrieval-master\\images\\b6b09e58-74bd-44bc-8d26-4f63736a9cb9.jpg");
+		logger.debug("name: " + file.getName());
+		String name = FilenameUtils.getName("E:\\Projects\\java_retrieval\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\retrieval-master\\images\\b6b09e58-74bd-44bc-8d26-4f63736a9cb9.jpg");
+		logger.debug(name);
 	}
 }

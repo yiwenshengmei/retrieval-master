@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.json.JSONUtil;
 import org.hibernate.Hibernate;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ModelDriven;
+import com.zj.retrieval.master.BizNode;
 import com.zj.retrieval.master.DALService;
 import com.zj.retrieval.master.FeatureImage;
 import com.zj.retrieval.master.IDALAction;
@@ -111,6 +113,7 @@ public class NodeAction implements ModelDriven<Node> {
 			public Object doAction(Session sess, Transaction tx) throws Exception {
 				Node nd = (Node) sess.get(Node.class, node.getId());
 				initialize(nd);
+				nd.setOwl(BizNode.createOwl(nd));
 				return nd;
 			}
 		});
@@ -124,8 +127,21 @@ public class NodeAction implements ModelDriven<Node> {
 	 */
 	public String getNode() throws Exception {
 		Node nd = doGetNode();
+		changePath2Url(nd);
 		this.node = nd;
 		return ACTION_RESULT_SHOW_NODE;
+	}
+	
+	private void changePath2Url(Node node) {
+		String contextPath = ServletActionContext.getServletContext().getContextPath(); // ·µ»Ø"/retrieval-master"
+		for (NodeImage img : node.getImages()) {
+			img.setUrl(contextPath + "/images/" + FilenameUtils.getName(img.getPath()));
+		}
+		RetrievalDataSource rds = node.getRetrievalDataSource();
+		for (NodeFeature feature : rds.getFeatures()) {
+			for (FeatureImage img : feature.getImages())
+				img.setUrl(contextPath + "/images/" + FilenameUtils.getName(img.getPath()));
+		}
 	}
 	
 	/**
@@ -135,8 +151,14 @@ public class NodeAction implements ModelDriven<Node> {
 	 */
 	public String getNodeJSON() throws Exception {
 		Node nd = doGetNode();
+		changePath2Url(nd);
 //		deleteParentRelation(nd);
 		dataMap.put("node", nd);
+		return ACTION_RESULT_JSON;
+	}
+	
+	public String test() throws Exception {
+		dataMap.put("ServletContext", ServletActionContext.getServletContext());
 		return ACTION_RESULT_JSON;
 	}
 	

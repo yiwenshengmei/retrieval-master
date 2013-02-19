@@ -30,6 +30,7 @@ public class Node {
 	private List<NodeAttribute> attributes;
 	private List<Node> childNodes;
 	private Node parentNode;
+	private String owl;
 
 	public Node() {
 		retrievalDataSource = new RetrievalDataSource(this);
@@ -168,5 +169,13 @@ public class Node {
 
 	public void setImageFilesContentType(String[] imageFilesContentType) {
 		this.imageFilesContentType = imageFilesContentType;
+	}
+
+	public String getOwl() {
+		return owl;
+	}
+
+	public void setOwl(String owl) {
+		this.owl = owl;
 	}
 }

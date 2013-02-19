@@ -8,6 +8,7 @@ public class NodeImage {
 	private String id;
 	private String path;
 	private Node node;
+	private String url;
 	
 	public static List<NodeImage> batchCreate(List<String> paths, Node node) {
 		List<NodeImage> ret = new ArrayList<NodeImage>();
@@ -50,5 +51,13 @@ public class NodeImage {
 	
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }

@@ -8,6 +8,7 @@ public class FeatureImage {
 	private String id;
 	private String path;
 	private NodeFeature feature;
+	private String url;
 	
 	public static List<FeatureImage> batchCreate(List<String> paths, NodeFeature feature) {
 		List<FeatureImage> ret = new ArrayList<FeatureImage>();
@@ -46,5 +47,13 @@ public class FeatureImage {
 
 	public void setFeature(NodeFeature feature) {
 		this.feature = feature;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }
