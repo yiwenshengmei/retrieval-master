@@ -14,28 +14,30 @@ public class Node {
 
 	public final static String VIRTUAL_NODE_ID = "VIRTUAL_NODE";
 
-	private String uri;
 	private String id;
+	private String uri;
+	private String owl;
 	private String name;
+	private String desc;
+	private String label;
 	private String uriName;
 	private String englishName;
-	private String desc;
-	private RetrievalDataSource retrievalDataSource;
-	private String label;
 	private String authorContact;
+	private Node parentNode;
+	private RetrievalDataSource retrievalDataSource;
+	private List<Node> childNodes;
 	private List<NodeImage> images;
-	private File[] imageFiles;
+	private List<NodeAttribute> attributes;
+	private List<NodeFeature> featuresOfParent;
 	private String[] imageFilesFileName;
 	private String[] imageFilesContentType;
-	private List<NodeAttribute> attributes;
-	private List<Node> childNodes;
-	private Node parentNode;
-	private String owl;
+	private File[] imageFiles;
 
 	public Node() {
 		retrievalDataSource = new RetrievalDataSource(this);
 		images = new ArrayList<NodeImage>();
 		childNodes = new ArrayList<Node>();
+		featuresOfParent = new ArrayList<NodeFeature>();
 	}
 	
 	public Node(String name) {
@@ -177,5 +179,13 @@ public class Node {
 
 	public void setOwl(String owl) {
 		this.owl = owl;
+	}
+	
+	public List<NodeFeature> getFeaturesOfParent() {
+		return featuresOfParent;
+	}
+
+	public void setFeaturesOfParent(List<NodeFeature> featuresOfParent) {
+		this.featuresOfParent = featuresOfParent;
 	}
 }

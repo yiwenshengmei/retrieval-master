@@ -2,7 +2,13 @@ package com.zj.retrieval.master;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.struts2.ServletActionContext;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.jamesmurty.utils.XMLBuilder;
@@ -57,7 +63,7 @@ public class BizNode {
 		// Create <images>
 		XMLBuilder eImages = elemClass.e("images");
 		for (NodeImage nodeImage : node.getImages()) {
-			eImages.e("item").t(nullEmpty(nodeImage.getPath()));
+			eImages.e("item").t(nodeImage.getPath() == null ? StringUtils.EMPTY : FilenameUtils.getName(nodeImage.getPath()));
 		}
 		
 		// Create <attributes>
@@ -122,6 +128,46 @@ public class BizNode {
 		XMLBuilder elemUserfields = nodeXml.e("attributes");
 		for (NodeAttribute attr : node.getAttributes()) {
 			elemUserfields.e("attribute").a("key", nullEmpty(attr.getKey())).t(nullEmpty(attr.getValue()));
+		}
+	}
+	
+	private static void initialize(Node node) {
+		Hibernate.initialize(node.getChildNodes());
+		Hibernate.initialize(node.getImages());
+		Hibernate.initialize(node.getParentNode());
+		Hibernate.initialize(node.getAttributes());
+		RetrievalDataSource rds = node.getRetrievalDataSource();
+		Hibernate.initialize(rds.getMatrix());
+		for (NodeFeature feature : rds.getFeatures()) {
+			Hibernate.initialize(feature.getImages());
+		}
+		for (MatrixRow row : rds.getMatrix().getRows()) {
+			Hibernate.initialize(row.getItems());
+		}
+	}
+	
+	public static Node getNode(final String id) throws Exception {
+		Node nd = (Node) DALService.doAction(new IDALAction() {
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				Node nd = (Node) sess.get(Node.class, id);
+				initialize(nd);
+				nd.setOwl(BizNode.createOwl(nd));
+				return nd;
+			}
+		});
+		return nd;
+	}
+	
+	public static void changePath2Url(Node node) {
+		String contextPath = ServletActionContext.getServletContext().getContextPath(); // ·µ»Ø"/retrieval-master"
+		for (NodeImage img : node.getImages()) {
+			img.setUrl(contextPath + "/images/" + FilenameUtils.getName(img.getPath()));
+		}
+		RetrievalDataSource rds = node.getRetrievalDataSource();
+		for (NodeFeature feature : rds.getFeatures()) {
+			for (FeatureImage img : feature.getImages())
+				img.setUrl(contextPath + "/images/" + FilenameUtils.getName(img.getPath()));
 		}
 	}
 }

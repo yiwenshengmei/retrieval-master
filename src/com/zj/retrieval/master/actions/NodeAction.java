@@ -9,10 +9,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.struts2.ServletActionContext;
+import org.apache.struts2.interceptor.RequestAware;
 import org.apache.struts2.json.JSONUtil;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -31,11 +30,12 @@ import com.zj.retrieval.master.NodeFeature;
 import com.zj.retrieval.master.NodeImage;
 import com.zj.retrieval.master.RetrievalDataSource;
 
-public class NodeAction implements ModelDriven<Node> {
+public class NodeAction implements ModelDriven<Node>, RequestAware {
 	
 	private final static Logger logger = LoggerFactory.getLogger(NodeAction.class);
 	private Map<String, Object> dataMap = new HashMap<String, Object>();
 	private Node node;
+	private Map<String, Object> requestMap;
 	
 	public final static String ACTION_RESULT_SHOW_NODE = "showNode";
 	public final static String ACTION_RESULT_JSON      = "jsonRet";
@@ -92,56 +92,27 @@ public class NodeAction implements ModelDriven<Node> {
 		}
 	}
 	
-	private void initialize(Node node) {
-		Hibernate.initialize(node.getChildNodes());
-		Hibernate.initialize(node.getImages());
-		Hibernate.initialize(node.getParentNode());
-		Hibernate.initialize(node.getAttributes());
-		RetrievalDataSource rds = node.getRetrievalDataSource();
-		Hibernate.initialize(rds.getMatrix());
-		for (NodeFeature feature : rds.getFeatures()) {
-			Hibernate.initialize(feature.getImages());
-		}
-		for (MatrixRow row : rds.getMatrix().getRows()) {
-			Hibernate.initialize(row.getItems());
-		}
-	}
-	
-	private Node doGetNode() throws Exception {
-		Node nd = (Node) DALService.doAction(new IDALAction() {
-			@Override
-			public Object doAction(Session sess, Transaction tx) throws Exception {
-				Node nd = (Node) sess.get(Node.class, node.getId());
-				initialize(nd);
-				nd.setOwl(BizNode.createOwl(nd));
-				return nd;
-			}
-		});
-		return nd;
+	/**
+	 * Action方法：添加非root节点
+	 * @return
+	 */
+	public String addNode() {
+		logger.debug("features数量: " + this.node.getRetrievalDataSource().getFeatures().size());
+		this.dataMap.put("node", this.node);
+		return ACTION_RESULT_JSON;
 	}
 	
 	/**
 	 * 
-	 * @return 转向 show_node.jsp
+	 * @return 转向 view_node_detail.jsp
 	 * @throws Exception
 	 */
 	public String getNode() throws Exception {
-		Node nd = doGetNode();
-		changePath2Url(nd);
+		Node nd = BizNode.getNode(node.getId());
+		BizNode.changePath2Url(nd);
+		this.requestMap.put("node_id", nd.getId());
 		this.node = nd;
 		return ACTION_RESULT_SHOW_NODE;
-	}
-	
-	private void changePath2Url(Node node) {
-		String contextPath = ServletActionContext.getServletContext().getContextPath(); // 返回"/retrieval-master"
-		for (NodeImage img : node.getImages()) {
-			img.setUrl(contextPath + "/images/" + FilenameUtils.getName(img.getPath()));
-		}
-		RetrievalDataSource rds = node.getRetrievalDataSource();
-		for (NodeFeature feature : rds.getFeatures()) {
-			for (FeatureImage img : feature.getImages())
-				img.setUrl(contextPath + "/images/" + FilenameUtils.getName(img.getPath()));
-		}
 	}
 	
 	/**
@@ -150,9 +121,8 @@ public class NodeAction implements ModelDriven<Node> {
 	 * @throws Exception
 	 */
 	public String getNodeJSON() throws Exception {
-		Node nd = doGetNode();
-		changePath2Url(nd);
-//		deleteParentRelation(nd);
+		Node nd = BizNode.getNode(node.getId());
+		BizNode.changePath2Url(nd);
 		dataMap.put("node", nd);
 		return ACTION_RESULT_JSON;
 	}
@@ -188,7 +158,7 @@ public class NodeAction implements ModelDriven<Node> {
 		});
 		
 //		dataMap.put("node", this.node);
-		return "jsonRet";
+		return ACTION_RESULT_JSON;
 	}
 
 	@Override
@@ -200,4 +170,10 @@ public class NodeAction implements ModelDriven<Node> {
 	public Map<String, Object> getDataMap() {
 		return dataMap;
 	}
+
+	@Override
+	public void setRequest(Map<String, Object> requestMap) {
+		this.requestMap = requestMap;
+	}
+
 }

@@ -1,14 +1,11 @@
-<%@page import="java.util.Map"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map.Entry"%>
-<%@page import="com.zj.retrieval.master.actions.XMLUtils"%>
-<%@page import="java.util.ArrayList"%>
+﻿<%@page import="com.zj.retrieval.master.actions.XMLUtils"%>
+<%@page import="org.apache.commons.lang.StringUtils"%>
+<%@page import="com.zj.retrieval.master.FeatureImage"%>
 <%@page import="com.zj.retrieval.master.NodeFeature"%>
-<%@page import="java.util.List"%>
-<%@page import="com.zj.retrieval.master.DetailType"%>
+<%@page import="com.zj.retrieval.master.NodeImage"%>
+<%@page import="com.zj.retrieval.master.NodeAttribute"%>
+<%@page import="com.zj.retrieval.master.BizNode"%>
 <%@page import="com.zj.retrieval.master.Node"%>
-<%@page import="com.zj.retrieval.master.Configuration"%>
-<%@page import="com.zj.retrieval.master.dao.NodeDao"%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
     pageEncoding="utf-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -19,95 +16,53 @@
 <title>查看物种详细信息</title>
 </head>
 <body>
-<table width="95%" style='margin: 0 auto;'>
+<table border="1" width="95%" style="margin: 0 auto;">
 <%
-	String name = "";
-	String name_en = "";
-	String parent_id = "";
-	String desc = "";
-	String owl = "";
-	String label = "";
-	String contact = "";
-	String uri = "";
-	String uri_name = "";
-	List<String> images = new ArrayList<String>();
-	List<String> child_nodes = new ArrayList<String>();
-	List<NodeFeature> attrs = new ArrayList<NodeFeature>();
-	String node_id = request.getParameter("node_id");
-	Map<String, String> user_filed = new HashMap<String, String>();
-	
-	try {	
-		NodeDao ns = Configuration.getNodeDao();
-		
-		Node nd = ns.queryById(node_id);
-		name = nd.getName();
-		name_en = nd.getEnglishName();
-		parent_id = nd.getParentId();
-		
-		boolean isFull = (nd.getDetailType() == DetailType.FULL);
-		if (isFull) {
-	images = nd.getImages();
-	uri = nd.getUri();
-	uri_name = nd.getUriName();
-	desc = nd.getDesc();
-	owl = Configuration.html(XMLUtils.format(nd.getOwl(), 4));
-	label = nd.getLabel();
-	child_nodes = nd.getRetrievalDataSource().getChildNodes();
-	attrs = nd.getRetrievalDataSource().getAttributes();
-	user_filed = nd.getUserfields();
-		} else {
-	contact = nd.getContact();
+	String nodeId = request.getParameter("node_id");
+	Node node = BizNode.getNode(nodeId);
+	BizNode.changePath2Url(node);
+%>
+<tr><td>ID: </td><td><%=node.getId()%></td></tr>
+<tr><td>中文名称: </td><td><%=node.getName()%></td></tr>
+<tr><td>英文名称: </td><td><%=node.getEnglishName()%></td></tr>
+<tr><td>描述:</td><td><%=node.getDesc()%></td></tr>
+<tr><td>OWL: </td><td><textarea rows="25" cols="120"><%=XMLUtils.format(node.getOwl())%></textarea></td></tr>
+<tr><td>URI: </td><td><%=node.getUri()%></td></tr>
+<tr><td>URI名称: </td><td><%=node.getUriName()%></td></tr>
+<tr><td>父节点名称: </td><td><%=node.getParentNode() == null ? StringUtils.EMPTY : node.getParentNode().getName()%></td></tr>
+<tr><td>标签: </td><td><%=node.getLabel()%></td></tr>
+<tr><td>作者联系方式: </td><td><%=node.getAuthorContact()%></td></tr>
+<tr><td colspan='2'>====== 属性 ======</td></tr>
+<%
+	for (NodeAttribute attr : node.getAttributes()) {
+%>
+<tr><td>属性名称: <%=attr.getKey()%></td><td>属性内容: <%=attr.getValue()%></td></tr>
+<%
+	}
+%>
+<tr><td colspan='2'>====== 图片 ======</td></tr>
+<%
+	for (NodeImage nodeImg : node.getImages()) {
+%>
+<tr><td colspan='2'><img src='<%=nodeImg.getUrl()%>'/></td></tr>
+<%
+	}
+%>
+<tr><td colspan='2'>====== 特征 ======</td></tr>
+<%
+	for (NodeFeature feature : node.getRetrievalDataSource().getFeatures()) {
+%>
+<tr><td>特征中文名称：</td><td><%=feature.getName() %></td></tr>
+<tr><td>特征英文名称：</td><td><%=feature.getEnglishName() %></td></tr>
+<tr><td>特征描述：</td><td><%=feature.getDesc() %></td></tr>
+<%
+		for (FeatureImage featureImg : feature.getImages()) {
+%>
+<tr><td>特征图片：</td><td><img src='<%="images/" + featureImg.getUrl() %>'/></td></tr>
+<%
 		}
-		
-		
-	} catch (Exception ex) {
-		out.print(ex.getMessage());
 	}
 %>
-<tr><td>ID: </td><td><%=node_id%></td></tr>
-<tr><td>NAME: </td><td><%=name%></td></tr>
-<tr><td>NAME_EN: </td><td><%=name_en%></td></tr>
-<tr><td>DESC:</td><td><%=desc%></td></tr>
-<tr><td>OWL: </td><td><%=owl%></td></tr>
-<tr><td>URI: </td><td><%=uri%></td></tr>
-<tr><td>URI_NAME: </td><td><%=uri_name%></td></tr>
-<tr><td>PARENT_ID: </td><td><%=parent_id%></td></tr>
-<tr><td>LABEL: </td><td><%=label%></td></tr>
-<tr><td>CONTACT: </td><td><%=contact%></td></tr>
-<tr><td colspan='2'>====== User Field ======</td></tr>
-<%
-	for (Entry<String, String> entry : user_filed.entrySet()) {
-%>
-<tr><td>KEY: <%=entry.getKey()%></td><td>VALUE: <%=entry.getValue()%></td></tr>
-<%
-	}
-%>
-<tr><td colspan='2'>====== Images ======</td></tr>
-<%
-	for (String image_url : images) {
-%>
-<tr><td colspan='2'><img src='<%=image_url%>'/></td></tr>
-<%
-	}
-%>
-<tr><td colspan='2'>====== Attributes ======</td></tr>
-<%
-	for (NodeFeature attr : attrs) {
-%>
-<tr><td>attr_name</td><td><%=attr.getName() %></td></tr>
-<tr><td>attr_name_en</td><td><%=attr.getEnglishName() %></td></tr>
-<tr><td>attr_desc</td><td><%=attr.getDesc() %></td></tr>
-<tr><td>attr_image</td><td><img src='<%="images/" + attr.getImage() %>'/></td></tr>
-<tr><td colspan='2'>====== ====== ======</td></tr>
-<% for (Entry<String, String> entry : attr.getUserFields().entrySet()) { %>
-<tr><td>KEY: <%=entry.getKey() %></td><td>VALUE: <%=entry.getValue() %></td></tr>
-<% } %>
-<% } %>
-<tr><td></td><td></td></tr>
-<tr><td></td><td></td></tr>
-<tr><td></td><td></td></tr>
-<tr><td></td><td></td></tr>
 </table>
-
 </body>
 </html>
