@@ -1,12 +1,17 @@
 package com.zj.retrieval.master.test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -28,6 +33,21 @@ import com.zj.retrieval.master.RetrievalDataSource;
 public class AddNodeTests {
 	
 	private final static Logger logger = LoggerFactory.getLogger(AddNodeTests.class);
+	
+	@Test
+	public void t1() {
+		List<Integer> array = new ArrayList<Integer>();
+		array.add(2);
+		array.add(null);
+		array.add(2);
+		Iterator<Integer> iter = array.iterator();
+		while (iter.hasNext()) {
+			logger.debug("next");
+			if (iter.next() == null)
+				iter.remove();
+		}
+		logger.debug("size: " + array.size());
+	}
 	
 	public static String addNode() throws Exception {
 		String id = (String) DALService.doAction(new IDALAction() {

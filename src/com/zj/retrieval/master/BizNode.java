@@ -1,8 +1,12 @@
 package com.zj.retrieval.master;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.ServletActionContext;
@@ -33,6 +37,46 @@ public class BizNode {
 		return xmlStr;
 	}
 	
+	private static List<String> saveImageFiles(File[] files, String[] fileNames, File folder, String msg) throws IOException {
+		List<String> paths = new ArrayList<String>();
+		if (files == null) return paths;
+		for (int i = 0; i < files.length; i++) {
+			File destFile = new File(folder, UUID.randomUUID().toString() + ".jpg");
+			FileUtils.copyFile(files[i], destFile);
+			logger.debug(String.format("%1$s, %2$s -> %3$s", msg, fileNames[i], destFile));
+			paths.add(destFile.getPath());
+		}
+		return paths;
+	}
+	
+	public static void saveAndPrepareImages(Node node, String savePath) throws IOException {
+		File folder = new File(savePath);
+		if(!folder.exists()) {
+			folder.mkdirs();
+			logger.debug("用于保存图片的文件夹不存在，开始创建: " + folder.getPath());
+		}
+		
+		List<String> paths = saveImageFiles(node.getImageFiles(), node.getImageFilesFileName(), folder, "Save a NodeImage");
+		node.setImages(NodeImage.batchCreate(paths, node));
+		
+		if (node.getRetrievalDataSource() != null && node.getRetrievalDataSource().getFeatures() != null) {
+			for (NodeFeature feature : node.getRetrievalDataSource().getFeatures()) {
+				List<String> featureImagePaths = saveImageFiles(feature.getImageFiles(), 
+						feature.getImageFilesFileName(), folder, "Save a NodeFeatureImage");
+				feature.setImages(FeatureImage.batchCreate(featureImagePaths, feature));
+			}
+		}
+	}
+	
+	public static void rebuildRelation(Node node) {
+		RetrievalDataSource rds = node.getRetrievalDataSource();
+		rds.setNode(node);
+		for (NodeAttribute attr : node.getAttributes()) {
+			attr.setNode(node);
+		}
+		rds.getMatrix().setRetrievalDataSource(rds);
+	}
+	
 	public static AttributeSelector getAttributeSelector(Node nd) {
 		List<Integer> resultData = new ArrayList<Integer>();
 		List<NodeFeature> attrs = nd.getRetrievalDataSource().getFeatures();
@@ -44,6 +88,45 @@ public class BizNode {
 	
 	private static String nullEmpty(String value) {
 		return (value == null ? StringUtils.EMPTY : value);
+	}
+	
+	public static void addNodeToParent(Node child, Node parent, List<NodeFeature> newFeatures) {
+		// 更新父节点的特征
+		parent.getRetrievalDataSource().getFeatures().addAll(newFeatures);
+		// 更新父节点的矩阵
+		Matrix mtx = parent.getRetrievalDataSource().getMatrix();
+		// 新建一行
+		MatrixRow newRow = new MatrixRow();
+		// 按照父节点原始矩阵的colSize填充新行，如果node.getOfParentFeatures中有，则填Yes，否则填写No
+		List<NodeFeature> parentFeatures = parent.getRetrievalDataSource().getFeatures();
+		for(int i = 0; i < mtx.getColSize(); i++) {
+			MatrixItem item = containsFeature(newFeatures, parentFeatures.get(i)) ? MatrixItem.Yes(newRow) : MatrixItem.No(newRow);
+			newRow.addItem(item);
+		}
+		mtx.addRow(newRow);
+		
+		//   再修改列：向parentNode添加创建newNode时一起添加的新特性
+		//   在添加新特性的同时将新特性加入parentNode的attribute列表
+		List<Attribute> parentAttributes = parentNode.getRetrievalDataSource().getAttributes();
+		for(Attribute attr : as.getNewAttributeMapping().keySet()) {
+			// matrix可能为空，向空矩阵添加1列需要的长度始终是1
+			int[] newCol = matrix.getRowSize() == 0 ? new int[1] : new int[matrix.getRowSize()];
+			for(int j = 0; j < newCol.length; j++) {
+				newCol[j] = (j != newCol.length - 1 ? 0 : 
+					(as.getNewAttributeMapping().get(attr) ? Attribute.YES : Attribute.NO));
+			}
+			matrix.addCol(newCol, 0, newCol.length);
+			// 同时更新parentNode的attribte列表
+			parentAttributes.add(attr);
+		}
+	}
+	
+	private static boolean containsFeature(List<NodeFeature> features, NodeFeature feature) {
+		for (NodeFeature f : features) {
+			if (f.getId().equals(feature.getId()))
+				return true;
+		}
+		return false;
 	}
 
 	private static void createClassTypeXML(Node node, XMLBuilder xml) throws Exception {

@@ -5,6 +5,18 @@ public class MatrixItem {
 	private MatrixRow row;
 	private String id;
 	
+	public static MatrixItem Yes(MatrixRow row) {
+		return new MatrixItem(NodeFeature.YES, row);
+	}
+	
+	public static MatrixItem No(MatrixRow row) {
+		return new MatrixItem(NodeFeature.NO, row);
+	}
+	
+	public static MatrixItem Unknow(MatrixRow row) {
+		return new MatrixItem(NodeFeature.UNKNOW, row);
+	}
+	
 	public MatrixItem() { }
 	
 	public MatrixItem(Integer value, MatrixRow row) {

@@ -26,7 +26,7 @@ public class Matrix {
 		return rows.get(rowIndex);
 	}
 	
-	public void addRow(MatrixRow row, int index) {
+	public void addRow(MatrixRow row) {
 		int newRowColSize = row.getItems().size();
 		int oldRowColSize = getColSize();
 		

@@ -12,6 +12,10 @@ public class MatrixRow {
 		items = new ArrayList<MatrixItem>();
 	}
 	
+	public void addItem(MatrixItem item) {
+		this.items.add(item);
+	}
+	
 	public MatrixRow(List<Integer> values, Matrix matrix) {
 		this();
 		for (Integer v : values) {
