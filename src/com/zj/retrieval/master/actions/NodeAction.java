@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ModelDriven;
+import com.opensymphony.xwork2.Preparable;
 import com.zj.retrieval.master.BizNode;
 import com.zj.retrieval.master.DALService;
 import com.zj.retrieval.master.FeatureImage;
@@ -30,13 +31,22 @@ import com.zj.retrieval.master.NodeFeature;
 import com.zj.retrieval.master.NodeImage;
 import com.zj.retrieval.master.RetrievalDataSource;
 
-public class NodeAction implements ModelDriven<Node>, RequestAware {
+public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 	
-	private final static Logger logger = LoggerFactory.getLogger(NodeAction.class);
-	private Map<String, Object> dataMap = new HashMap<String, Object>();
 	private Node node;
+	private String id = null;
 	private Map<String, Object> requestMap;
+	private Map<String, Object> dataMap = new HashMap<String, Object>();
+	private final static Logger logger = LoggerFactory.getLogger(NodeAction.class);
 	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public final static String ACTION_RESULT_SHOW_NODE = "showNode";
 	public final static String ACTION_RESULT_JSON      = "jsonRet";
 	
@@ -128,7 +138,8 @@ public class NodeAction implements ModelDriven<Node>, RequestAware {
 	}
 	
 	public String test() throws Exception {
-		dataMap.put("ServletContext", ServletActionContext.getServletContext());
+		logger.debug("test被执行了");
+		logger.debug("node.id=" + this.node.getId());
 		return ACTION_RESULT_JSON;
 	}
 	
@@ -163,10 +174,11 @@ public class NodeAction implements ModelDriven<Node>, RequestAware {
 
 	@Override
 	public Node getModel() {
-		this.node = new Node();
+		logger.debug("getModel被执行了");
+		logger.debug("node.id=" + this.node.getId());
 		return this.node;
 	}
-
+	
 	public Map<String, Object> getDataMap() {
 		return dataMap;
 	}
@@ -174,6 +186,19 @@ public class NodeAction implements ModelDriven<Node>, RequestAware {
 	@Override
 	public void setRequest(Map<String, Object> requestMap) {
 		this.requestMap = requestMap;
+	}
+
+	@Override
+	public void prepare() throws Exception {
+		logger.debug("prepare被执行了");
+		logger.debug("id=" + this.id);
+		if (id == null) {
+			this.node = new Node();
+		}
+		else {
+			this.node = new Node();
+			this.node.setId(id);
+		}
 	}
 
 }

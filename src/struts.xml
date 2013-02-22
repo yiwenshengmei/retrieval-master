@@ -12,7 +12,7 @@
 			<interceptor name="permission" class="com.zj.retrieval.master.interceptors.PermissionInterceptor"/>
 			<interceptor-stack name="permissionStack">
 <!-- 				<interceptor-ref name="permission"/> -->
-				<interceptor-ref name="defaultStack"/>
+				<interceptor-ref name="paramsPrepareParamsStack"/>
 			</interceptor-stack>
 		</interceptors>
 		<default-interceptor-ref name="permissionStack"/>
