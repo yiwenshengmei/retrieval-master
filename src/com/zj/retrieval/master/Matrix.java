@@ -1,6 +1,7 @@
 package com.zj.retrieval.master;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -24,6 +25,17 @@ public class Matrix {
 	
 	public MatrixRow getRow(int rowIndex) {
 		return rows.get(rowIndex);
+	}
+	
+	public void addCol(List<MatrixItem> items) {
+		if (items.size() != getRowSize())
+			throw new IllegalArgumentException(String.format("新列的行数不正确，应该为%1$s，传入的是%2$s", getRowSize(), items.size()));
+		
+		int rowSize = getRowSize();
+		for (int i = 0; i < rowSize; i++) {
+			items.get(i).setRow(getRow(i));
+			getRow(i).addItem(items.get(i));
+		}
 	}
 	
 	public void addRow(MatrixRow row) {
@@ -77,6 +89,31 @@ public class Matrix {
 		List<String> rowStrs = new ArrayList<String>();
 		for (MatrixRow row : rows) {
 			rowStrs.add(ArrayUtils.toString(row.getItems()));
+		}
+		return "\n" + StringUtils.join(rowStrs, "\n");
+	}
+	
+	public String toTextString() {
+		List<String> rowStrs = new ArrayList<String>();
+		List<String> items = new ArrayList<String>();
+		for (MatrixRow row : rows) {
+			for (MatrixItem item : row.getItems()) {
+				items.add(item.getTextValue());
+			}
+			rowStrs.add("[" + StringUtils.join(items, ", ") + "]");
+		}
+		return "\n" + StringUtils.join(rowStrs, "\n");
+	}
+	
+	public String toShortTextString() {
+		List<String> rowStrs = new ArrayList<String>();
+		List<String> items = new ArrayList<String>();
+		for (MatrixRow row : rows) {
+			items.clear();
+			for (MatrixItem item : row.getItems()) {
+				items.add(item.getShortTextValue());
+			}
+			rowStrs.add("[" + StringUtils.join(items, "  ") + "]");
 		}
 		return "\n" + StringUtils.join(rowStrs, "\n");
 	}

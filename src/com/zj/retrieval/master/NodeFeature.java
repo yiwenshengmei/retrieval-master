@@ -1,6 +1,7 @@
 package com.zj.retrieval.master;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
@@ -19,6 +20,15 @@ public class NodeFeature {
 		}
 	}
 	
+	public static String shotTextValue(int value) {
+		switch(value) {
+			case YES : return "¡Ì";
+			case NO : return "¡Á";
+			case UNKNOW : return "-";
+			default : return "Unknow Feature Answer Value";
+		}
+	}
+	
 	private String desc = StringUtils.EMPTY;
 	private String name = StringUtils.EMPTY;
 	private String englishName = StringUtils.EMPTY;
@@ -30,10 +40,18 @@ public class NodeFeature {
 	private String id;
 	private int index = -1;
 	
-	public NodeFeature() { }
+	public NodeFeature() { 
+		images = new ArrayList<FeatureImage>();
+	}
 	
 	public NodeFeature(String name) {
+		this();
 		this.name = name;
+	}
+	
+	public NodeFeature(String name, String id) {
+		this(name);
+		this.id = id;
 	}
 	
 	public NodeFeature(String name, String enName, String desc) {

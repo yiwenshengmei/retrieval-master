@@ -90,39 +90,44 @@ public class BizNode {
 		return (value == null ? StringUtils.EMPTY : value);
 	}
 	
-	public static void addNodeToParent(Node child, Node parent, List<NodeFeature> newFeatures) {
+	public static void addChildToParent(Node child, Node parent, List<NodeFeature> newFeatures) {
+		// 更新父节点的子节点列表
+		parent.getChildNodes().add(child);
 		// 更新父节点的特征
-		parent.getRetrievalDataSource().getFeatures().addAll(newFeatures);
+		List<NodeFeature> parentFeatures = parent.getRetrievalDataSource().getFeatures();
+		parentFeatures.addAll(newFeatures);
 		// 更新父节点的矩阵
 		Matrix mtx = parent.getRetrievalDataSource().getMatrix();
-		// 新建一行
+		// 新建一行，其长度将等于父节点矩阵的列数
 		MatrixRow newRow = new MatrixRow();
-		// 按照父节点原始矩阵的colSize填充新行，如果node.getOfParentFeatures中有，则填Yes，否则填写No
-		List<NodeFeature> parentFeatures = parent.getRetrievalDataSource().getFeatures();
+		// 从左至右依次填充新行，规则是父节点当前列所代表的Feature存在于node.getFeaturesOfParent中，则填Yes，否则填写No
 		for(int i = 0; i < mtx.getColSize(); i++) {
-			MatrixItem item = containsFeature(newFeatures, parentFeatures.get(i)) ? MatrixItem.Yes(newRow) : MatrixItem.No(newRow);
+			MatrixItem item = containsFeature(child.getFeaturesOfParent(), parentFeatures.get(i)) ? MatrixItem.Yes(newRow) : MatrixItem.No(newRow);
 			newRow.addItem(item);
 		}
 		mtx.addRow(newRow);
 		
-		//   再修改列：向parentNode添加创建newNode时一起添加的新特性
-		//   在添加新特性的同时将新特性加入parentNode的attribute列表
-		List<Attribute> parentAttributes = parentNode.getRetrievalDataSource().getAttributes();
-		for(Attribute attr : as.getNewAttributeMapping().keySet()) {
-			// matrix可能为空，向空矩阵添加1列需要的长度始终是1
-			int[] newCol = matrix.getRowSize() == 0 ? new int[1] : new int[matrix.getRowSize()];
-			for(int j = 0; j < newCol.length; j++) {
-				newCol[j] = (j != newCol.length - 1 ? 0 : 
-					(as.getNewAttributeMapping().get(attr) ? Attribute.YES : Attribute.NO));
+		// 假设父节点矩阵中有3行，并需要添加4个新特征，则构造出4组[0, 0, 1]这样的列添加到父节点矩阵中
+		for (int i = 0; i < newFeatures.size(); i++) {
+			int rowSize = mtx.getRowSize();
+			List<MatrixItem> newCol = new ArrayList<MatrixItem>();
+			for (int j = 0; j < rowSize; j++) {
+				newCol.add( ((j + 1) == rowSize) ? MatrixItem.Yes(null) : MatrixItem.Unknow(null));
 			}
-			matrix.addCol(newCol, 0, newCol.length);
-			// 同时更新parentNode的attribte列表
-			parentAttributes.add(attr);
+			mtx.addCol(newCol);
 		}
 	}
 	
+	/**
+	 * 检测feature是否存在于features中，匹配原则是对比id
+	 * @param features 被检测的目标集合
+	 * @param feature 被检测的目标
+	 * @return 存在则返回true，否则返回false
+	 */
 	private static boolean containsFeature(List<NodeFeature> features, NodeFeature feature) {
 		for (NodeFeature f : features) {
+			if (f.getId() == null)
+				throw new IllegalArgumentException("用于比较的Feature的id不能为null！");
 			if (f.getId().equals(feature.getId()))
 				return true;
 		}

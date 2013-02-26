@@ -2,9 +2,14 @@ package com.zj.retrieval.master;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,4 +193,36 @@ public class Node {
 	public void setFeaturesOfParent(List<NodeFeature> featuresOfParent) {
 		this.featuresOfParent = featuresOfParent;
 	}
+
+	@Override
+	public String toString() {
+		Matrix mtx = getRetrievalDataSource().getMatrix();
+		List<MatrixRow> rows = mtx.getRows();
+		List<Node> childs = getChildNodes();
+		List<NodeFeature> features = getRetrievalDataSource().getFeatures();
+		if (rows.size() != childs.size())
+			throw new IllegalArgumentException("矩阵行数和子节点数目不相符，不能调用Node.toString方法！");
+		if (features.size() != mtx.getColSize())
+			throw new IllegalArgumentException("矩阵列数和特征数目不相符，不能调用Node.toString方法！");
+		
+		StringBuilder str = new StringBuilder();
+		str.append("\n\nName: ").append(getName());
+		// 输出Features
+		List<String> featureNames = new ArrayList<String>();
+		for (NodeFeature feature : features) {
+			featureNames.add(feature.getName());
+		}
+		str.append("\nFeatures: [").append(StringUtils.join(featureNames, ", ")).append("]");
+		// 输出子节点
+		List<String> childNames = new ArrayList<String>();
+		for (Node child : getChildNodes()) {
+			childNames.add(child.getName());
+		}
+		str.append("\nChilds: [").append(StringUtils.join(childNames, ", ")).append("]");
+		// 输出矩阵
+		str.append("\nMatrix: ").append(mtx.toShortTextString());
+		str.append("\n");
+		return str.toString();
+	}
+	
 }

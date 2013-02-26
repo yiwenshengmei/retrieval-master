@@ -45,6 +45,14 @@ public class MatrixItem {
 	public Integer getValue() {
 		return value;
 	}
+	
+	public String getTextValue() {
+		return NodeFeature.textValue(value);
+	}
+	
+	public String getShortTextValue() {
+		return NodeFeature.shotTextValue(value);
+	}
 
 	public void setValue(Integer value) {
 		this.value = value;

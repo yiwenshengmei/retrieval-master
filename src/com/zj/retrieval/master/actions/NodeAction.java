@@ -91,7 +91,7 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 				node.setParentNode(parent);
 				
 				// 更新父节点
-				BizNode.addNodeToParent(node, parent, newFeatures);
+				BizNode.addChildToParent(node, parent, newFeatures);
 				
 				sess.save(node);
 				sess.update(parent);
