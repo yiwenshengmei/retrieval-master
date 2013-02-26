@@ -1,17 +1,10 @@
 package com.zj.retrieval.master.actions;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.interceptor.RequestAware;
-import org.apache.struts2.json.JSONUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -21,14 +14,10 @@ import com.opensymphony.xwork2.ModelDriven;
 import com.opensymphony.xwork2.Preparable;
 import com.zj.retrieval.master.BizNode;
 import com.zj.retrieval.master.DALService;
-import com.zj.retrieval.master.FeatureImage;
 import com.zj.retrieval.master.IDALAction;
-import com.zj.retrieval.master.MatrixItem;
-import com.zj.retrieval.master.MatrixRow;
 import com.zj.retrieval.master.Node;
 import com.zj.retrieval.master.NodeAttribute;
 import com.zj.retrieval.master.NodeFeature;
-import com.zj.retrieval.master.NodeImage;
 import com.zj.retrieval.master.RetrievalDataSource;
 import com.zj.retrieval.master.Utils;
 
@@ -68,6 +57,19 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 		});
 		
 //		dataMap.put("node", this.node);
+		return ACTION_RESULT_JSON;
+	}
+	
+	public String getNodesAjax() throws Exception {
+		List<Node> nodes = (List<Node>) DALService.doAction(new IDALAction() {
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				return sess.createQuery(
+					"select nd.name from Node nd where nd.id <> '" + Node.VIRTUAL_NODE_ID + "'").list();
+			}
+		});
+		
+		dataMap.put("nodes", nodes);
 		return ACTION_RESULT_JSON;
 	}
 	

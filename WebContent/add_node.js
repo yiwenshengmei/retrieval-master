@@ -6,6 +6,24 @@ function deleteNodeFeature(index) {
 	$('#node_feature_' + index).remove();
 }
 
+var findParentNodeDialog;
+/**
+ * 
+ */
+function findParentNode() {
+	findParentNodeDialog.dialog("open");
+}
+
+function loadNodes() {
+	$.ajax({
+		url: "node/getNodesAjax.action",
+		type: "POST",
+		dataType: "json"
+	}).done(function (data) {
+		alert(data);
+	});
+}
+
 // 判断是否存在没有填写的input域，如果有，则高亮未填写的input域并弹出提示
 function validate_input() {
 	var has_no_value_input = false;
@@ -116,6 +134,7 @@ $(function() {
 	$("#add_node_image").click(addNodeImageHandler);
 	$('#add_node_feature').click(addNodeFeatureHandler);
 	$("#add_node_attribute").click(addNodeAttributeHandler);
+	findParentNodeDialog = $("#findParentNodeDialog").dialog({ autoOpen: false });
 	
 	$("#submit_form").click(function() {
 		$('#add_node_form').submit();

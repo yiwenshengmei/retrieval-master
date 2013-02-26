@@ -11,19 +11,21 @@
 			border-color: red;
 		}
 	</style>
-	<script type="text/javascript" src="jquery-1.7.1.js"></script>
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  	<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
 	<script type="text/javascript" src="add_node.js"></script>
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css" />
 </head>
 <body>
 	<form style="width:700px;margin:0 auto;" id="add_node_form" action="node/addNode.action" method="post" enctype="multipart/form-data" >
 		<table id="base_info">
 			<tr><td>中文名称: </td><td><input name="name" type="text"/></td></tr>
 			<tr><td>英文名称: </td><td><input name="englishName" type="text"/></td></tr>
-			<tr><td>父节点ID: </td><td><input name="parentNode.id" type="text"/></td></tr>
+			<tr><td>父节点: </td><td><input name="parentNode.id" type="text"/><a href="#" onclick='findParentNode();' >查找</a></td></tr>
+			<tr><td>父节点特征ID: </td><td><input name='featuresOfParent[0].id' type='text'/></td></tr>
 			<tr><td>描述: </td><td><input name="desc" type="text"/></td></tr>
 			<tr><td>URI:</td><td><input name="uri" type="text"/></td></tr>
 			<tr><td>URI名称: </td><td><input name="uriName" type="text"/></td></tr>
-			<tr><td>父节点特征ID: </td><td><input name='featuresOfParent[0].id' type='text'/></td></tr>
 		</table>
 		
 		<a id="add_node_image" href="#">添加物种图片</a>
@@ -40,5 +42,14 @@
 		<div style='height: 10px;'></div>
 		<div><a id="submit_form" href="#">保存节点</a></div>
 	</form>
+	
+	<div id="findParentNodeDialog" style="display:none;" title="Basic dialog">
+		<table>
+			<tr><td>父节点1</td><td><a>选择</a></td></tr>
+			<tr><td>父节点2</td><td><a>选择</a></td></tr>
+			<tr><td>父节点3</td><td><a>选择</a></td></tr>
+			<tr><td>父节点4</td><td><a>选择</a></td></tr>
+		</table>
+	</div>
 </body>
 </html>
