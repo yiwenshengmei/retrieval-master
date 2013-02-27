@@ -6,22 +6,70 @@ function deleteNodeFeature(index) {
 	$('#node_feature_' + index).remove();
 }
 
-var findParentNodeDialog;
+var selectParentNodeDialog;
+var selectParentFeatureDialog;
+var nodeId;
+var parentId;
 /**
  * 
  */
-function findParentNode() {
-	findParentNodeDialog.dialog("open");
+function selectParentNodeHandler() {
+	$.ajax({
+		url: "node/getParentNodesSelectAjax.action",
+		type: "POST",
+		dataType: "json",
+		success: function (data) {
+			showSelectParentNodes(data);
+		}
+	});
 }
 
-function loadNodes() {
+function selectParentFeatureHandler() {
+	if (parentId == null) {
+		alert("请先选择父类");
+		return;
+	}
 	$.ajax({
-		url: "node/getNodesAjax.action",
+		url: "node/getFeaturesAjax.action",
 		type: "POST",
-		dataType: "json"
-	}).done(function (data) {
-		alert(data);
+		dataType: "json",
+		data: { id: parentId },
+		success: function (data) {
+			showSelectParentFeatures(data);
+		}
 	});
+}
+
+function selectParent(id, name) {
+	parentId = id;
+	selectParentNodeDialog.dialog("close");
+	$("input[name='parentNode.id']").val(name);
+}
+
+function selectFeature(id, name) {
+	
+}
+
+function showSelectParentFeatures(data) {
+	var tbl = $("#select_parent_feature_location");
+	tbl.empty();
+	for (var i = 0; i < data.nodes.length; i++) {
+		var featureNameTD = $("<td/>").html(data.features[i].name);
+		var selectLinkTD = $("<td/>").append($("<a href='#' onclick='selectFeature(\"" + data.features[i].id + "\", \"" + data.features[i].name + "\")'>选择</a>"));
+		tbl.append($("<tr/>").append(featureNameTD).append(selectLinkTD));
+	}
+	selectParentNodeDialog.dialog("open");
+}
+
+function showSelectParentNodes(data) {
+	var tbl = $("#selectParentNodeTable");
+	tbl.empty();
+	for (var i = 0; i < data.nodes.length; i++) {
+		var parentNodeNameTD = $("<td/>").html(data.nodes[i].name);
+		var selectLinkTD = $("<td/>").append($("<a href='#' onclick='selectParent(\"" + data.nodes[i].id + "\", \"" + data.nodes[i].name + "\")'>选择</a>"));
+		tbl.append($("<tr/>").append(parentNodeNameTD).append(selectLinkTD));
+	}
+	selectParentNodeDialog.dialog("open");
 }
 
 // 判断是否存在没有填写的input域，如果有，则高亮未填写的input域并弹出提示
@@ -134,7 +182,8 @@ $(function() {
 	$("#add_node_image").click(addNodeImageHandler);
 	$('#add_node_feature').click(addNodeFeatureHandler);
 	$("#add_node_attribute").click(addNodeAttributeHandler);
-	findParentNodeDialog = $("#findParentNodeDialog").dialog({ autoOpen: false });
+	selectParentNodeDialog = $("#findParentNodeDialog").dialog({ autoOpen: false });
+	selectParentFeatureDialog = $("#select_parent_feature_dialog").dialog({ autoOpen: false });
 	
 	$("#submit_form").click(function() {
 		$('#add_node_form').submit();

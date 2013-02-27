@@ -13,6 +13,8 @@ import org.apache.struts2.ServletActionContext;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.jamesmurty.utils.XMLBuilder;
@@ -232,6 +234,26 @@ public class BizNode {
 		for (MatrixRow row : rds.getMatrix().getRows()) {
 			Hibernate.initialize(row.getItems());
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static List<Object[]> getParentNodes() throws Exception {
+		List<Object[]> nodes = (List<Object[]>) DALService.doAction(new IDALAction() {
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				StringBuilder sql = new StringBuilder()
+				.append("select nd.id, nd.name, nd.desc")
+				.append(" from t_node nd");
+				return sess.createSQLQuery(sql.toString())
+						.addScalar("desc", StandardBasicTypes.STRING)
+						.addScalar("name", StandardBasicTypes.STRING)
+						.addScalar("id", StandardBasicTypes.STRING)
+						.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+						.list();
+			}
+		});
+		
+		return nodes;
 	}
 	
 	public static Node getNode(final String id) throws Exception {

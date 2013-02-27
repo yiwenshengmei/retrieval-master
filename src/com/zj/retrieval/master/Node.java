@@ -45,6 +45,13 @@ public class Node {
 		featuresOfParent = new ArrayList<NodeFeature>();
 	}
 	
+	public Node(String name, String desc, String id) {
+		this();
+		this.name = name;
+		this.desc = desc;
+		this.id = id;
+	}
+	
 	public Node(String name) {
 		this();
 		this.name = name;

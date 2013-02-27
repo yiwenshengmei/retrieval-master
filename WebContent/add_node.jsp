@@ -21,12 +21,12 @@
 		<table id="base_info">
 			<tr><td>中文名称: </td><td><input name="name" type="text"/></td></tr>
 			<tr><td>英文名称: </td><td><input name="englishName" type="text"/></td></tr>
-			<tr><td>父节点: </td><td><input name="parentNode.id" type="text"/><a href="#" onclick='findParentNode();' >查找</a></td></tr>
-			<tr><td>父节点特征ID: </td><td><input name='featuresOfParent[0].id' type='text'/></td></tr>
+			<tr><td>父节点: </td><td><input name="parentNode.id" type="text"/><a href="#" onclick='selectParentNodeHandler();' >选择</a></td></tr>
 			<tr><td>描述: </td><td><input name="desc" type="text"/></td></tr>
 			<tr><td>URI:</td><td><input name="uri" type="text"/></td></tr>
 			<tr><td>URI名称: </td><td><input name="uriName" type="text"/></td></tr>
 		</table>
+		<input type="hidden" name="parentNode.id" />
 		
 		<a id="add_node_image" href="#">添加物种图片</a>
 		<div id="add_node_image_location"></div>
@@ -34,6 +34,10 @@
 		<div style='height: 10px;'></div>
 		<a id='add_node_attribute' href='#'>添加属性</a>
 		<div id='add_node_attribute_location'></div>
+		
+		<div style='height: 10px;'></div>
+		<a href='#' onclick='selectParentFeatureHandler();'>选择父节点特征</a>
+		<div id='parent_feature_location'></div>
 		
 		<div style='height: 10px;'></div>
 		<a id="add_node_feature" href="#">添加特征</a>
@@ -44,11 +48,12 @@
 	</form>
 	
 	<div id="findParentNodeDialog" style="display:none;" title="Basic dialog">
-		<table>
-			<tr><td>父节点1</td><td><a>选择</a></td></tr>
-			<tr><td>父节点2</td><td><a>选择</a></td></tr>
-			<tr><td>父节点3</td><td><a>选择</a></td></tr>
-			<tr><td>父节点4</td><td><a>选择</a></td></tr>
+		<table id="selectParentNodeTable">
+		</table>
+	</div>
+	
+	<div id='select_parent_feature_dialog' style='display:none;'>
+		<table id="select_parent_feature_location">
 		</table>
 	</div>
 </body>

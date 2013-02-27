@@ -3,10 +3,18 @@ package com.zj.retrieval.master.actions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.interceptor.RequestAware;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.transform.ResultTransformer;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
+import org.hibernate.type.StringType;
+import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,15 +68,13 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 		return ACTION_RESULT_JSON;
 	}
 	
-	public String getNodesAjax() throws Exception {
-		List<Node> nodes = (List<Node>) DALService.doAction(new IDALAction() {
-			@Override
-			public Object doAction(Session sess, Transaction tx) throws Exception {
-				return sess.createQuery(
-					"select nd.name from Node nd where nd.id <> '" + Node.VIRTUAL_NODE_ID + "'").list();
-			}
-		});
-		
+	/**
+	 * 返回所有Node的name，desc和id
+	 * @return json视图
+	 * @throws Exception
+	 */
+	public String getParentNodesSelectAjax() throws Exception {
+		List<Object[]> nodes = BizNode.getParentNodes();
 		dataMap.put("nodes", nodes);
 		return ACTION_RESULT_JSON;
 	}
@@ -134,8 +140,7 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 		}
 		else {
 			// 从数据库中取出Node
-			this.node = new Node();
-			this.node.setId(id);
+			this.node = BizNode.getNode(id);
 		}
 	}
 
