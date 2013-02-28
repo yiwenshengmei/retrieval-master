@@ -6,6 +6,10 @@ function deleteNodeFeature(index) {
 	$('#node_feature_' + index).remove();
 }
 
+function deleteParentFeature(index) {
+	$('#parent_feature_' + index).remove();
+}
+
 var selectParentNodeDialog;
 var selectParentFeatureDialog;
 var nodeId;
@@ -24,16 +28,20 @@ function selectParentNodeHandler() {
 	});
 }
 
+/**
+ * 点击选择父节点特征按钮的响应时间函数
+ * 从服务端获得的数据会传给showSelectParentFeatures构建供选择的Dialog
+ */
 function selectParentFeatureHandler() {
 	if (parentId == null) {
 		alert("请先选择父类");
 		return;
 	}
 	$.ajax({
-		url: "node/getFeaturesAjax.action",
+		url: "feature/getParentFeatureAjax.action",
 		type: "POST",
 		dataType: "json",
-		data: { id: parentId },
+		data: { parentId: parentId },
 		success: function (data) {
 			showSelectParentFeatures(data);
 		}
@@ -46,19 +54,49 @@ function selectParent(id, name) {
 	$("input[name='parentNode.id']").val(name);
 }
 
+var parentFeatureIndex = 0;
+
+/**
+ * 在parent_feature_location添加已经被选中的parent_feature
+ * 每个feature带有删除按钮，点击删除按钮（调用deleteParentFeature函数）可以删除该feature
+ * feature对应的input标签的name形如featuresOfParent[x].id
+ * @param id
+ * @param name
+ */
 function selectFeature(id, name) {
-	
+	var location = $("#parent_feature_location");
+	var html = 
+		"<div style='margin-top: 10px;' id='parent_feature_:index'>" +
+			"<input type='hidden' name='featuresOfParent[:index].id' value=':id' />" + 
+			"<span>" +
+				"<input id='parent_feature_:index' type='text' name='parent_feature_:index' value=':name'/>" +
+			"</span>" + 
+			"<span>" +
+				"<a class='button' href='#' onclick='deleteParentFeature(:index);'>删除</a>" +
+			"</span>" +
+		"</div>";
+	html = html.replace(/:index/g, parentFeatureIndex);
+	html = html.replace(/:name/g, name);
+	html = html.replace(/:id/g, id);
+	location.append($(html));
+	parentFeatureIndex++;
+	return false;
 }
 
+/**
+ * 生成用于选择父节点特征的Dialog
+ * 在生成的HTML中可以点击“选择”按钮调用selectFeature(id, name)函数
+ * @param data
+ */
 function showSelectParentFeatures(data) {
 	var tbl = $("#select_parent_feature_location");
 	tbl.empty();
-	for (var i = 0; i < data.nodes.length; i++) {
+	for (var i = 0; i < data.features.length; i++) {
 		var featureNameTD = $("<td/>").html(data.features[i].name);
 		var selectLinkTD = $("<td/>").append($("<a href='#' onclick='selectFeature(\"" + data.features[i].id + "\", \"" + data.features[i].name + "\")'>选择</a>"));
 		tbl.append($("<tr/>").append(featureNameTD).append(selectLinkTD));
 	}
-	selectParentNodeDialog.dialog("open");
+	selectParentFeatureDialog.dialog("open");
 }
 
 function showSelectParentNodes(data) {

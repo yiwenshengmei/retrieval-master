@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -237,8 +238,8 @@ public class BizNode {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static List<Object[]> getParentNodes() throws Exception {
-		List<Object[]> nodes = (List<Object[]>) DALService.doAction(new IDALAction() {
+	public static List<Map> getParentNodes() throws Exception {
+		List<Map> nodes = (List<Map>) DALService.doAction(new IDALAction() {
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
 				StringBuilder sql = new StringBuilder()

@@ -27,6 +27,16 @@
 				<param name="excludeProperties">.*Files</param>
 			</result>
 		</action>
+		
+		<action name="feature/*" class="com.zj.retrieval.master.actions.FeatureAction" method="{1}">
+			<result name="success">/common-message.jsp</result>
+			<result name="error">/common-message.jsp</result>
+			<result name="login">/login.jsp</result>
+			<result name="jsonResult" type="json">
+				<param name="root">dataMap</param>
+				<param name="excludeProperties">.*Files</param>
+			</result>
+		</action>
 	</package>
 	
 	<package name="user" extends="json-default">

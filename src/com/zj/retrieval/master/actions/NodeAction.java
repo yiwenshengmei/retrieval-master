@@ -74,7 +74,7 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 	 * @throws Exception
 	 */
 	public String getParentNodesSelectAjax() throws Exception {
-		List<Object[]> nodes = BizNode.getParentNodes();
+		List<Map> nodes = BizNode.getParentNodes();
 		dataMap.put("nodes", nodes);
 		return ACTION_RESULT_JSON;
 	}
