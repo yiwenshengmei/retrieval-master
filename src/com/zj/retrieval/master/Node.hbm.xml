@@ -28,6 +28,10 @@
 			<list-index column="`CHILD_INDEX`" />
 			<one-to-many class="com.zj.retrieval.master.Node" />
 		</list>
+		<bag name="featuresOfParent" table="T_FEATURES_PARENT_NODE">
+			<key column="NODE_ID" />
+			<many-to-many class="com.zj.retrieval.master.NodeFeature" column="FEATURE_ID" />
+		</bag>
 		<one-to-one name="retrievalDataSource" property-ref="node"
 			cascade="save-update" />
 	</class>

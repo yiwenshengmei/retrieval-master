@@ -39,15 +39,18 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 	public final static String ACTION_RESULT_SHOW_NODE = "showNode";
 	public final static String ACTION_RESULT_JSON      = "jsonResult";
 	public final static String ACTION_RESULT_ADD_SUCCESS = "addSuccess";
+	public final static String ACTION_RESULT_VIEW_NODE_DETAIL = "viewDetail";
 	private final static Logger logger = LoggerFactory.getLogger(NodeAction.class);
 	
 	/**************
 	 * Action 方法 *
 	 **************/
-	
 	public String addRootNode() throws Exception {
 		BizNode.saveAndPrepareImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
 		RetrievalDataSource rds = node.getRetrievalDataSource();
+		Utils.cleanList(node.getAttributes(), rds.getFeatures(), node.getImages());
+		for (NodeFeature feature : rds.getFeatures())
+			Utils.cleanList(feature.getImages());
 		rds.setNode(node);
 		for (NodeAttribute attr : node.getAttributes()) {
 			attr.setNode(node);
@@ -65,7 +68,7 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 		});
 		
 //		dataMap.put("node", this.node);
-		return ACTION_RESULT_JSON;
+		return ACTION_RESULT_VIEW_NODE_DETAIL;
 	}
 	
 	/**
@@ -87,7 +90,7 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 		
 		RetrievalDataSource rds = node.getRetrievalDataSource();
 		// 清除那些List中为null的元素
-		Utils.cleanList(node.getAttributes(), rds.getFeatures(), node.getImages(), newFeatures);
+		Utils.cleanList(node.getAttributes(), rds.getFeatures(), node.getImages(), newFeatures, node.getFeaturesOfParent());
 		for (NodeFeature feature : rds.getFeatures()) 
 			Utils.cleanList(feature.getImages());
 		
@@ -126,9 +129,8 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 	}
 	
 	public String test() throws Exception {
-		logger.debug("test被执行了");
-		logger.debug("node.id=" + this.node.getId());
-		return ACTION_RESULT_JSON;
+		this.node.setId("402809813d399b23013d399b32ee0000");
+		return ACTION_RESULT_VIEW_NODE_DETAIL;
 	}
 	
 	/*********************************************************/
@@ -136,10 +138,12 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 	@Override
 	public void prepare() throws Exception {
 		if (id == null) {
+			logger.debug("id == null 实例化node");
 			this.node = new Node();
 		}
 		else {
 			// 从数据库中取出Node
+			logger.debug("id有值: " + id);
 			this.node = BizNode.getNode(id);
 		}
 	}

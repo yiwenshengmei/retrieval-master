@@ -43,6 +43,7 @@ public class Node {
 		images = new ArrayList<NodeImage>();
 		childNodes = new ArrayList<Node>();
 		featuresOfParent = new ArrayList<NodeFeature>();
+		attributes = new ArrayList<NodeAttribute>();
 	}
 	
 	public Node(String name, String desc, String id) {

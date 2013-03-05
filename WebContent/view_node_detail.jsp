@@ -19,17 +19,20 @@
 <table border="1" width="95%" style="margin: 0 auto;">
 <%
 	String nodeId = request.getParameter("node_id");
+	if (StringUtils.isBlank(nodeId)) {
+		throw new IllegalArgumentException("传入的node_id为空");
+	}
 	Node node = BizNode.getNode(nodeId);
 	BizNode.changePath2Url(node);
 %>
 <tr><td>ID: </td><td><%=node.getId()%></td></tr>
 <tr><td>中文名称: </td><td><%=node.getName()%></td></tr>
 <tr><td>英文名称: </td><td><%=node.getEnglishName()%></td></tr>
-<tr><td>描述:</td><td><%=node.getDesc()%></td></tr>
+<tr><td>描述:</td><td><textarea rows="5" cols="120"><%=node.getDesc()%></textarea></td></tr>
 <tr><td>OWL: </td><td><textarea rows="25" cols="120"><%=XMLUtils.format(node.getOwl())%></textarea></td></tr>
 <tr><td>URI: </td><td><%=node.getUri()%></td></tr>
 <tr><td>URI名称: </td><td><%=node.getUriName()%></td></tr>
-<tr><td>父节点名称: </td><td><%=node.getParentNode() == null ? StringUtils.EMPTY : node.getParentNode().getName()%></td></tr>
+<tr><td>父节点名称: </td><td><%=node.getParentNode() == null ? "无" : node.getParentNode().getName()%></td></tr>
 <tr><td>标签: </td><td><%=node.getLabel()%></td></tr>
 <tr><td>作者联系方式: </td><td><%=node.getAuthorContact()%></td></tr>
 <tr><td colspan='2'>====== 属性 ======</td></tr>

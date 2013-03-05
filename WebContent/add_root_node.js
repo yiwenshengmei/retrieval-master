@@ -1,5 +1,9 @@
-﻿var nodeAttributeIndex = 0;
+﻿// 节点属性计数器
+var nodeAttributeIndex = 0;
+// 节点图片计数器
 var nodeImageIndex = 0;
+// 特征计数器
+var nodeFeatureIndex = 0;
 
 // 删除一条NodeAttribute
 function deleteNodeAttribute(index) {
@@ -11,6 +15,12 @@ function deleteNodeImage(index) {
 	$('#image_field_' + index).remove();
 }
 
+// 删除指定id的DOM元素
+function delementElement(id) {
+	$('#' + id).remove();
+}
+
+// 点击添加属性
 function addNodeAttributeHandler() {
 	var location = $("#add_node_attribute_location");
 	var newNodeAttributeDivHTML = $(
@@ -30,6 +40,7 @@ function addNodeAttributeHandler() {
 	nodeAttributeIndex++;
 }
 
+// 点击添加图片
 function addNodeImageHandler() {
 	var location = $('#add_image_location');
 	var newImageDivHTML = $(
@@ -44,6 +55,7 @@ function addNodeImageHandler() {
 	nodeImageIndex++;
 }
 
+// 点击保存按钮
 function submitHandler() {
 	// 检验表单
 	if ($('input[name="name"]').val() == "") {
@@ -56,8 +68,39 @@ function submitHandler() {
 	return false;
 }
 
+// 在新增的特征中点击添加图片按钮
+function addFeatureImageHandler(featureIndex) {
+	// TODO 赶紧给我实现！
+	// 添加的位置：add_feature_image_location_ + featureIndex
+	// code copy from function addNodeImageHandler() go go go!
+	
+}
+
+// 点击添加特征按钮
+function addNodeFeatureHandler() {
+	var featureTableHTML = $("<table id='node_feature_" + nodeFeatureIndex + "'></table>");
+	var featureNameTrHTML = $("<tr><td>特征中文名称: </td><td><input id='node_feature_name_" + nodeFeatureIndex +"' type='text' name='retrievalDataSource.features[" + nodeFeatureIndex + "].name'/></td></tr>");
+	var featureEnglishNameTrHTML = $("<tr><td>特征英文名称: </td><td><input id='node_feature_english_name_" + nodeFeatureIndex +"' type='text' name='retrievalDataSource.features[" + nodeFeatureIndex + "].englishName'/></td></tr>");
+	var featureDescTrHTML = $("<tr><td>特征描述: </td><td><textarea id='node_feature_desc_" + nodeFeatureIndex +"' wrap='virtual' name='retrievalDataSource.features[" + nodeFeatureIndex + "].desc'/></td></tr>");
+	var addFeatureImageAnchorHTML = $("<tr><td colspan='2'><a href='#' onClick='addFeatureImageHandler(" + nodeFeatureIndex + ");'>添加图片</a></td></tr>");
+	var featureImageLocationTrHTML = $("<tr><td colspan='2'><div id='add_feature_image_location_" + nodeFeatureIndex + "'></div></td></tr>");
+	var deleteCode = 'deleteElement("node_feature_' + nodeFeatureIndex + '")';
+	var featureDeleteTrHTML = $("<tr><td colspan='2'><a href='#' onclick='" + deleteCode + "'>删除特征</a></td></tr>");
+	featureTableHTML.append(featureNameTrHTML)
+					.append(featureEnglishNameTrHTML)
+		            .append(featureDescTrHTML)
+		            .append(addFeatureImageAnchorHTML)
+		            .append(featureImageLocationTrHTML)
+		            .append(featureDeleteTrHTML);
+	$('#add_node_feature_location').append(featureTableHTML);
+	nodeFeatureIndex++;
+	return false;
+}
+
+// 注册事件
 $(function() {
 	$("#add_node_attribute").click(addNodeAttributeHandler);
 	$("#add_image").click(addNodeImageHandler);
 	$("#submit_form").click(submitHandler);
+	$('#add_node_feature').click(addNodeFeatureHandler);
 });

@@ -26,6 +26,7 @@
 				<param name="root">dataMap</param>
 				<param name="excludeProperties">.*Files</param>
 			</result>
+			<result name="viewDetail" type="redirect">/view_node_detail.jsp?node_id=${id}</result>
 		</action>
 		
 		<action name="feature/*" class="com.zj.retrieval.master.actions.FeatureAction" method="{1}">

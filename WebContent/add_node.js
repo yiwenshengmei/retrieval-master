@@ -10,6 +10,10 @@ function deleteParentFeature(index) {
 	$('#parent_feature_' + index).remove();
 }
 
+function delementElement(id) {
+	$('#' + id).remove();
+}
+
 var selectParentNodeDialog;
 var selectParentFeatureDialog;
 var nodeId;

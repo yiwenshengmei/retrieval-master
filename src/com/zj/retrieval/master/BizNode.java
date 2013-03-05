@@ -52,6 +52,12 @@ public class BizNode {
 		return paths;
 	}
 	
+	/**
+	 * 把Node对象中的图片流保存到文件系统并未需要持久化的Node中的图片字段赋值
+	 * @param node
+	 * @param savePath
+	 * @throws IOException
+	 */
 	public static void saveAndPrepareImages(Node node, String savePath) throws IOException {
 		File folder = new File(savePath);
 		if(!folder.exists()) {

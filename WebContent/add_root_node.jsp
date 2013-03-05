@@ -28,6 +28,9 @@
 		<a id="add_node_attribute" href="#">添加自定义属性</a>
 		<div id="add_node_attribute_location"></div>
 		
+		<a id="add_node_feature" href="#">添加特征</a>
+		<div id="add_node_feature_location"></div>
+		
 		<div><a id="submit_form" href="#">保存物种</a></div>
 	</form>
 </body>
