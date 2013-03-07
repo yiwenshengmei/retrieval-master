@@ -5,11 +5,11 @@ import java.util.List;
 
 
 public class Utils {
-	public static void cleanList(List<? extends Object>... arrays) {
-		for (List<? extends Object> array : arrays) {
+	public static void cleanList(List... arrays) {
+		for (List array : arrays) {
 			if (array == null)
 				continue;
-			Iterator<? extends Object> iter = array.iterator();
+			Iterator iter = array.iterator();
 			while (iter.hasNext()) {
 				if (iter.next() == null) 
 					iter.remove();

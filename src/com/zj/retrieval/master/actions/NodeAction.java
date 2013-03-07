@@ -4,17 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.interceptor.RequestAware;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.transform.ResultTransformer;
-import org.hibernate.transform.Transformers;
-import org.hibernate.type.StandardBasicTypes;
-import org.hibernate.type.StringType;
-import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +17,6 @@ import com.zj.retrieval.master.BizNode;
 import com.zj.retrieval.master.DALService;
 import com.zj.retrieval.master.IDALAction;
 import com.zj.retrieval.master.Node;
-import com.zj.retrieval.master.NodeAttribute;
 import com.zj.retrieval.master.NodeFeature;
 import com.zj.retrieval.master.RetrievalDataSource;
 import com.zj.retrieval.master.Utils;
@@ -35,39 +27,82 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 	private String id = null;
 	private Map<String, Object> requestMap;
 	private Map<String, Object> dataMap = new HashMap<String, Object>();
-	private List<NodeFeature> newFeatures;
 	public final static String ACTION_RESULT_SHOW_NODE = "showNode";
 	public final static String ACTION_RESULT_JSON      = "jsonResult";
 	public final static String ACTION_RESULT_ADD_SUCCESS = "addSuccess";
 	public final static String ACTION_RESULT_VIEW_NODE_DETAIL = "viewDetail";
 	private final static Logger logger = LoggerFactory.getLogger(NodeAction.class);
 	
-	/**************
-	 * Action 方法 *
-	 **************/
+	/**
+	 * ACTION方法：添加根节点
+	 * @return
+	 * @throws Exception
+	 */
 	public String addRootNode() throws Exception {
-		BizNode.saveAndPrepareImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
 		RetrievalDataSource rds = node.getRetrievalDataSource();
-		Utils.cleanList(node.getAttributes(), rds.getFeatures(), node.getImages());
+		
+		// 清理集合中的index
+		Utils.cleanList(node.getAttributes(), node.getNewFeatures(), node.getImages());
 		for (NodeFeature feature : rds.getFeatures())
 			Utils.cleanList(feature.getImages());
-		rds.setNode(node);
-		for (NodeAttribute attr : node.getAttributes()) {
-			attr.setNode(node);
-		}
-		rds.getMatrix().setRetrievalDataSource(rds);
 		
+		// 根据newFeatures更新Matrix
+		BizNode.addFeatures(node, node.getNewFeatures());
+		
+		// 处理上传的文件
+		BizNode.prepareImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
+		
+		// 重建关系
+		BizNode.rebuildRelation(node);
+		
+		node.setParentNode(null);
+		
+		// 保存
 		DALService.doAction(new IDALAction() {
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
-				Node virtual = (Node) sess.get(Node.class, node.VIRTUAL_NODE_ID);
-				node.setParentNode(virtual);
 				sess.save(node);
 				return null;
 			}
 		});
 		
-//		dataMap.put("node", this.node);
+		return ACTION_RESULT_VIEW_NODE_DETAIL;
+	}
+	
+	public String addNode() throws Exception {
+		RetrievalDataSource rds = node.getRetrievalDataSource();
+		
+		// 清理集合中的index
+		Utils.cleanList(node.getAttributes(), rds.getFeatures(), node.getImages(), 
+				node.getNewFeatures(), node.getFeaturesOfParent());
+		for (NodeFeature feature : rds.getFeatures()) 
+			Utils.cleanList(feature.getImages());
+		
+		// 根据newFeatures更新Matrix
+		BizNode.addFeatures(node, node.getNewFeatures());
+		
+		// 处理上传的文件
+		BizNode.prepareImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
+		
+		// 重建关系
+		BizNode.rebuildRelation(node);
+		
+		DALService.doAction(new IDALAction() {
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				// 获取父节点
+				Node parent = (Node) sess.get(Node.class, node.getParentNode().getId());
+				node.setParentNode(parent);
+				
+				// 更新父节点
+				BizNode.addChildToParent(node, parent, node.getNewFeatures());
+				
+				sess.save(node);
+				sess.update(parent);
+				return null;
+			}
+		});
+		
 		return ACTION_RESULT_VIEW_NODE_DETAIL;
 	}
 	
@@ -80,37 +115,6 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 		List<Map> nodes = BizNode.getParentNodes();
 		dataMap.put("nodes", nodes);
 		return ACTION_RESULT_JSON;
-	}
-	
-	public String addNode() throws Exception {
-		// 保存临时目录中的图片至指定文件夹，为图片统一命名，填充对应的图片字段
-		BizNode.saveAndPrepareImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
-		// 在多对一的多端向一端建立关联
-		BizNode.rebuildRelation(node);
-		
-		RetrievalDataSource rds = node.getRetrievalDataSource();
-		// 清除那些List中为null的元素
-		Utils.cleanList(node.getAttributes(), rds.getFeatures(), node.getImages(), newFeatures, node.getFeaturesOfParent());
-		for (NodeFeature feature : rds.getFeatures()) 
-			Utils.cleanList(feature.getImages());
-		
-		DALService.doAction(new IDALAction() {
-			@Override
-			public Object doAction(Session sess, Transaction tx) throws Exception {
-				// 获取父节点
-				Node parent = (Node) sess.get(Node.class, node.getParentNode().getId());
-				node.setParentNode(parent);
-				
-				// 更新父节点
-				BizNode.addChildToParent(node, parent, newFeatures);
-				
-				sess.save(node);
-				sess.update(parent);
-				return null;
-			}
-		});
-		
-		return ACTION_RESULT_ADD_SUCCESS;
 	}
 	
 	public String getNode() throws Exception {
@@ -133,25 +137,21 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 		return ACTION_RESULT_VIEW_NODE_DETAIL;
 	}
 	
-	/*********************************************************/
-	
 	@Override
 	public void prepare() throws Exception {
+		logger.debug("===== 执行了prepare方法 =====");
 		if (id == null) {
-			logger.debug("id == null 实例化node");
+			logger.debug("id == null");
 			this.node = new Node();
 		}
 		else {
-			// 从数据库中取出Node
-			logger.debug("id有值: " + id);
+			logger.debug("id == " + id);
 			this.node = BizNode.getNode(id);
 		}
 	}
 
 	@Override
 	public Node getModel() {
-		logger.debug("getModel被执行了");
-		logger.debug("node.id=" + this.node.getId());
 		return this.node;
 	}
 
@@ -170,9 +170,5 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public void setNewFeatures(List<NodeFeature> newFeatures) {
-		this.newFeatures = newFeatures;
 	}
 }

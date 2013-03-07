@@ -58,7 +58,7 @@ public class BizNode {
 	 * @param savePath
 	 * @throws IOException
 	 */
-	public static void saveAndPrepareImages(Node node, String savePath) throws IOException {
+	public static void prepareImages(Node node, String savePath) throws IOException {
 		File folder = new File(savePath);
 		if(!folder.exists()) {
 			folder.mkdirs();
@@ -79,11 +79,31 @@ public class BizNode {
 	
 	public static void rebuildRelation(Node node) {
 		RetrievalDataSource rds = node.getRetrievalDataSource();
+		// 建立RetrievalDataSource -> Node的关系
 		rds.setNode(node);
-		for (NodeAttribute attr : node.getAttributes()) {
+		// 建立Attribute -> Node的关系
+		for (NodeAttribute attr : node.getAttributes())
 			attr.setNode(node);
+		// 建立NodeImage -> Node的关系
+		for (NodeImage img : node.getImages())
+			img.setNode(node);
+		// 建立NodeFeature -> RetrievalDataSource的关系
+		for (NodeFeature feature : rds.getFeatures()) { 
+			feature.setRetrievalDataSource(rds);
+			// 建立FeatureImage -> NodeFeature的关系
+			for (FeatureImage fimg : feature.getImages())
+				fimg.setFeature(feature);
 		}
-		rds.getMatrix().setRetrievalDataSource(rds);
+		Matrix mtx = rds.getMatrix();
+		// 建立Matrix -> RetrievalDataSource的关系
+		mtx.setRetrievalDataSource(rds);
+		// 建立MatrixRow -> Matrix的关系
+		for (MatrixRow row : mtx.getRows()) {
+			row.setMatrix(mtx);
+			// 建立MatrixItem -> MatrixRow的关系
+			for (MatrixItem item : row.getItems()) 
+				item.setRow(row);
+		}
 	}
 	
 	public static AttributeSelector getAttributeSelector(Node nd) {
@@ -116,7 +136,7 @@ public class BizNode {
 		}
 		mtx.addRow(newRow);
 		
-		// 假设父节点矩阵中有3行，并需要添加4个新特征，则构造出4组[0, 0, 1]这样的列添加到父节点矩阵中
+		// 假设父节点矩阵中有3行，并需要添加4个新特征，则构造出4组[Unknow, Unknow, Yes]这样的列添加到父节点矩阵中
 		for (int i = 0; i < newFeatures.size(); i++) {
 			int rowSize = mtx.getRowSize();
 			List<MatrixItem> newCol = new ArrayList<MatrixItem>();
@@ -183,7 +203,7 @@ public class BizNode {
 			
 			XMLBuilder featureImages = elemAttribute.e("images");
 			for (FeatureImage featureImage : features.get(index).getImages()) {
-				featureImages.e("image").a("path", nullEmpty(featureImage.getPath()));
+				featureImages.e("image").a("path", featureImage.getPath() == null ? StringUtils.EMPTY : FilenameUtils.getName(featureImage.getPath()));
 			}
 		}
 
@@ -285,6 +305,29 @@ public class BizNode {
 		for (NodeFeature feature : rds.getFeatures()) {
 			for (FeatureImage img : feature.getImages())
 				img.setUrl(contextPath + "/images/" + FilenameUtils.getName(img.getPath()));
+		}
+	}
+
+	/**
+	 * 向指定的父节点添加新特征
+	 * @param node
+	 * @param newFeatures
+	 */
+	public static void addFeatures(Node node, List<NodeFeature> newFeatures) {
+		// 1. copy新特征到node中
+		node.getRetrievalDataSource().getFeatures().addAll(newFeatures);
+		
+		// 2. 更新Matrix
+		// 假设该节点矩阵中有3行，并需要添加4个新特征，则构造出4组[Unknow, Unknow, Unknow]这样的列添加到父节点矩阵中
+		Matrix mtx = node.getRetrievalDataSource().getMatrix();
+		for (int i = 0; i < newFeatures.size(); i++) {
+			int rowSize = mtx.getRowSize();
+			if (rowSize == 0) break;
+			List<MatrixItem> newCol = new ArrayList<MatrixItem>();
+			for (int j = 0; j < rowSize; j++) {
+				newCol.add( MatrixItem.Unknow(null) );
+			}
+			mtx.addCol(newCol);
 		}
 	}
 }

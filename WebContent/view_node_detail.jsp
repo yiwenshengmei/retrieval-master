@@ -47,7 +47,7 @@
 <%
 	for (NodeImage nodeImg : node.getImages()) {
 %>
-<tr><td colspan='2'><img src='<%=nodeImg.getUrl()%>'/></td></tr>
+<tr><td colspan='2'><a href='<%=nodeImg.getUrl()%>' target='_blank'><img style='max-width:300px;' src='<%=nodeImg.getUrl()%>'/></a></td></tr>
 <%
 	}
 %>
@@ -61,7 +61,7 @@
 <%
 		for (FeatureImage featureImg : feature.getImages()) {
 %>
-<tr><td>特征图片：</td><td><img src='<%="images/" + featureImg.getUrl() %>'/></td></tr>
+<tr><td>特征图片：</td><td><a href='<%=featureImg.getUrl()%>' target='_blank'><img style='max-width:300px;' src='<%=featureImg.getUrl() %>'/></a></td></tr>
 <%
 		}
 	}

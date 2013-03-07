@@ -1,17 +1,21 @@
 ﻿function deleteNodeAttribute(index) {
 	$('#node_attribute_' + index).remove();
+	return false;
 }
 
 function deleteNodeFeature(index) {
 	$('#node_feature_' + index).remove();
+	return false;
 }
 
 function deleteParentFeature(index) {
 	$('#parent_feature_' + index).remove();
+	return false;
 }
 
-function delementElement(id) {
+function deleteElement(id) {
 	$('#' + id).remove();
+	return false;
 }
 
 var selectParentNodeDialog;
@@ -172,11 +176,6 @@ function createImageDivHTML(divId, onClickCode, inputName) {
 							"</span>" +
 						"</div>";
 	return imageDivHTML;
-}
-
-function deleteElement(id) {
-	$('#' + id).remove();
-	return false;
 }
 
 var nodeImageIndex = 0;

@@ -34,6 +34,7 @@ public class Node {
 	private List<NodeImage> images;
 	private List<NodeAttribute> attributes;
 	private List<NodeFeature> featuresOfParent;
+	private List<NodeFeature> newFeatures;
 	private String[] imageFilesFileName;
 	private String[] imageFilesContentType;
 	private File[] imageFiles;
@@ -210,7 +211,7 @@ public class Node {
 		List<NodeFeature> features = getRetrievalDataSource().getFeatures();
 		if (rows.size() != childs.size())
 			throw new IllegalArgumentException("矩阵行数和子节点数目不相符，不能调用Node.toString方法！");
-		if (features.size() != mtx.getColSize())
+		if (rows.size() != 0 && features.size() != mtx.getColSize())
 			throw new IllegalArgumentException("矩阵列数和特征数目不相符，不能调用Node.toString方法！");
 		
 		StringBuilder str = new StringBuilder();
@@ -231,6 +232,14 @@ public class Node {
 		str.append("\nMatrix: ").append(mtx.toShortTextString());
 		str.append("\n");
 		return str.toString();
+	}
+
+	public List<NodeFeature> getNewFeatures() {
+		return newFeatures;
+	}
+
+	public void setNewFeatures(List<NodeFeature> newFeatures) {
+		this.newFeatures = newFeatures;
 	}
 	
 }
