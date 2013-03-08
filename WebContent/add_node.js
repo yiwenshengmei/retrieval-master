@@ -59,7 +59,8 @@ function selectParentFeatureHandler() {
 function selectParent(id, name) {
 	parentId = id;
 	selectParentNodeDialog.dialog("close");
-	$("input[name='parentNode.id']").val(name);
+	$("input[name='parentNode.id']").val(id);
+	$("input[name='parentNodeName']").val(name);
 }
 
 var parentFeatureIndex = 0;
@@ -72,6 +73,10 @@ var parentFeatureIndex = 0;
  * @param name
  */
 function selectFeature(id, name) {
+	if ( $("input[value='" + id + "']").size() > 0 ) {
+		alert("已经选择");
+		return;
+	}
 	var location = $("#parent_feature_location");
 	var html = 
 		"<div style='margin-top: 10px;' id='parent_feature_:index'>" +
@@ -80,7 +85,7 @@ function selectFeature(id, name) {
 				"<input id='parent_feature_:index' type='text' name='parent_feature_:index' value=':name'/>" +
 			"</span>" + 
 			"<span>" +
-				"<a class='button' href='#' onclick='deleteParentFeature(:index);'>删除</a>" +
+				"<a class='button' href='#' onclick='return deleteParentFeature(:index);'>删除</a>" +
 			"</span>" +
 		"</div>";
 	html = html.replace(/:index/g, parentFeatureIndex);
@@ -101,7 +106,7 @@ function showSelectParentFeatures(data) {
 	tbl.empty();
 	for (var i = 0; i < data.features.length; i++) {
 		var featureNameTD = $("<td/>").html(data.features[i].name);
-		var selectLinkTD = $("<td/>").append($("<a href='#' onclick='selectFeature(\"" + data.features[i].id + "\", \"" + data.features[i].name + "\")'>选择</a>"));
+		var selectLinkTD = $("<td/>").append($("<a href='#' onclick='return selectFeature(\"" + data.features[i].id + "\", \"" + data.features[i].name + "\");'>选择</a>"));
 		tbl.append($("<tr/>").append(featureNameTD).append(selectLinkTD));
 	}
 	selectParentFeatureDialog.dialog("open");
@@ -190,21 +195,27 @@ function addNodeImageHandler() {
 var featureImageIndex = 0;
 function addFeatureImageHandler(currentIndex) {
 	var location = $("#add_feature_image_location_" + currentIndex);
-	var featureImageDivHTML = $(createImageDivHTML("feature_image_" + featureImageIndex, 'deleteElement("feature_image_' + featureImageIndex + '")', "retrievalDataSource.features[" + currentIndex + "].imageFiles"));
+	var inputName4FeatureImage = "newFeatures[" + currentIndex + "].imageFiles";
+	var featureImageDivHTML = $(createImageDivHTML("feature_image_" + featureImageIndex, 'deleteElement("feature_image_' + featureImageIndex + '")', inputName4FeatureImage));
 	location.append(featureImageDivHTML);
 	featureImageIndex++;
 	return false;
 }
 
-var nodeFeatureIndex = 0;
+var newParentFeatureIndex = 0;
 function addNodeFeatureHandler() {
-	var featureTableHTML = $("<table id='node_feature_" + nodeFeatureIndex + "'></table>");
-	var featureNameTrHTML = $("<tr><td>特征中文名称: </td><td><input id='node_feature_name_" + nodeFeatureIndex +"' type='text' name='retrievalDataSource.features[" + nodeFeatureIndex + "].name'/></td></tr>");
-	var featureEnglishNameTrHTML = $("<tr><td>特征英文名称: </td><td><input id='node_feature_english_name_" + nodeFeatureIndex +"' type='text' name='retrievalDataSource.features[" + nodeFeatureIndex + "].englishName'/></td></tr>");
-	var featureDescTrHTML = $("<tr><td>特征描述: </td><td><textarea id='node_feature_desc_" + nodeFeatureIndex +"' wrap='virtual' name='retrievalDataSource.features[" + nodeFeatureIndex + "].desc'/></td></tr>");
-	var addFeatureImageAnchorHTML = $("<tr><td colspan='2'><a href='#' onClick='addFeatureImageHandler(" + nodeFeatureIndex + ");'>添加图片</a></td></tr>");
-	var featureImageLocationTrHTML = $("<tr><td colspan='2'><div id='add_feature_image_location_" + nodeFeatureIndex + "'></div></td></tr>");
-	var deleteCode = 'deleteElement("node_feature_' + nodeFeatureIndex + '")';
+	var featureTableHTML = $("<table id='node_feature_" + newParentFeatureIndex + "'></table>");
+	var inputNamePrefix = "newFeatures[" + newParentFeatureIndex + "].";
+	var inputName4Name = inputNamePrefix + "name";
+	var inputName4EnglishName = inputNamePrefix + "englishName";
+	var inputName4Desc = inputNamePrefix + "desc";
+	
+	var featureNameTrHTML = $("<tr><td>特征中文名称: </td><td><input id='node_feature_name_" + newParentFeatureIndex +"' type='text' name='" + inputName4Name + "'/></td></tr>");
+	var featureEnglishNameTrHTML = $("<tr><td>特征英文名称: </td><td><input id='node_feature_english_name_" + newParentFeatureIndex +"' type='text' name='" + inputName4EnglishName + "'/></td></tr>");
+	var featureDescTrHTML = $("<tr><td>特征描述: </td><td><textarea id='node_feature_desc_" + newParentFeatureIndex +"' wrap='virtual' name='" + inputName4Desc + "'/></td></tr>");
+	var addFeatureImageAnchorHTML = $("<tr><td colspan='2'><a href='#' onClick='addFeatureImageHandler(" + newParentFeatureIndex + ");'>添加图片</a></td></tr>");
+	var featureImageLocationTrHTML = $("<tr><td colspan='2'><div id='add_feature_image_location_" + newParentFeatureIndex + "'></div></td></tr>");
+	var deleteCode = 'deleteElement("node_feature_' + newParentFeatureIndex + '")';
 	var featureDeleteTrHTML = $("<tr><td colspan='2'><a href='#' onclick='" + deleteCode + "'>删除特征</a></td></tr>");
 	featureTableHTML.append(featureNameTrHTML)
 					.append(featureEnglishNameTrHTML)
@@ -213,7 +224,7 @@ function addNodeFeatureHandler() {
 		            .append(featureImageLocationTrHTML)
 		            .append(featureDeleteTrHTML);
 	$('#add_node_feature_location').append(featureTableHTML);
-	nodeFeatureIndex++;
+	newParentFeatureIndex++;
 	return false;
 }
 

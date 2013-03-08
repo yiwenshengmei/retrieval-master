@@ -44,6 +44,7 @@ public class Node {
 		images = new ArrayList<NodeImage>();
 		childNodes = new ArrayList<Node>();
 		featuresOfParent = new ArrayList<NodeFeature>();
+		newFeatures = new ArrayList<NodeFeature>();
 		attributes = new ArrayList<NodeAttribute>();
 	}
 	

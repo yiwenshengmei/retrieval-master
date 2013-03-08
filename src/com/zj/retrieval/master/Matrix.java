@@ -38,9 +38,13 @@ public class Matrix {
 		}
 	}
 	
+	
+	
 	public void addRow(MatrixRow row) {
 		int newRowColSize = row.getItems().size();
 		int oldRowColSize = getColSize();
+		List<MatrixRow> oldRows = new ArrayList<MatrixRow>();
+		oldRows.addAll(rows);
 		
 		if (newRowColSize == 0) 
 			return;
@@ -50,13 +54,18 @@ public class Matrix {
 		rows.add(row);
 		
 		int diff = newRowColSize - oldRowColSize;
-		// 如果新增的行的列数比现有的列数多，则需要把现有的列数扩充（填充0）
-		if (diff > 0) {
-			List<MatrixItem> zeroCols = new ArrayList<MatrixItem>();
-			for (MatrixRow oldRow : rows) {
-				for (int i = 0; i < diff; i++)
-					zeroCols.add(new MatrixItem(0, oldRow));
-				oldRow.getItems().addAll(zeroCols); 
+		// 如果新增的行的列数比现有的列数多，则需要把现有的列数扩充（填充Unknow）
+		extendColumns(diff, NodeFeature.UNKNOW, oldRows);
+	}
+	
+	private void extendColumns(int size, int value, List<MatrixRow> rows) {
+		if (size > 0) {
+			for (MatrixRow row : rows) {
+				// 注意：每行都要单独new一组列
+				List<MatrixItem> extendedCols = new ArrayList<MatrixItem>();
+				for (int i = 0; i < size; i++)
+					extendedCols.add(MatrixItem.Unknow(row));
+				row.getItems().addAll(extendedCols);
 			}
 		}
 	}

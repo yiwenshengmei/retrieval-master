@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
@@ -18,27 +17,10 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.jamesmurty.utils.XMLBuilder;
 
 public class BizNode {
 	
 	private static final Logger logger = LoggerFactory.getLogger(BizNode.class);
-	
-	public static String createOwl(Node node) throws Exception {
-
-		XMLBuilder xml = XMLBuilder.create("rdf:RDF");
-		
-		xml.a("xmlns:rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-		xml.a("xmlns:owl", "http://www.w3.org/2002/07/owl#");
-		xml.a("xmlns:rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-		xml.a("xmlns:xsd", "http://www.w3.org/2001/XMLSchema#");
-		
-		createClassTypeXML(node, xml);
-
-		String xmlStr = xml.asString();
-		logger.debug(xmlStr);
-		return xmlStr;
-	}
 	
 	private static List<String> saveImageFiles(File[] files, String[] fileNames, File folder, String msg) throws IOException {
 		List<String> paths = new ArrayList<String>();
@@ -115,26 +97,24 @@ public class BizNode {
 		return new AttributeSelector(resultData);
 	}
 	
-	private static String nullEmpty(String value) {
-		return (value == null ? StringUtils.EMPTY : value);
-	}
-	
 	public static void addChildToParent(Node child, Node parent, List<NodeFeature> newFeatures) {
 		// 更新父节点的子节点列表
 		parent.getChildNodes().add(child);
-		// 更新父节点的特征
-		List<NodeFeature> parentFeatures = parent.getRetrievalDataSource().getFeatures();
-		parentFeatures.addAll(newFeatures);
 		// 更新父节点的矩阵
 		Matrix mtx = parent.getRetrievalDataSource().getMatrix();
 		// 新建一行，其长度将等于父节点矩阵的列数
-		MatrixRow newRow = new MatrixRow();
+		MatrixRow newRow = new MatrixRow(mtx);
 		// 从左至右依次填充新行，规则是父节点当前列所代表的Feature存在于node.getFeaturesOfParent中，则填Yes，否则填写No
-		for(int i = 0; i < mtx.getColSize(); i++) {
-			MatrixItem item = containsFeature(child.getFeaturesOfParent(), parentFeatures.get(i)) ? MatrixItem.Yes(newRow) : MatrixItem.No(newRow);
+		List<NodeFeature> parentFeatures = parent.getRetrievalDataSource().getFeatures();
+		for(int i = 0; i < parentFeatures.size(); i++) {
+			MatrixItem item = hasFeature(child.getFeaturesOfParent(), parentFeatures.get(i)) ? 
+					MatrixItem.Yes(newRow) : MatrixItem.No(newRow);
 			newRow.addItem(item);
 		}
 		mtx.addRow(newRow);
+		
+		// 更新父节点的特征
+		parentFeatures.addAll(newFeatures);
 		
 		// 假设父节点矩阵中有3行，并需要添加4个新特征，则构造出4组[Unknow, Unknow, Yes]这样的列添加到父节点矩阵中
 		for (int i = 0; i < newFeatures.size(); i++) {
@@ -153,7 +133,7 @@ public class BizNode {
 	 * @param feature 被检测的目标
 	 * @return 存在则返回true，否则返回false
 	 */
-	private static boolean containsFeature(List<NodeFeature> features, NodeFeature feature) {
+	private static boolean hasFeature(List<NodeFeature> features, NodeFeature feature) {
 		for (NodeFeature f : features) {
 			if (f.getId() == null)
 				throw new IllegalArgumentException("用于比较的Feature的id不能为null！");
@@ -161,91 +141,6 @@ public class BizNode {
 				return true;
 		}
 		return false;
-	}
-
-	private static void createClassTypeXML(Node node, XMLBuilder xml) throws Exception {
-
-		// Create <owl:Class>
-		String parentURI = StringUtils.EMPTY;
-		if (node.getParentNode() != null)
-			parentURI = (node.getParentNode().getId() == Node.VIRTUAL_NODE_ID ? StringUtils.EMPTY :	nullEmpty(node.getParentNode().getUri()));
-		String rdfId = nullEmpty(node.getUri()) + "#" + nullEmpty(node.getEnglishName());
-		XMLBuilder elemClass = xml.e("owl:Class").a("rdf:ID", rdfId);
-		elemClass.e("rdfs:subClassOf").a("rdf:resource", nullEmpty(parentURI));
-		elemClass.e("rdfs:label").t(nullEmpty(node.getLabel()));
-		
-		// Create <desc>
-		elemClass.e("desc").t(nullEmpty(node.getDesc()));
-		
-		// Create <images>
-		XMLBuilder eImages = elemClass.e("images");
-		for (NodeImage nodeImage : node.getImages()) {
-			eImages.e("item").t(nodeImage.getPath() == null ? StringUtils.EMPTY : FilenameUtils.getName(nodeImage.getPath()));
-		}
-		
-		// Create <attributes>
-		XMLBuilder elemUserfields = elemClass.e("attributes");
-		for (NodeAttribute attr : node.getAttributes()) {
-			elemUserfields.e("attribute").a("key", nullEmpty(attr.getKey())).t(nullEmpty(attr.getValue()));
-			
-		}
-
-		// Create <features>
-		List<NodeFeature> features = node.getRetrievalDataSource().getFeatures();
-		XMLBuilder elemAttributes = elemClass.e("features");
-		for(int index = 0; index < features.size(); index ++) {
-			
-			XMLBuilder elemAttribute = elemAttributes.e("feature");
-			elemAttribute.a("name", nullEmpty(features.get(index).getName()))
-				         .a("english_name", nullEmpty(features.get(index).getEnglishName()))
-				         .a("index", String.valueOf(index))
-					     	.e("desc").t(nullEmpty(features.get(index).getDesc())).up();
-			
-			XMLBuilder featureImages = elemAttribute.e("images");
-			for (FeatureImage featureImage : features.get(index).getImages()) {
-				featureImages.e("image").a("path", featureImage.getPath() == null ? StringUtils.EMPTY : FilenameUtils.getName(featureImage.getPath()));
-			}
-		}
-
-		// Create <matrix>
-		XMLBuilder elemMatrix = elemClass.e("matrix");
-		Matrix matrix = node.getRetrievalDataSource().getMatrix();
-		for(int rowindex = 0; rowindex < matrix.getRowSize(); rowindex++) {
-			elemMatrix.e("row").a("index", String.valueOf(rowindex))
-				.t(StringUtils.join(matrix.getRow(rowindex).getValueList(), " "));
-		}
-		
-		// Create <childNodes>
-		XMLBuilder elemChildNodes = elemClass.e("child_nodes");
-		List<Node> childNodes = node.getChildNodes();
-		for(int index = 0; index < childNodes.size(); index++) {
-			elemChildNodes.e("node").a("index", String.valueOf(index)).t(nullEmpty(childNodes.get(index).getName()));
-		}
-	
-	}
-	
-	private static void createIndividualTypeXML(Node node, XMLBuilder xml) throws Exception {
-
-		String parentEnName = StringUtils.EMPTY;
-		if (node.getParentNode() != null)
-			nullEmpty(parentEnName = node.getParentNode().getEnglishName());
-		XMLBuilder nodeXml = xml.e(parentEnName);
-		nodeXml.a("rdf:ID", nullEmpty(node.getUri()) + "#" + nullEmpty(node.getEnglishName()))
-			.e("label").t(nullEmpty(node.getLabel())).up()
-			.e("name").t(nullEmpty(node.getName())).up()
-			.e("desc").t(nullEmpty(node.getDesc()));
-
-		// Create <images>
-		XMLBuilder eImages = nodeXml.e("images");
-		for (NodeImage nodeImage : node.getImages()) {
-			eImages.e("item").t(nullEmpty(nodeImage.getPath()));
-		}
-		
-		// Create <attributes>
-		XMLBuilder elemUserfields = nodeXml.e("attributes");
-		for (NodeAttribute attr : node.getAttributes()) {
-			elemUserfields.e("attribute").a("key", nullEmpty(attr.getKey())).t(nullEmpty(attr.getValue()));
-		}
 	}
 	
 	private static void initialize(Node node) {
@@ -288,8 +183,10 @@ public class BizNode {
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
 				Node nd = (Node) sess.get(Node.class, id);
+				if (nd == null)
+					throw new IllegalArgumentException("没有找到节点[id=" + id + "]");
 				initialize(nd);
-				nd.setOwl(BizNode.createOwl(nd));
+				nd.setOwl(BizOWL.createOwl(nd));
 				return nd;
 			}
 		});

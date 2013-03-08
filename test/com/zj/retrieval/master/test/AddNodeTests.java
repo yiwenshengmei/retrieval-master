@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zj.retrieval.master.BizNode;
 import com.zj.retrieval.master.DALService;
 import com.zj.retrieval.master.FeatureImage;
 import com.zj.retrieval.master.IDALAction;
@@ -222,5 +223,37 @@ public class AddNodeTests {
 		logger.debug("name: " + file.getName());
 		String name = FilenameUtils.getName("E:\\Projects\\java_retrieval\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\retrieval-master\\images\\b6b09e58-74bd-44bc-8d26-4f63736a9cb9.jpg");
 		logger.debug(name);
+	}
+	
+	@Test
+	public void testAddToParent() throws Exception {
+		DALService.doAction(new IDALAction() {
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				Node parent = new Node("Parent");
+				RetrievalDataSource rds = parent.getRetrievalDataSource();
+				rds.getFeatures().add(new NodeFeature("nf1", rds));
+				
+				sess.save(parent);
+				return null;
+			}
+		});
+		
+		DALService.doAction(new IDALAction() {
+			
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				Node child = new Node("Child");
+				Node parent = (Node) sess.createQuery("from Node nd where nd.name = :name")
+					.setString("name", "Parent")
+					.uniqueResult();
+				List<NodeFeature> newFeatures = Arrays.asList(new NodeFeature("nf2"));
+				BizNode.addFeatures(child, newFeatures);
+				BizNode.addChildToParent(child, parent, newFeatures);
+				sess.save(child);
+				sess.update(parent);
+				return null;
+			}
+		});
 	}
 }

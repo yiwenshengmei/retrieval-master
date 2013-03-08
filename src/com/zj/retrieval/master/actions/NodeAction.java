@@ -52,15 +52,14 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 		// 处理上传的文件
 		BizNode.prepareImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
 		
-		// 重建关系
-		BizNode.rebuildRelation(node);
-		
 		node.setParentNode(null);
 		
 		// 保存
 		DALService.doAction(new IDALAction() {
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
+				// 重建关系
+				BizNode.rebuildRelation(node);
 				sess.save(node);
 				return null;
 			}
@@ -84,18 +83,20 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 		// 处理上传的文件
 		BizNode.prepareImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
 		
-		// 重建关系
-		BizNode.rebuildRelation(node);
-		
 		DALService.doAction(new IDALAction() {
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
 				// 获取父节点
-				Node parent = (Node) sess.get(Node.class, node.getParentNode().getId());
+				String parentId = node.getParentNode().getId();
+				Node parent = (Node) sess.get(Node.class, parentId);
+				if (parent == null)
+					throw new IllegalArgumentException("父节点[id=" + parentId + "]不存在");
 				node.setParentNode(parent);
 				
 				// 更新父节点
 				BizNode.addChildToParent(node, parent, node.getNewFeatures());
+				// 重建关系
+				BizNode.rebuildRelation(node);
 				
 				sess.save(node);
 				sess.update(parent);

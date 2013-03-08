@@ -21,12 +21,13 @@
 		<table id="base_info">
 			<tr><td>中文名称: </td><td><input name="name" type="text"/></td></tr>
 			<tr><td>英文名称: </td><td><input name="englishName" type="text"/></td></tr>
-			<tr><td>父节点: </td><td><input name="parentNode.id" type="text"/><a href="#" onclick='selectParentNodeHandler();' >选择</a></td></tr>
+			<tr><td>父节点: </td><td>
+				<input name="parentNode.id" type="hidden" />
+				<input name="parentNodeName" type="text"/><a href="#" onclick='selectParentNodeHandler();' >选择</a></td></tr>
 			<tr><td>描述: </td><td><input name="desc" type="text"/></td></tr>
 			<tr><td>URI:</td><td><input name="uri" type="text"/></td></tr>
 			<tr><td>URI名称: </td><td><input name="uriName" type="text"/></td></tr>
 		</table>
-		<input type="hidden" name="parentNode.id" />
 		
 		<a id="add_node_image" href="#">添加物种图片</a>
 		<div id="add_node_image_location"></div>

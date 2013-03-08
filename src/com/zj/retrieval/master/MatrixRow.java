@@ -3,6 +3,8 @@ package com.zj.retrieval.master;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 public class MatrixRow {
 	private List<MatrixItem> items;
 	private Matrix matrix;
@@ -10,6 +12,11 @@ public class MatrixRow {
 	
 	public MatrixRow() { 
 		items = new ArrayList<MatrixItem>();
+	}
+	
+	public MatrixRow(Matrix matrix) {
+		this();
+		this.matrix = matrix;
 	}
 	
 	public void addItem(MatrixItem item) {
@@ -54,5 +61,13 @@ public class MatrixRow {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	@Override
+	public String toString() {
+		List<String> itemStrs = new ArrayList<String>();
+		for (MatrixItem item : items) 
+			itemStrs.add(item.toString());
+		return "[" + StringUtils.join(itemStrs, ", ") + "]";
 	}
 }

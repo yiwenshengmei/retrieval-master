@@ -49,6 +49,11 @@ public class NodeFeature {
 		this.name = name;
 	}
 	
+	public NodeFeature(String name, RetrievalDataSource retrievalDataSource) {
+		this(name);
+		this.retrievalDataSource = retrievalDataSource;
+	}
+	
 	public NodeFeature(String name, String id) {
 		this(name);
 		this.id = id;
