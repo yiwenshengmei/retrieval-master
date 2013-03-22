@@ -59,32 +59,34 @@ public class BizNode {
 		}
 	}
 	
-	public static void rebuildRelation(Node node) {
-		RetrievalDataSource rds = node.getRetrievalDataSource();
-		// 建立RetrievalDataSource -> Node的关系
-		rds.setNode(node);
-		// 建立Attribute -> Node的关系
-		for (NodeAttribute attr : node.getAttributes())
-			attr.setNode(node);
-		// 建立NodeImage -> Node的关系
-		for (NodeImage img : node.getImages())
-			img.setNode(node);
-		// 建立NodeFeature -> RetrievalDataSource的关系
-		for (NodeFeature feature : rds.getFeatures()) { 
-			feature.setRetrievalDataSource(rds);
-			// 建立FeatureImage -> NodeFeature的关系
-			for (FeatureImage fimg : feature.getImages())
-				fimg.setFeature(feature);
-		}
-		Matrix mtx = rds.getMatrix();
-		// 建立Matrix -> RetrievalDataSource的关系
-		mtx.setRetrievalDataSource(rds);
-		// 建立MatrixRow -> Matrix的关系
-		for (MatrixRow row : mtx.getRows()) {
-			row.setMatrix(mtx);
-			// 建立MatrixItem -> MatrixRow的关系
-			for (MatrixItem item : row.getItems()) 
-				item.setRow(row);
+	public static void buildRelation(Node... nodes) {
+		for (Node node : nodes) {
+			RetrievalDataSource rds = node.getRetrievalDataSource();
+			// 建立RetrievalDataSource -> Node的关系
+			rds.setNode(node);
+			// 建立Attribute -> Node的关系
+			for (NodeAttribute attr : node.getAttributes())
+				attr.setNode(node);
+			// 建立NodeImage -> Node的关系
+			for (NodeImage img : node.getImages())
+				img.setNode(node);
+			// 建立NodeFeature -> RetrievalDataSource的关系
+			for (NodeFeature feature : rds.getFeatures()) { 
+				feature.setRetrievalDataSource(rds);
+				// 建立FeatureImage -> NodeFeature的关系
+				for (FeatureImage fimg : feature.getImages())
+					fimg.setFeature(feature);
+			}
+			Matrix mtx = rds.getMatrix();
+			// 建立Matrix -> RetrievalDataSource的关系
+			mtx.setRetrievalDataSource(rds);
+			// 建立MatrixRow -> Matrix的关系
+			for (MatrixRow row : mtx.getRows()) {
+				row.setMatrix(mtx);
+				// 建立MatrixItem -> MatrixRow的关系
+				for (MatrixItem item : row.getItems()) 
+					item.setRow(row);
+			}
 		}
 	}
 	
@@ -97,6 +99,17 @@ public class BizNode {
 		return new AttributeSelector(resultData);
 	}
 	
+	/**
+	 * 将child节点添加到parent节点中
+	 * 同时更新parent节点的特征矩阵，包括：
+	 * 1. 更新parent的childNodes字段
+	 * 2. 根据child.getFeaturesOfParent值在parent节点的特征矩阵中添加新行
+	 * 3. 更新parent节点的features字段，加入newFeatures
+	 * 4. 更新parent节点的特征矩阵，加入newFeatures对应的列
+	 * @param child
+	 * @param parent
+	 * @param newFeatures
+	 */
 	public static void addChildToParent(Node child, Node parent, List<NodeFeature> newFeatures) {
 		// 更新父节点的子节点列表
 		parent.getChildNodes().add(child);
@@ -113,18 +126,8 @@ public class BizNode {
 		}
 		mtx.addRow(newRow);
 		
-		// 更新父节点的特征
-		parentFeatures.addAll(newFeatures);
-		
-		// 假设父节点矩阵中有3行，并需要添加4个新特征，则构造出4组[Unknow, Unknow, Yes]这样的列添加到父节点矩阵中
-		for (int i = 0; i < newFeatures.size(); i++) {
-			int rowSize = mtx.getRowSize();
-			List<MatrixItem> newCol = new ArrayList<MatrixItem>();
-			for (int j = 0; j < rowSize; j++) {
-				newCol.add( ((j + 1) == rowSize) ? MatrixItem.Yes(null) : MatrixItem.Unknow(null));
-			}
-			mtx.addCol(newCol);
-		}
+		// 更新parent节点的特征矩阵，加入newFeatures对应的列
+		addNewFeaturesToNode(parent, newFeatures);
 	}
 	
 	/**
@@ -206,11 +209,12 @@ public class BizNode {
 	}
 
 	/**
-	 * 向指定的父节点添加新特征
+	 * 向指定的节点添加新特征，并同时更新该节点的特征矩阵（添加列）
 	 * @param node
 	 * @param newFeatures
 	 */
-	public static void addFeatures(Node node, List<NodeFeature> newFeatures) {
+	public static void addNewFeaturesToNode(Node node, List<NodeFeature> newFeatures) {
+		if (newFeatures == null) return;
 		// 1. copy新特征到node中
 		node.getRetrievalDataSource().getFeatures().addAll(newFeatures);
 		

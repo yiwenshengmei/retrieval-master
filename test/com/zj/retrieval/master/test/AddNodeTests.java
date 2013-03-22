@@ -3,6 +3,8 @@ package com.zj.retrieval.master.test;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.Assert;
@@ -227,14 +230,17 @@ public class AddNodeTests {
 	
 	@Test
 	public void testAddToParent() throws Exception {
+		final String parentName = "Parent" + Calendar.getInstance().getTime();
 		DALService.doAction(new IDALAction() {
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
-				Node parent = new Node("Parent");
-				RetrievalDataSource rds = parent.getRetrievalDataSource();
-				rds.getFeatures().add(new NodeFeature("nf1", rds));
+				Node parent = new Node(parentName);
+				BizNode.addNewFeaturesToNode(parent, Arrays.asList(new NodeFeature("nf1")));
 				
+				BizNode.buildRelation(parent);
 				sess.save(parent);
+				
+				logger.debug(parent.toString());
 				return null;
 			}
 		});
@@ -244,14 +250,19 @@ public class AddNodeTests {
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
 				Node child = new Node("Child");
-				Node parent = (Node) sess.createQuery("from Node nd where nd.name = :name")
-					.setString("name", "Parent")
+				Node parent = (Node) sess.createQuery("from Node nd where nd.name = :ndName")
+					.setString("ndName", parentName)
 					.uniqueResult();
+				if (parent == null) throw new IllegalArgumentException("没有找到名称为Parent的节点");
+				child.setFeaturesOfParent(Arrays.asList(parent.getFeatures().get(0)));
 				List<NodeFeature> newFeatures = Arrays.asList(new NodeFeature("nf2"));
-				BizNode.addFeatures(child, newFeatures);
 				BizNode.addChildToParent(child, parent, newFeatures);
+				BizNode.buildRelation(child, parent);
 				sess.save(child);
 				sess.update(parent);
+				
+				logger.debug("Parent: \n" + parent.toString());
+				logger.debug("Child: \n" + child.toString());
 				return null;
 			}
 		});

@@ -39,7 +39,7 @@ public class MatrixItem {
 
 	@Override
 	public String toString() {
-		return String.format("%1$s(%2$s)", NodeFeature.textValue(value), value);
+		return String.valueOf(value);
 	}
 
 	public Integer getValue() {

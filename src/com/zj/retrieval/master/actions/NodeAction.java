@@ -46,9 +46,6 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 		for (NodeFeature feature : rds.getFeatures())
 			Utils.cleanList(feature.getImages());
 		
-		// 根据newFeatures更新Matrix
-		BizNode.addFeatures(node, node.getNewFeatures());
-		
 		// 处理上传的文件
 		BizNode.prepareImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
 		
@@ -59,7 +56,7 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
 				// 重建关系
-				BizNode.rebuildRelation(node);
+				BizNode.buildRelation(node);
 				sess.save(node);
 				return null;
 			}
@@ -77,9 +74,6 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 		for (NodeFeature feature : rds.getFeatures()) 
 			Utils.cleanList(feature.getImages());
 		
-		// 根据newFeatures更新Matrix
-		BizNode.addFeatures(node, node.getNewFeatures());
-		
 		// 处理上传的文件
 		BizNode.prepareImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
 		
@@ -96,7 +90,7 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 				// 更新父节点
 				BizNode.addChildToParent(node, parent, node.getNewFeatures());
 				// 重建关系
-				BizNode.rebuildRelation(node);
+				BizNode.buildRelation(node);
 				
 				sess.save(node);
 				sess.update(parent);

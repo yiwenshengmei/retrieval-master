@@ -55,6 +55,10 @@ public class Node {
 		this.id = id;
 	}
 	
+	public List<NodeFeature> getFeatures() {
+		return retrievalDataSource.getFeatures();
+	}
+	
 	public Node(String name) {
 		this();
 		this.name = name;
@@ -220,17 +224,23 @@ public class Node {
 		// 输出Features
 		List<String> featureNames = new ArrayList<String>();
 		for (NodeFeature feature : features) {
-			featureNames.add(feature.getName());
+			featureNames.add(String.format("%1$s(id=%2$s)", feature.getName(), feature.getId()));
 		}
 		str.append("\nFeatures: [").append(StringUtils.join(featureNames, ", ")).append("]");
+		// 输出featuresOfParent
+		List<String> featureNamesOfParent = new ArrayList<String>();
+		for (NodeFeature feature : featuresOfParent) {
+			featureNamesOfParent.add(String.format("%1$s(id=%2$s)", feature.getName(), feature.getId()));
+		}
+		str.append("\nFeaturesOfParent: [").append(StringUtils.join(featureNamesOfParent, ", ")).append("]");
 		// 输出子节点
 		List<String> childNames = new ArrayList<String>();
 		for (Node child : getChildNodes()) {
-			childNames.add(child.getName());
+			childNames.add(String.format("%1$s(id=%2$s)", child.getName(), child.getId()));
 		}
 		str.append("\nChilds: [").append(StringUtils.join(childNames, ", ")).append("]");
 		// 输出矩阵
-		str.append("\nMatrix: ").append(mtx.toShortTextString());
+		str.append("\nMatrix: ").append(mtx.toString());
 		str.append("\n");
 		return str.toString();
 	}
