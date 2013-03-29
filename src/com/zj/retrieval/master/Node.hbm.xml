@@ -15,15 +15,16 @@
 		<property name="uriName" column="`URI_NAME`" type="java.lang.String" />
 		<property name="authorContact" column="`AUTHOR_CONTACT`" type="java.lang.String" />
 		<many-to-one name="parentNode" column="`PARENT_ID`" />
-		<bag name="images" cascade="save-update" inverse="true">
+		<bag name="images" cascade="all" inverse="true">
 			<key column="`NODE_ID`" />
 			<one-to-many class="com.zj.retrieval.master.NodeImage" />
 		</bag>
-		<bag name="attributes" cascade="save-update" inverse="true">
+		<list name="attributes" cascade="all-delete-orphan" inverse="false">
 			<key column="`NODE_ID`" />
+			<list-index column="`ATTR_INDEX`" />
 			<one-to-many class="com.zj.retrieval.master.NodeAttribute" />
-		</bag>
-		<list name="childNodes" cascade="save-update">
+		</list>
+		<list name="childNodes" cascade="all-delete-orphan">
 			<key column="`PARENT_ID`" not-null="false" />
 			<list-index column="`CHILD_INDEX`" />
 			<one-to-many class="com.zj.retrieval.master.Node" />
@@ -33,6 +34,6 @@
 			<many-to-many class="com.zj.retrieval.master.NodeFeature" column="FEATURE_ID" />
 		</bag>
 		<one-to-one name="retrievalDataSource" property-ref="node"
-			cascade="save-update" />
+			cascade="all" />
 	</class>
 </hibernate-mapping>

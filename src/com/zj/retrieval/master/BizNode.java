@@ -40,7 +40,7 @@ public class BizNode {
 	 * @param savePath
 	 * @throws IOException
 	 */
-	public static void prepareImages(Node node, String savePath) throws IOException {
+	public static void preProcessImages(Node node, String savePath) throws IOException {
 		File folder = new File(savePath);
 		if(!folder.exists()) {
 			folder.mkdirs();
@@ -120,8 +120,7 @@ public class BizNode {
 		// 从左至右依次填充新行，规则是父节点当前列所代表的Feature存在于node.getFeaturesOfParent中，则填Yes，否则填写No
 		List<NodeFeature> parentFeatures = parent.getRetrievalDataSource().getFeatures();
 		for(int i = 0; i < parentFeatures.size(); i++) {
-			MatrixItem item = hasFeature(child.getFeaturesOfParent(), parentFeatures.get(i)) ? 
-					MatrixItem.Yes(newRow) : MatrixItem.No(newRow);
+			MatrixItem item = child.getFeaturesOfParent().contains(parentFeatures.get(i)) ? MatrixItem.Yes(newRow) : MatrixItem.No(newRow);
 			newRow.addItem(item);
 		}
 		mtx.addRow(newRow);
@@ -136,7 +135,7 @@ public class BizNode {
 	 * @param feature 被检测的目标
 	 * @return 存在则返回true，否则返回false
 	 */
-	private static boolean hasFeature(List<NodeFeature> features, NodeFeature feature) {
+	private static boolean containsFeature(List<NodeFeature> features, NodeFeature feature) {
 		for (NodeFeature f : features) {
 			if (f.getId() == null)
 				throw new IllegalArgumentException("用于比较的Feature的id不能为null！");
@@ -215,6 +214,10 @@ public class BizNode {
 	 */
 	public static void addNewFeaturesToNode(Node node, List<NodeFeature> newFeatures) {
 		if (newFeatures == null) return;
+		RetrievalDataSource rds = node.getRetrievalDataSource();
+		// 0. 设置newFeatures的所属
+		for (NodeFeature f : newFeatures) 
+			f.setRetrievalDataSource(rds);
 		// 1. copy新特征到node中
 		node.getRetrievalDataSource().getFeatures().addAll(newFeatures);
 		
@@ -230,5 +233,38 @@ public class BizNode {
 			}
 			mtx.addCol(newCol);
 		}
+	}
+	
+	public static void deleteFeatureFromNode(Node node, List<NodeFeature> features) {
+		if (!checkNodeContainsFeatures(node, features))
+			throw new IllegalArgumentException("要删除的特征并非都是该节点中的特征，所以不能删除。[nodeid=" + node.getId() + "]");
+		
+		// 0. 删除node.childNodes中的featuresOfParent
+		for (Node child : node.getChildNodes()) {
+			child.getFeaturesOfParent().removeAll(features);
+		}
+		
+		// 1. 更新Matrix——删除feature对应的列
+		for (NodeFeature feature : features) {
+			int col = node.getFeatures().indexOf(feature);
+			List<MatrixItem> items = node.getMatrix().removeCol(col);
+		}
+		
+		// 2. 从feature集合中删除
+		for (NodeFeature feature : features) {
+			node.getFeatures().remove(feature);
+		}
+	}
+	
+	private static boolean checkNodeContainsFeatures(Node node, List<NodeFeature> features) {
+		for (NodeFeature feature : features) {
+			if (!containsFeature(node.getFeatures(), feature))
+				return false;
+		}
+		return true;
+	}
+	
+	public static Node getNodeByName(String name, Session sess) {
+		return (Node) sess.createQuery("from Node nd where nd.name = :name").setString("name", name).uniqueResult();
 	}
 }

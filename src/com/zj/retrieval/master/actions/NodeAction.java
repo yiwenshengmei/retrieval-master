@@ -47,7 +47,7 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 			Utils.cleanList(feature.getImages());
 		
 		// 处理上传的文件
-		BizNode.prepareImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
+		BizNode.preProcessImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
 		
 		node.setParentNode(null);
 		
@@ -75,7 +75,7 @@ public class NodeAction implements ModelDriven<Node>, RequestAware, Preparable {
 			Utils.cleanList(feature.getImages());
 		
 		// 处理上传的文件
-		BizNode.prepareImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
+		BizNode.preProcessImages(node, ServletActionContext.getServletContext().getRealPath("/images"));
 		
 		DALService.doAction(new IDALAction() {
 			@Override

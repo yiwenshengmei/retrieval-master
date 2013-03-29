@@ -4,18 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.Assert;
@@ -231,6 +224,8 @@ public class AddNodeTests {
 	@Test
 	public void testAddToParent() throws Exception {
 		final String parentName = "Parent" + Calendar.getInstance().getTime();
+		final String childName = "Child" + Calendar.getInstance().getTime();
+		
 		DALService.doAction(new IDALAction() {
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
@@ -249,7 +244,7 @@ public class AddNodeTests {
 			
 			@Override
 			public Object doAction(Session sess, Transaction tx) throws Exception {
-				Node child = new Node("Child");
+				Node child = new Node(childName);
 				Node parent = (Node) sess.createQuery("from Node nd where nd.name = :ndName")
 					.setString("ndName", parentName)
 					.uniqueResult();
@@ -263,6 +258,104 @@ public class AddNodeTests {
 				
 				logger.debug("Parent: \n" + parent.toString());
 				logger.debug("Child: \n" + child.toString());
+				return null;
+			}
+		});
+		
+		DALService.doAction(new IDALAction() {
+			
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				Node parent = (Node) sess.createQuery("from Node nd where nd.name = :name")
+					.setString("name", parentName)
+					.uniqueResult();
+				logger.debug(parent.toString());
+				return null;
+			}
+		});
+	}
+	
+	@Test
+	public void testDeleteFeature() throws Exception {
+		final String parentName = "Parent " + Calendar.getInstance().getTime().toString();
+		final String childName = "Child " + Calendar.getInstance().getTime().toString();
+		
+		DALService.doAction(new IDALAction() {
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				Node parent = saveAndGetTestNode(parentName, sess);
+				
+				List<NodeFeature> features = new ArrayList<NodeFeature>();
+				features.add(new NodeFeature("ndf1"));
+				features.add(new NodeFeature("ndf2"));
+				
+				parent.addFeatures(features);
+				
+				Node child = saveAndGetTestNode(childName, sess);
+				child.addFeaturesOfParent(Arrays.asList(parent.getFeatures().get(0)));
+				
+				parent.addChilds(Arrays.asList(child), null);
+				BizNode.buildRelation(parent, child);
+				sess.update(parent);
+				sess.update(child);
+				return null;
+			}
+		});
+		
+		DALService.doAction(new IDALAction() {
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				Node parent = BizNode.getNodeByName(parentName, sess);
+				logger.debug("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 输出准备好的数据");
+				logger.debug(parent.toString());
+				BizNode.deleteFeatureFromNode(parent, Arrays.asList(parent.getFeatures().get(0)));
+				sess.update(parent);
+				return null;
+			}
+		});
+		
+		DALService.doAction(new IDALAction() {
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				Node parent = BizNode.getNodeByName(parentName, sess);
+				logger.debug("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 输出删除特征后的数据");
+				logger.debug(parent.toString());
+				return null;
+			}
+		});
+	}
+	
+	@Test
+	public void testDeleteAttribute() throws Exception {
+		final String parentName = "Parent " + Calendar.getInstance().getTime().toString();
+		
+		DALService.doAction(new IDALAction() {
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				Node node = new Node(parentName);
+				return null;
+			}
+		});
+	}
+	
+	private Node saveAndGetTestNode(final String nodeName, Session sess) throws Exception {
+		Node node = new Node(nodeName);
+		BizNode.buildRelation(node);
+		sess.save(node);
+		return node;
+	}
+	
+	@Test
+	public void testNode() throws Exception {
+		final String nodeName = "ParentTue Mar 26 10:10:47 CST 2013";
+		DALService.doAction(new IDALAction() {
+			
+			@Override
+			public Object doAction(Session sess, Transaction tx) throws Exception {
+				Node node = (Node) sess.createQuery("from Node nd where nd.name = :name")
+					.setString("name", nodeName)
+					.uniqueResult();
+				logger.debug(node.toString());
 				return null;
 			}
 		});

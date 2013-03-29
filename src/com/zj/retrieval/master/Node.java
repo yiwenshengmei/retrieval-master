@@ -215,9 +215,9 @@ public class Node {
 		List<Node> childs = getChildNodes();
 		List<NodeFeature> features = getRetrievalDataSource().getFeatures();
 		if (rows.size() != childs.size())
-			throw new IllegalArgumentException("矩阵行数和子节点数目不相符，不能调用Node.toString方法！");
+			logger.warn("矩阵行数和子节点数目不相符，不能调用Node.toString方法！");
 		if (rows.size() != 0 && features.size() != mtx.getColSize())
-			throw new IllegalArgumentException("矩阵列数和特征数目不相符，不能调用Node.toString方法！");
+			logger.warn("矩阵列数和特征数目不相符，不能调用Node.toString方法！");
 		
 		StringBuilder str = new StringBuilder();
 		str.append("\n\nName: ").append(getName());
@@ -253,4 +253,31 @@ public class Node {
 		this.newFeatures = newFeatures;
 	}
 	
+	public Matrix getMatrix() {
+		return this.retrievalDataSource.getMatrix();
+	}
+	
+	public void setMatrix(Matrix matrix) {
+		this.retrievalDataSource.setMatrix(matrix);
+	}
+	
+	public void addFeatures(List<NodeFeature> features) {
+		BizNode.addNewFeaturesToNode(this, features);
+	}
+	
+	public void addChilds(List<Node> childs, List<NodeFeature> newFeatures) {
+		for (Node child : childs) {
+			BizNode.addChildToParent(child, this, newFeatures);
+		}
+	}
+	
+	public void addFeaturesOfParent(List<NodeFeature> features) {
+		this.featuresOfParent.addAll(features);
+	}
+	
+	public void addAttributes(List<NodeAttribute> attrs) {
+		for (NodeAttribute attr : attrs) 
+			attr.setNode(this);
+		this.attributes.addAll(attrs);
+	}
 }

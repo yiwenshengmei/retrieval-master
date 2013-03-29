@@ -38,8 +38,6 @@ public class Matrix {
 		}
 	}
 	
-	
-	
 	public void addRow(MatrixRow row) {
 		int newRowColSize = row.getItems().size();
 		int oldRowColSize = getColSize();
@@ -127,8 +125,18 @@ public class Matrix {
 		return "\n" + StringUtils.join(rowStrs, "\n");
 	}
 	
-	public void removeRow(int row) {
-		this.rows.remove(row);
+	public MatrixRow removeRow(int row) {
+		return this.rows.remove(row);
+	}
+	
+	public List<MatrixItem> removeCol(int col) {
+		List<MatrixItem> items = new ArrayList<MatrixItem>();
+		if (col > getColSize() || col < 0)
+			throw new IllegalArgumentException("要删除的列不在矩阵的列范围内");
+		for (MatrixRow row : rows) {
+			items.add(row.getItems().remove(col));
+		}
+		return items;
 	}
 
 	public String getId() {

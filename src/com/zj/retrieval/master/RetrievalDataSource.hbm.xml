@@ -8,10 +8,11 @@
 			<generator class="uuid" />
 		</id>
 		<many-to-one name="node" column="`NODE_ID`" unique="true" />
-		<bag name="features" cascade="save-update" inverse="true">
+		<list name="features" cascade="all-delete-orphan" inverse="false">
 			<key column="`RDS_ID`" />
+			<list-index column="`FEATURE_INDEX`" />
 			<one-to-many class="com.zj.retrieval.master.NodeFeature" />
-		</bag>
-		<one-to-one name="matrix" property-ref="retrievalDataSource" cascade="save-update" />
+		</list>
+		<one-to-one name="matrix" property-ref="retrievalDataSource" cascade="all-delete-orphan" />
 	</class>
 </hibernate-mapping>
